@@ -1,0 +1,2 @@
+Context: RULEBOOK (§ cited in Brief), readable HUD, ≤3 colors.
+Output: 1) one runnable tsx file in motion canvas 2) Self-check on Brief IDs (✅/❌ + reason)
