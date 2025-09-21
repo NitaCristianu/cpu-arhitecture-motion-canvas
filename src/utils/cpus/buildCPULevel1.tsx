@@ -124,6 +124,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene : boolean = true) {
     />
   ) as Line;
 
+
   const wire_iu_mc = (
     <Line
       points={[
@@ -356,6 +357,30 @@ export function buildCPULevel1(scene: Scene3D, addToScene : boolean = true) {
       key="level_1 wire_mc_ir_margin"
     />
   ) as Line;
+  
+  const wire_cu_gpr = (
+    <Line
+      points={[
+        cu
+          .localPosition()
+          .clone()
+          .add(new Vector3(0, cu.localScale().y / 2, 0)),
+        cu
+          .localPosition()
+          .clone()
+          .lerp(gpr.localPosition(), 0.5)
+          .add(new Vector3(-0.02, 0.12, 0)),
+        gpr
+          .localPosition()
+          .clone()
+          .add(new Vector3(-gpr.localScale().x / 2, 0, 0)),
+      ]}
+      lineWidth={0}
+      color="register"
+      smooth
+      key="level 1 wire_cu_gpr"
+    />
+  ) as Line;
 
   const wire_ir_cu = (
     <Line
@@ -415,6 +440,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene : boolean = true) {
     wire_gpr_mc,
     wire_gpr_iu,
     wire_cu_pc,
+    wire_cu_gpr,
     wire_pc_mc,
     wire_mc_ir_margin,
     wire_ir_cu,
@@ -441,6 +467,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene : boolean = true) {
     clock,
     ...wires,
     wires: wiresarray,
+    wire_cu_gpr,
     initWires: function* (
       wires: Line[] = [
         wire_cu_iu,

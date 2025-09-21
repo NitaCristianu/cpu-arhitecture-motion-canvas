@@ -1,0 +1,26 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "zoom in",
+      "targetTime": 0.8
+    },
+    {
+      "name": "select bit",
+      "targetTime": 1.5
+    },
+    {
+      "name": "modify",
+      "targetTime": 8.5
+    },
+    {
+      "name": "address",
+      "targetTime": 8.5
+    },
+    {
+      "name": "end",
+      "targetTime": 17.77999999999998
+    }
+  ],
+  "seed": 1349546265
+}

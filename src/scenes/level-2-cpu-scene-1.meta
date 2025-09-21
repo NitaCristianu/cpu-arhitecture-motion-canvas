@@ -1,0 +1,42 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 0.5
+    },
+    {
+      "name": "activate",
+      "targetTime": 3.55
+    },
+    {
+      "name": "level 1 cpu",
+      "targetTime": 10.050000000000004
+    },
+    {
+      "name": "alu",
+      "targetTime": 13.850000000000005
+    },
+    {
+      "name": "light bulbs",
+      "targetTime": 29.278435900838012
+    },
+    {
+      "name": "N",
+      "targetTime": 35.48033309132478
+    },
+    {
+      "name": "V",
+      "targetTime": 39.92262447163151
+    },
+    {
+      "name": "DZ",
+      "targetTime": 45.42262447163151
+    },
+    {
+      "name": "next",
+      "targetTime": 50.602407258596514
+    }
+  ],
+  "seed": 1546857294
+}

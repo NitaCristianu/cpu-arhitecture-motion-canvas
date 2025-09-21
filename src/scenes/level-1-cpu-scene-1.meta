@@ -1,0 +1,38 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 1
+    },
+    {
+      "name": "inspect ram",
+      "targetTime": 3.0999999999999996
+    },
+    {
+      "name": "inspect data",
+      "targetTime": 4.1
+    },
+    {
+      "name": "level-1-cpu",
+      "targetTime": 9.879999999999997
+    },
+    {
+      "name": "steps",
+      "targetTime": 12.879999999999997
+    },
+    {
+      "name": "zoom",
+      "targetTime": 12.879999999999997
+    },
+    {
+      "name": "alu",
+      "targetTime": 13.879999999999997
+    },
+    {
+      "name": "next",
+      "targetTime": 15.879999999999997
+    }
+  ],
+  "seed": 1789488040
+}

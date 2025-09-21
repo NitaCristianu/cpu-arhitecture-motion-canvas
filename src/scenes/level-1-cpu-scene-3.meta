@@ -1,0 +1,78 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 0
+    },
+    {
+      "name": "gAtes",
+      "targetTime": 2.2
+    },
+    {
+      "name": "table",
+      "targetTime": 6.2
+    },
+    {
+      "name": "traits",
+      "targetTime": 8.2
+    },
+    {
+      "name": "logic functions",
+      "targetTime": 10.2
+    },
+    {
+      "name": "bananalogic",
+      "targetTime": 17.000000000000004
+    },
+    {
+      "name": "8bit",
+      "targetTime": 20.229999999999997
+    },
+    {
+      "name": "mul",
+      "targetTime": 20.66333333333333
+    },
+    {
+      "name": "numbers",
+      "targetTime": 21.096666666666664
+    },
+    {
+      "name": "representation",
+      "targetTime": 22.596666666666664
+    },
+    {
+      "name": "scroll",
+      "targetTime": 23.996666666666673
+    },
+    {
+      "name": "sub",
+      "targetTime": 28.996666666666673
+    },
+    {
+      "name": "cut",
+      "targetTime": 30.996666666666673
+    },
+    {
+      "name": "~bits",
+      "targetTime": 32.34666666666667
+    },
+    {
+      "name": "+1",
+      "targetTime": 33.34666666666667
+    },
+    {
+      "name": "examples",
+      "targetTime": 33.34666666666667
+    },
+    {
+      "name": "solve",
+      "targetTime": 34.34666666666667
+    },
+    {
+      "name": "next",
+      "targetTime": 35.14666666666667
+    }
+  ],
+  "seed": 953439808
+}

@@ -22,7 +22,7 @@ const DEFAULT_THEME: AsmTheme = {
   immediate:"#e0af68",
   number:   "#ff9e64",
   punc:     "#89ddff",
-  comment:  "#565f89",
+  comment:  "#8b95c0",
 };
 
 export class AsmHighlighter implements CodeHighlighter<AsmToken[]> {
@@ -67,7 +67,7 @@ export class AsmHighlighter implements CodeHighlighter<AsmToken[]> {
     const NL = /^\n/;
 
     const COMMENT  = /^;[^\n]*/;
-    const KEYWORD  = /^(?:LOAD|STORE|MOV|ADD|SUB|INC|DEC|AND|OR|XOR|NOT|SHL|SHR|CMP|JMP|BRGT|BREQ|BRNEG|NOP|HLT|PUSH|POP|CALL|RET|VADD|VSUB|VMUL|VDIV)\b/;
+    const KEYWORD  = /^(?:LOAD|STORE|MOV|ADD|SUB|INC|DIV|DEC|AND|OR|XOR|NOT|SHL|SHR|CMP|JMP|BRGT|BREQ|BRNEG|NOP|HLT|PUSH|POP|CALL|RET|VADD|VSUB|VMUL|VDIV)\b/;
     const REGISTER = /^(?:ACC|PC|IR|SP|BP|ALU|FPU|VPU|R(?:1[0-5]|[0-9]))\b/;
 
     const HEX      = /^0x[0-9A-Fa-f]+/;

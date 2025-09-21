@@ -474,17 +474,17 @@ export default makeScene2D(function* (view: View2D) {
     ["ADD", "ACC = ACC + operand"],
     ["SUB", "ACC = ACC - operand"],
     ["MUL", "ACC = ACC * operand"],
+    ["DIV", "ACC = ACC / operand"],
 
     ["INC", "Increment ACC"],
-    ["DEC", "Decrement ACC"],
 
     ["AND", "Bitwise AND with ACC"],
     ["OR", "Bitwise OR with ACC"],
     ["XOR", "Bitwise XOR with ACC"],
     ["NOT", "Bitwise NOT (invert ACC)"],
 
-    ["SHL", "Shift ACC left (ACC << 1)"],
-    ["SHR", "Shift ACC right (ACC >> 1)"],
+    ["SHL", "ACC = ACC << operand"],
+    ["SHR", "ACC = ACC >> operand"],
 
     ["JMP", "Jump to memory address (unconditional)"],
   ];
@@ -603,5 +603,7 @@ export default makeScene2D(function* (view: View2D) {
     ...instructions.children().map((child) => child.opacity(1, 1)),
     title.text("", 1)
   );
+
+  
   yield* waitUntil("next");
 });

@@ -16,7 +16,7 @@ const L = 0.18; // large unit width
 const H = 0.13; // large unit height
 const wire_sizes = [8, 8, 8, 8, 6, 10, 6, 6, 8, 8, 6, 16, 16];
 
-const FLAG_DEFS = {
+export const FLAG_DEFS = {
   Z: { on: 0x00ff00, off: 0x222222 }, // green
   N: { on: 0xff00ff, off: 0x222222 }, // magenta
   V: { on: 0xffff00, off: 0x222222 }, // yellow
@@ -596,7 +596,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
       },
       *clear(flag: "Z" | "N" | "V" | "DZ", duration = 0.3) {
         const target = this[flag];
-        yield target.pulse(1.2);
+        yield target.pulse(1/1.2);
         yield* target.glowTo(this.defs[flag].off, duration);
       },
       *clearAll(duration = 0.3) {

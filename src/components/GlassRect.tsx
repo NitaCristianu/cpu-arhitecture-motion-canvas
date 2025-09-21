@@ -1,6 +1,6 @@
 import { Gradient, initial, Rect, RectProps, signal } from "@motion-canvas/2d";
 import gaussianblur from "../shaders/glassmorphic.glsl";
-import { Color, SignalValue, SimpleSignal, Vector2 } from "@motion-canvas/core";
+import { Color, createRef, SignalValue, SimpleSignal, Vector2 } from "@motion-canvas/core";
 
 export interface GlassProps extends RectProps {
   translucency?: SignalValue<number>;
@@ -36,6 +36,9 @@ export class Glass extends Rect {
   @signal()
   public declare readonly disableShader: SimpleSignal<boolean, this>;
 
+  public shaderRect = createRef<Rect>();
+  public strokeRect = createRef<Rect>();
+
   public constructor(props?: GlassProps) {
     super({
       radius: 32,
@@ -52,6 +55,7 @@ export class Glass extends Rect {
           fill="white"
           size={this.size}
           radius={this.radius}
+          ref={this.shaderRect}
           shadowBlur={() =>
             inShadowBlur == 0
               ? this.removeShadow()
@@ -74,6 +78,7 @@ export class Glass extends Rect {
         <Rect
           size={this.size}
           radius={this.radius}
+          ref={this.strokeRect}
           stroke={
             new Gradient({
               from: new Vector2(1, 2),

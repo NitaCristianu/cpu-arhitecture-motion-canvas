@@ -15,7 +15,7 @@ import {
 } from "three";
 import CameraThrash from "./Camera";
 import { SimpleSignal } from "@motion-canvas/core/lib/signals";
-import ThrashCamera from '../Thrash/Camera'
+import ThrashCamera from "../Thrash/Camera";
 import Object from "./utils/Object";
 import { Vector2 } from "@motion-canvas/core";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
@@ -89,7 +89,7 @@ export default class Scene3D extends Layout {
         }
         this.composer.render();
       });
-    this.scene.background = new Color(this.background());
+      // this.scene.background = new Color(this.background());
   }
 
   public init() {
@@ -161,7 +161,7 @@ export default class Scene3D extends Layout {
   @computed()
   private configuredRenderer(): WebGLRenderer {
     const size = this.computedSize();
-    
+
     const renderer = this.renderer;
 
     renderer.shadowMap.enabled = true;
@@ -176,7 +176,7 @@ export default class Scene3D extends Layout {
     return renderer;
   }
 
-  public getCameraClass(): ThrashCamera{
-    return this.findFirst(child => child instanceof ThrashCamera) as any; 
+  public getCameraClass(): ThrashCamera {
+    return this.findFirst((child) => child instanceof ThrashCamera) as any;
   }
 }

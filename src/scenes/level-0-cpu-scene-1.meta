@@ -1,0 +1,30 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "reverse",
+      "targetTime": 10.459999999999972
+    },
+    {
+      "name": "cu",
+      "targetTime": 13.759999999999973
+    },
+    {
+      "name": "iu",
+      "targetTime": 15.159999999999973
+    },
+    {
+      "name": "mc",
+      "targetTime": 16.159999999999975
+    },
+    {
+      "name": "mc-exit",
+      "targetTime": 17.159999999999975
+    },
+    {
+      "name": "next",
+      "targetTime": 20.159999999999975
+    }
+  ],
+  "seed": 3874951370
+}

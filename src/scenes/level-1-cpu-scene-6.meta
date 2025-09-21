@@ -1,0 +1,18 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "zoom in",
+      "targetTime": 0.3
+    },
+    {
+      "name": "go",
+      "targetTime": 3.9599999999999995
+    },
+    {
+      "name": "end",
+      "targetTime": 23.259999999999987
+    }
+  ],
+  "seed": 2368890563
+}

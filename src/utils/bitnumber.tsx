@@ -6,6 +6,7 @@ import { all, createEffect, createSignal, easeInCubic, easeOutCubic, range, sequ
 export interface BitnumberProps extends RectProps {
     number?: SignalValue<number>,
     bitgroups?: SignalValue<number>,
+    bits?: SignalValue<number>,
     showDecimal?: SignalValue<number>, // 1 is true, 0 is false
     showHex?: SignalValue<number>, // 1 is true, 0 is false
     initialVisibility?: boolean
@@ -22,6 +23,10 @@ function getBinary(decimal: number, bits_amount = 8) {
 
 export class Bitnumber extends Rect {
 
+    @initial(1)
+    @signal()
+    public declare readonly bits: SimpleSignal<number, this>;
+    
     @initial(4)
     @signal()
     public declare readonly bitgroups: SimpleSignal<number, this>;
@@ -51,6 +56,9 @@ export class Bitnumber extends Rect {
             gap: 10,
             ...props
         });
+        if(props.bitgroups && !props.bits){
+            this.bits(Math.floor(this.bitgroups()*4));
+        }
         this.add(<Rect
             marginRight={() => this.showDecimal() ? 50 + 100 * Math.min(this.showDecimal(), 1) : 50}
             height={160}
@@ -132,7 +140,7 @@ export class Bitnumber extends Rect {
             spawn(this.children()[1].opacity(0.2, t/2 + .02).do(() => this.number(newval)).to(1, t));
         }
         const decimal = newval ? newval : (this.number ? this.number() : 0);
-        const bits_amount = Math.floor(this.bitgroups() * 4);
+        const bits_amount = Math.floor(this.bits() * 1);
         const binary = getBinary(decimal, bits_amount);
         this.i = 0;
 

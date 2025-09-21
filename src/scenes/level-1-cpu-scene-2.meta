@@ -1,0 +1,26 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 0
+    },
+    {
+      "name": "alu",
+      "targetTime": 1.3
+    },
+    {
+      "name": "fall",
+      "targetTime": 2.8
+    },
+    {
+      "name": "purpose",
+      "targetTime": 2.8
+    },
+    {
+      "name": "next",
+      "targetTime": 9.000000000000002
+    }
+  ],
+  "seed": 1915906503
+}

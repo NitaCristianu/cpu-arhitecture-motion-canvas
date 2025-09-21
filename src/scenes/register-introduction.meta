@@ -1,0 +1,66 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "introduce cpu",
+      "targetTime": 2
+    },
+    {
+      "name": "contents",
+      "targetTime": 7.9
+    },
+    {
+      "name": "ar",
+      "targetTime": 8.9
+    },
+    {
+      "name": "vr",
+      "targetTime": 9.23
+    },
+    {
+      "name": "hardcode vr",
+      "targetTime": 9.56
+    },
+    {
+      "name": "focus",
+      "targetTime": 9.860000000000001
+    },
+    {
+      "name": "cleanup",
+      "targetTime": 21.366666666666646
+    },
+    {
+      "name": "clock",
+      "targetTime": 24.766666666666644
+    },
+    {
+      "name": "press",
+      "targetTime": 28.766666666666644
+    },
+    {
+      "name": "resume",
+      "targetTime": 30.766666666666644
+    },
+    {
+      "name": "tap",
+      "targetTime": 38.74999999999989
+    },
+    {
+      "name": "clean",
+      "targetTime": 58.67000000000017
+    },
+    {
+      "name": "others",
+      "targetTime": 59.67000000000017
+    },
+    {
+      "name": "second",
+      "targetTime": 66.47000000000018
+    },
+    {
+      "name": "next",
+      "targetTime": 68.47000000000018
+    }
+  ],
+  "seed": 4213255170
+}
