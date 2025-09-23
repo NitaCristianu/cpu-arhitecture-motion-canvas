@@ -1,3 +1,11 @@
-✅/❌ REG-RES-4K — …
-✅/❌ REG-LAY-GLASS-0 — …
-✅/❌ REG-FLAG-V-001 — …
+- [ ] REG-RES-4K (4096×2048)
+- [ ] REG-LAYOUT-REQUIRED (layout={true} on Layout)
+- [ ] REG-POS-ANCHOR (center-based position; topLeft when anchoring)
+- [ ] REG-SHADER-2D (ShaderBackground at low opacity)
+- [ ] REG-LAY-GLASS-0 (no layout content inside Glass)
+- [ ] REG-BITS-BITNUMBER-001 (Bitnumber used for live bits)
+- [ ] REG-FONT-001 and REG-VIS-MOBILE-001 (Poppins, ≥90pt)
+- [ ] REG-COLOR-001 (≤3 accent colors)
+- [ ] REG-SHADOW-001 (subtle shadows to avoid flatness)
+- [ ] waitUntil beats inserted for key reveals
+

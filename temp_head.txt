@@ -1,0 +1,200 @@
+import {
+  Gradient,
+  Icon,
+  makeScene2D,
+  Node,
+  Rect,
+  Txt,
+} from "@motion-canvas/2d";
+import {
+  all,
+  chain,
+  Color,
+  createRefArray,
+  createSignal,
+  easeInCubic,
+  easeOutBack,
+  easeOutCubic,
+  loop,
+  PossibleColor,
+  PossibleVector2,
+  range,
+  run,
+  sequence,
+  useRandom,
+  Vector2,
+  waitFor,
+  waitUntil,
+} from "@motion-canvas/core";
+import { ShaderBackground } from "../components/background";
+import { Bitnumber } from "../utils/bitnumber";
+import { Glass } from "../components/GlassRect";
+
+export default makeScene2D(function* (view) {
+  view.fill("#010a1b");
+  view.fontFamily("Poppins");
+
+  const title = (
+    <Txt
+      fill={"#fff"}
+      shadowBlur={30}
+      shadowColor={"#fffa"}
+      fontWeight={200}
+      opacity={0.5}
+      y={-1500}
+      fontFamily={"Poppins"}
+      fontSize={120}
+    />
+  ) as Txt;
+  view.add(title);
+
+  const container = (<Node scale={0.9} zIndex={1} />) as Node;
+  view.add(container);
+
+  const bgr = <ShaderBackground opacity={0.4} />;
+  view.add(bgr);
+
+  yield* waitUntil("begin");
+
+  const generator = useRandom(0);
+
+  const layoutCells = createRefArray<Rect>();
+  const OldlayoutPalette = range(32).map((index) => {
+    if (index < 4) return "#facc15";
+    if (index < 8) return "#c738ffff";
+    return "#60a5fa";
+  });
+  const NewlayoutPalette = range(32).map((index) => {
+    if (index < 8) return "#ff3864";
+    if (index < 12) return "#facc15";
+    if (index < 22) return "#2dd4bf";
+    return "#60a5fa";
+  });
+
+  const bitslayouttext = createSignal<string>("8-bit Instruction Layout");
+  const bitLayout = (
+    <Rect
+      layout
+      direction={"row"}
+      alignItems={"center"}
+      justifyContent={"center"}
+      padding={24}
+      radius={30}
+      y={900}
+      scale={0.9}
+      opacity={0}
+      fill={"#010a1b55"}
+      shadowBlur={36}
+      shadowColor={"#0009"}
+      zIndex={0}
+      lineWidth={2}
+      stroke={
+        new Gradient({
+          from: new Vector2(1000, 200),
+          to: new Vector2(0, 0),
+          stops: [
+            {
+              offset: 0,
+              color: "#fffa",
+            },
+            {
+              offset: 1,
+              color: "#fff2",
+            },
+          ],
+        })
+      }
+    >
+      <Txt
+        fill={"white"}
+        text={bitslayouttext}
+        marginRight={30}
+        opacity={0.8}
+      ></Txt>
+      {OldlayoutPalette.map((hex, i) => {
+        const color = new Color(hex);
+        return (
+          <Rect
+            ref={layoutCells}
+            margin={i < 8 ? 5 : 0}
+            width={i < 8 ? 28 : 0}
+            height={i < 8 ? 28 : 0}
+            radius={6}
+            fill={hex}
+            opacity={0.25}
+            shadowBlur={0}
+            shadowColor={color.alpha(0.7)}
+          />
+        );
+      })}
+    </Rect>
+  ) as Rect;
+  view.add(bitLayout);
+
+  const opcode = (<Bitnumber bits={4} y={50} x={-700} />) as Bitnumber;
+  const operand = (<Bitnumber bits={4} y={50} x={700} />) as Bitnumber;
+  container.add(opcode);
+  container.add(operand);
+
+  yield all(
+    title.y(-800, 1),
+    title.text("Instruction Register (IR) Decoding", 1)
+  );
+  yield* sequence(0.4, opcode.pop(), operand.pop());
+  yield* sequence(0.4, opcode.scale(2, 1), operand.scale(2, 1));
+
+  const byte_titles = createRefArray<Txt>();
+  const highlightByte = function* (
+    bitgroups: Bitnumber[],
+    tag: "opcode" | "operand" | string,
+    color: PossibleColor,
+    reverse: boolean = true
+  ) {
+    const C = new Color(color);
+    const ref = bitgroups[0];
+
+    const title = (
+      <Txt
+        fill={C.brighten(3)}
+        shadowBlur={30}
+        shadowColor={C.alpha(0.7).darken(0.5)}
+        position={() => ref.position().addX(100)}
+        fontFamily={"Poppins"}
+        scaleY={0}
+        opacity={0}
+        zIndex={2}
+        text={tag}
+        fontSize={120}
+        ref={byte_titles}
+      />
+    ) as Txt;
+    container.add(title);
+    bitgroups.forEach((el) => el.shadowColor("#fffa"));
+
+    yield* chain(
+      all(
+        title.opacity(1, 0.6),
+        title.scale(1, 0.6),
+        title.position(title.position().addY(-200), 0.6, easeOutCubic),
+        ...bitgroups.map((element) =>
+          all(
+            element.shadowBlur(100, 1),
+            element.y(element.y() + 50, 1),
+            run(function* () {
+              element.load(generator.nextInt(5, 16));
+            }),
+            ...element
+              .children()
+              .map((child, i) =>
+                child instanceof Rect && i > 1
+                  ? child.fill(C.brighten(2).alpha(0.2), 1)
+                  : null
+              )
+          )
+        )
+      )
+    );
+
+    if (!reverse) return;
+    yield* waitFor(0.5);
+    yield* all(

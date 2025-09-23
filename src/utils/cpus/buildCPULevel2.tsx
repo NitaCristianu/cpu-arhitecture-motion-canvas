@@ -568,6 +568,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
     ir,
     pc,
     clock,
+    decode,
     ...wires,
     wires: wires_array,
     initWires: function* (

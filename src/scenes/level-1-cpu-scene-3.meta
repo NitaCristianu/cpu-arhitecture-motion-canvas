@@ -15,63 +15,63 @@
     },
     {
       "name": "traits",
-      "targetTime": 8.2
+      "targetTime": 9.448710491015015
     },
     {
       "name": "logic functions",
-      "targetTime": 10.2
+      "targetTime": 11.448710491015015
     },
     {
       "name": "bananalogic",
-      "targetTime": 17.000000000000004
+      "targetTime": 18.248710491015018
     },
     {
       "name": "8bit",
-      "targetTime": 20.229999999999997
+      "targetTime": 23.184869379728596
     },
     {
       "name": "mul",
-      "targetTime": 20.66333333333333
+      "targetTime": 25.31536998707874
     },
     {
       "name": "numbers",
-      "targetTime": 21.096666666666664
+      "targetTime": 28.165199770171103
     },
     {
       "name": "representation",
-      "targetTime": 22.596666666666664
+      "targetTime": 29.665199770171103
     },
     {
       "name": "scroll",
-      "targetTime": 23.996666666666673
+      "targetTime": 31.065199770171112
     },
     {
       "name": "sub",
-      "targetTime": 28.996666666666673
+      "targetTime": 36.06519977017111
     },
     {
       "name": "cut",
-      "targetTime": 30.996666666666673
+      "targetTime": 39.57129523188139
     },
     {
       "name": "~bits",
-      "targetTime": 32.34666666666667
+      "targetTime": 42.322766041101396
     },
     {
       "name": "+1",
-      "targetTime": 33.34666666666667
+      "targetTime": 43.322766041101396
     },
     {
       "name": "examples",
-      "targetTime": 33.34666666666667
+      "targetTime": 45.79268489299406
     },
     {
       "name": "solve",
-      "targetTime": 34.34666666666667
+      "targetTime": 47.04892441799708
     },
     {
       "name": "next",
-      "targetTime": 35.14666666666667
+      "targetTime": 48.79151981354389
     }
   ],
   "seed": 953439808

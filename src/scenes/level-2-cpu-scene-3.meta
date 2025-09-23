@@ -7,19 +7,19 @@
     },
     {
       "name": "opcode",
-      "targetTime": 3.3282824619329974
+      "targetTime": 5.469559933476983
     },
     {
       "name": "operand",
-      "targetTime": 4.084944181997051
+      "targetTime": 6.516824559037409
     },
     {
       "name": "expand",
-      "targetTime": 6.839665756605249
+      "targetTime": 9.01682455903741
     },
     {
       "name": "next",
-      "targetTime": 11.994943936237997
+      "targetTime": 54.275335402610146
     }
   ],
   "seed": 1481779856

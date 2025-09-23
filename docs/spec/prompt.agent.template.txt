@@ -1,2 +1,4 @@
-Context: RULEBOOK (§ cited in Brief), readable HUD, ≤3 colors.
-Output: 1) one runnable tsx file in motion canvas 2) Self-check on Brief IDs (✅/❌ + reason)
+Context: RULEBOOK (as cited in Brief), readable HUD, ≤3 colors.
+Output: 1) One runnable TSX scene (Motion Canvas). 2) Self-check on Brief rule IDs (mark pass/fail + reason).
+Mandatory: use layout={true} on Layout, include ShaderBackground at low opacity, use Bitnumber for live bits, Poppins ≥90pt, 4096×2048, Glass allowed but never a layout parent, center-based positioning unless topLeft is explicitly used.
+

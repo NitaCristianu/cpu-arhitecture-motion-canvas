@@ -17,15 +17,16 @@ import level1CpuScene7 from "./scenes/level-1-cpu-scene-7?scene";
 import level2CpuScene1 from "./scenes/level-2-cpu-scene-1?scene";
 import level2CpuScene2 from "./scenes/level-2-cpu-scene-2?scene";
 import level2CpuScene3 from "./scenes/level-2-cpu-scene-3?scene";
+import level2CpuScene4 from "./scenes/level-2-cpu-scene-4?scene";
 
 export default makeProject({
   scenes: [
     // example,
-    // introScene,
-    // ramConcept,
-    // level0CpuScene1,
-    // level0CpuScene2,
-    // registerIntroduction,
+    introScene,
+    ramConcept,
+    level0CpuScene1,
+    level0CpuScene2,
+    registerIntroduction,
     level1CpuScene1,
     level1CpuScene2,
     level1CpuScene3,
@@ -36,6 +37,7 @@ export default makeProject({
     level2CpuScene1,
     level2CpuScene2,
     level2CpuScene3,
+    level2CpuScene4,
   ],
   experimentalFeatures: true,
 });

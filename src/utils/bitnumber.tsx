@@ -82,12 +82,12 @@ export class Bitnumber extends Rect {
             height={160}
             alignContent={'center'}
             justifyContent={'end'}
-            width={() => this.decimalScalar() * this.showDecimal() * 80}
+            width={() => this.showDecimal() * 120}
         >
             <Txt
                 marginTop={30}
                 text={() => `${this.number()} = `}
-                scale={() => this.decimalScalar() * this.showDecimal()}
+                scale={() => this.showDecimal()}
                 fontSize={80}
                 fontFamily={"Poppins"}
                 fill={"rgba(243, 240, 65, 1)"}

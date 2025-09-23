@@ -11,55 +11,55 @@
     },
     {
       "name": "ar",
-      "targetTime": 8.9
+      "targetTime": 9.511366971742618
     },
     {
       "name": "vr",
-      "targetTime": 9.23
+      "targetTime": 10.370019588484764
     },
     {
       "name": "hardcode vr",
-      "targetTime": 9.56
+      "targetTime": 11.433659954575905
     },
     {
       "name": "focus",
-      "targetTime": 9.860000000000001
+      "targetTime": 11.733659954575906
     },
     {
       "name": "cleanup",
-      "targetTime": 21.366666666666646
+      "targetTime": 23.24032662124257
     },
     {
       "name": "clock",
-      "targetTime": 24.766666666666644
+      "targetTime": 26.64032662124257
     },
     {
       "name": "press",
-      "targetTime": 28.766666666666644
+      "targetTime": 30.64032662124257
     },
     {
       "name": "resume",
-      "targetTime": 30.766666666666644
+      "targetTime": 32.640326621242565
     },
     {
       "name": "tap",
-      "targetTime": 38.74999999999989
+      "targetTime": 40.623659954575814
     },
     {
       "name": "clean",
-      "targetTime": 58.67000000000017
+      "targetTime": 60.54365995457609
     },
     {
       "name": "others",
-      "targetTime": 59.67000000000017
+      "targetTime": 61.54365995457609
     },
     {
       "name": "second",
-      "targetTime": 66.47000000000018
+      "targetTime": 68.34365995457611
     },
     {
       "name": "next",
-      "targetTime": 68.47000000000018
+      "targetTime": 76.26652225330156
     }
   ],
   "seed": 4213255170
