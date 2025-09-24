@@ -14,8 +14,36 @@
       "targetTime": 6.516824559037409
     },
     {
-      "name": "expand",
-      "targetTime": 9.01682455903741
+      "name": "operand-b",
+      "targetTime": 6.516824559037409
+    },
+    {
+      "name": "modifier-intro",
+      "targetTime": 6.516824559037409
+    },
+    {
+      "name": "larger",
+      "targetTime": 6.516824559037409
+    },
+    {
+      "name": "modifier-focus",
+      "targetTime": 10.51682455903741
+    },
+    {
+      "name": "modifier-m",
+      "targetTime": 11.51682455903741
+    },
+    {
+      "name": "modifier-destination",
+      "targetTime": 14.116824559037411
+    },
+    {
+      "name": "modifier-jump",
+      "targetTime": 16.716824559037413
+    },
+    {
+      "name": "modifier-condition",
+      "targetTime": 19.31682455903741
     },
     {
       "name": "next",

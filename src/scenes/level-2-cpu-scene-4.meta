@@ -10,8 +10,28 @@
       "targetTime": 4.780038061770529
     },
     {
+      "name": "IR",
+      "targetTime": 12.78003806177053
+    },
+    {
+      "name": "namings",
+      "targetTime": 18.380038061770534
+    },
+    {
+      "name": "translator",
+      "targetTime": 20.630038061770534
+    },
+    {
+      "name": "CPU",
+      "targetTime": 23.030038061770533
+    },
+    {
+      "name": "registers",
+      "targetTime": 25.139825920240042
+    },
+    {
       "name": "next",
-      "targetTime": 13.380102654788704
+      "targetTime": 31.532183213048015
     }
   ],
   "seed": 3291741135

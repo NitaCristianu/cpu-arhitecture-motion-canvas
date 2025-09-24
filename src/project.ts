@@ -36,7 +36,7 @@ export default makeProject({
     level1CpuScene7,
     level2CpuScene1,
     level2CpuScene2,
-    level2CpuScene3,
+    // level2CpuScene3,
     level2CpuScene4,
   ],
   experimentalFeatures: true,
