@@ -47,87 +47,91 @@
     },
     {
       "name": "imm-flag",
-      "targetTime": 33.98440096376858
+      "targetTime": 34.206599037121364
     },
     {
       "name": "imm-off",
-      "targetTime": 34.58440096376858
+      "targetTime": 37.79711486080389
     },
     {
       "name": "load-r1",
-      "targetTime": 35.18440096376858
+      "targetTime": 38.37263474816991
+    },
+    {
+      "name": "memory",
+      "targetTime": 39.84001217135925
     },
     {
       "name": "add-r0-r1",
-      "targetTime": 35.78440096376858
+      "targetTime": 41.58507319923156
     },
     {
       "name": "sum-note",
-      "targetTime": 36.384400963768584
+      "targetTime": 42.18507319923156
     },
     {
       "name": "store-r0",
-      "targetTime": 36.984400963768586
+      "targetTime": 42.18507319923156
     },
     {
       "name": "flags-check",
-      "targetTime": 37.58440096376859
+      "targetTime": 42.78507319923156
     },
     {
       "name": "cmp-zero",
-      "targetTime": 38.18440096376859
+      "targetTime": 42.78507319923156
     },
     {
       "name": "branch-negative",
-      "targetTime": 38.78440096376859
+      "targetTime": 43.38507319923156
     },
     {
       "name": "inc-positive",
-      "targetTime": 39.98440096376859
+      "targetTime": 44.168377518424734
     },
     {
       "name": "label-skip",
-      "targetTime": 40.584400963768594
+      "targetTime": 45.36837751842474
     },
     {
       "name": "while-intro",
-      "targetTime": 41.184400963768596
+      "targetTime": 45.36837751842474
     },
     {
       "name": "loop-load",
-      "targetTime": 41.7844009637686
+      "targetTime": 45.96837751842474
     },
     {
       "name": "loop-label",
-      "targetTime": 42.3844009637686
+      "targetTime": 46.56837751842474
     },
     {
       "name": "loop-sub",
-      "targetTime": 42.9844009637686
+      "targetTime": 47.16837751842474
     },
     {
       "name": "loop-store",
-      "targetTime": 43.5844009637686
+      "targetTime": 47.76837751842474
     },
     {
       "name": "loop-cmp",
-      "targetTime": 44.1844009637686
+      "targetTime": 48.368377518424744
     },
     {
       "name": "loop-branch",
-      "targetTime": 44.784400963768604
+      "targetTime": 48.968377518424745
     },
     {
       "name": "loop-jump",
-      "targetTime": 45.384400963768606
+      "targetTime": 49.56837751842475
     },
     {
       "name": "loop-end",
-      "targetTime": 45.98440096376861
+      "targetTime": 50.16837751842475
     },
     {
       "name": "next",
-      "targetTime": 47.58440096376861
+      "targetTime": 51.76837751842475
     }
   ],
   "seed": 3291741135

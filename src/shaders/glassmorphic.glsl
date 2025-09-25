@@ -17,45 +17,113 @@ uniform sampler2D destinationTexture;
 uniform mat4 sourceMatrix;
 uniform mat4 destinationMatrix;
 
-uniform float strength;  // Control the spread of the Gaussian
-uniform float opacity; // Opacity
-uniform float darkness; // How dark the glassmorphic will be
-uniform float blurstrength; // car wheel's diameter
-uniform float borderModifier; // Controls border hue
+uniform float strength;  // legacy, kept for compatibility
+uniform float opacity;   // Opacity
+uniform float darkness;  // How dark the glassmorphic panel will be
+uniform float blurstrength; // Controls blur radius similar to CSS backdrop blur
+uniform float borderModifier; // Controls rim intensity
+
+const int POISSON_COUNT = 16;
+const vec2 POISSON[POISSON_COUNT] = vec2[](
+  vec2(-0.94201624, -0.39906216),
+  vec2(0.94558609, -0.76890725),
+  vec2(-0.09418410, -0.92938870),
+  vec2(0.34495938, 0.29387760),
+  vec2(-0.91588580, 0.45771432),
+  vec2(-0.81544232, -0.87912464),
+  vec2(-0.38277543, 0.27676845),
+  vec2(0.97484398, 0.75648379),
+  vec2(0.44323325, -0.97511554),
+  vec2(0.53742981, -0.47373420),
+  vec2(-0.26496911, -0.41893023),
+  vec2(0.79197514, 0.19090188),
+  vec2(-0.24188840, 0.99706507),
+  vec2(-0.81409955, 0.91437590),
+  vec2(0.19984126, -0.78641367),
+  vec2(0.14383161, -0.14100790)
+);
+
+const int RING_COUNT = 4;
+const float RING_RADII[RING_COUNT] = float[](0.35, 0.75, 1.25, 1.75);
+const float RING_WEIGHTS[RING_COUNT] = float[](0.10, 0.09, 0.08, 0.07);
 
 float rand(vec2 c) {
-    return fract(sin(dot(c.xy, vec2(12.9898f, 78.233f))) * 43758.5453f);
+  return fract(sin(dot(c.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
-float gaussian(float x, float y, float sigma) {
-    float r2 = x * x + y * y;
-    return exp(-r2 / (2.0f * sigma * sigma)) / (2.0f * 3.141592653589793f * sigma * sigma);
+
+mat2 rot(float a) {
+  float s = sin(a);
+  float c = cos(a);
+  return mat2(c, -s, s, c);
 }
 
 void main() {
-    vec4 color = vec4(0.f);
-    float total = 0.0f;
+  vec2 safeResolution = max(resolution, vec2(1.0));
+  vec2 texel = 1.0 / safeResolution;
 
-    // Calculate the number of samples per dimension
-    int grid_side = int(blurstrength); // Use total samples directly
-    float scale = float(grid_side) / resolution.x; // Normalize by resolution
-    // 1) Normalize your texel step once up front
-    vec2 texel = 1.0f / resolution;    // one pixel in UV-space
-    int R = int(blurstrength) / 2;    // half-kernel
-    for(int i = -R; i <= R; ++i) {
-        for(int j = -R; j <= R; ++j) {
-            vec2 off = vec2(float(i), float(j)) * texel;
-            float w = gaussian(float(i), float(j), strength);
-            color += texture(destinationTexture, destinationUV + off) * w;
-            total += w;
-        }
-    }
+  // Map blurstrength to a very wide radius so even mid values produce dramatic blur.
+  float pixelRadius = clamp(blurstrength * 12.0 + 60.0, 60.0, 1200.0);
 
-    if(total > 0.0f) {
-        vec4 noiseTexture = vec4(rand(sourceUV));
-        vec4 fade = smoothstep(0.0f, 2.1f, vec4(distance(sourceUV - .5f, vec2(0.f))) * resolution.x / resolution.y);
-        outColor = color / (total - .01f) * (darkness + 1.f) + noiseTexture * 0.03f * (darkness + 1.f) + fade / 4.f * (darkness + 1.f + borderModifier);  // Normalize the color by total weight
-        outColor.a = texture(sourceTexture, sourceUV).a * opacity;
-    } else {
-        outColor = texture(destinationTexture, screenUV);  // Fallback to black if no samples are accumulated
+  // Rotate the Poisson disk each frame to avoid directional bias.
+  float jitter = rand(vec2(float(frame % 1024), sourceUV.x + sourceUV.y));
+  mat2 rotation = rot(jitter * 6.28318530718);
+
+  float centreWeight = 0.12;
+  vec3 accum = texture(destinationTexture, destinationUV).rgb * centreWeight;
+  float weightSum = centreWeight;
+
+  for (int ring = 0; ring < RING_COUNT; ++ring) {
+    float ringRadius = pixelRadius * RING_RADII[ring];
+    float ringWeight = RING_WEIGHTS[ring];
+    for (int i = 0; i < POISSON_COUNT; ++i) {
+      vec2 offset = rotation * (POISSON[i] * ringRadius) * texel;
+      vec3 sampleColor = texture(destinationTexture, destinationUV + offset).rgb;
+      accum += sampleColor * ringWeight;
+      weightSum += ringWeight;
     }
+  }
+
+  vec3 baseColor = accum / max(weightSum, 1e-4);
+
+  // Compress highlights so white backgrounds remain soft and neutral.
+  float luma = dot(baseColor, vec3(0.299, 0.587, 0.114));
+  float highlight = smoothstep(0.48, 0.88, luma);
+  vec3 neutralized = mix(vec3(luma), baseColor, 0.38);
+  vec3 compressed = mix(neutralized, vec3(0.94, 0.98, 1.05), highlight * 0.64);
+
+  // Gentle cool tint reminiscent of Apple glass.
+  vec3 tint = vec3(0.9, 0.97, 1.08);
+  vec3 tinted = mix(compressed, compressed * tint + vec3(0.012, 0.024, 0.052), 0.35);
+
+  // Edge lighting and global shading cues.
+  float inset = min(min(destinationUV.x, 1.0 - destinationUV.x),
+                    min(destinationUV.y, 1.0 - destinationUV.y));
+  float rim = (1.0 - smoothstep(0.0, 0.055, inset)) * (0.14 + borderModifier * 0.12);
+  float topGlow = smoothstep(0.0, 0.65, 1.0 - destinationUV.y) * 0.24;
+  float bottomShade = smoothstep(0.25, 1.1, destinationUV.y) * 0.09;
+
+  // Subtle moving grain keeps the blur lively.
+  vec2 grainBase = sourceUV * safeResolution * 0.95;
+  vec3 grain = vec3(
+      rand(grainBase + vec2(time * 1.3, -time * 0.7)),
+      rand(grainBase + vec2(-time * 1.1, time * 0.5)),
+      rand(grainBase + vec2(time * 0.6, time * 1.4))
+    ) - 0.5;
+  float grainPulse = 0.02 + 0.012 * abs(sin(time * 0.6));
+  vec3 grainColor = grain * grainPulse;
+
+  vec3 glass = tinted;
+  glass += rim * vec3(0.8, 0.86, 1.0);
+  glass += topGlow * vec3(0.38, 0.45, 0.66);
+  glass -= bottomShade * vec3(0.08, 0.1, 0.18);
+  glass += grainColor;
+
+  float lightBoost = max(0.25, 1.0 + darkness * 0.8);
+  glass *= lightBoost;
+  glass = clamp(glass, 0.0, 1.0);
+
+  float alpha = texture(sourceTexture, sourceUV).a * opacity;
+  outColor = vec4(glass, alpha);
 }
+
+

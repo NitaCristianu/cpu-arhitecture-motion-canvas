@@ -15,23 +15,23 @@
     },
     {
       "name": "GPR",
-      "targetTime": 9.96993354320606
+      "targetTime": 10.01318792248733
     },
     {
       "name": "Freedom",
-      "targetTime": 17.539408845165426
+      "targetTime": 17.582663224446694
     },
     {
       "name": "code",
-      "targetTime": 18.83940884516543
+      "targetTime": 18.8826632244467
     },
     {
       "name": "double",
-      "targetTime": 20.957296501057737
+      "targetTime": 21.000550880339006
     },
     {
       "name": "next",
-      "targetTime": 23.30451956190701
+      "targetTime": 23.34777394118828
     }
   ],
   "seed": 498428565

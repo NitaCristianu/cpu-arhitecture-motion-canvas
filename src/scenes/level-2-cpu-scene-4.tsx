@@ -1,17 +1,31 @@
-import { Code, lines, makeScene2D, Rect, Txt } from "@motion-canvas/2d";
+import {
+  Code,
+  Gradient,
+  Grid,
+  Icon,
+  Layout,
+  lines,
+  makeScene2D,
+  Node,
+  Rect,
+  Txt,
+} from "@motion-canvas/2d";
 import {
   all,
   any,
   chain,
   Color,
+  createRef,
   createRefArray,
   DEFAULT,
+  easeInCubic,
   easeInOutCubic,
   easeOutBack,
   easeOutCubic,
   easeOutSine,
   loop,
   range,
+  Reference,
   sequence,
   tween,
   useRandom,
@@ -261,11 +275,7 @@ export default makeScene2D(function* (view) {
     0.3,
     ...splits.map((split, i) =>
       all(
-        split.fill(
-          new Color(splitting[i][2]).brighten(1),
-          0.3,
-          easeOutBack
-        ),
+        split.fill(new Color(splitting[i][2]).brighten(1), 0.3, easeOutBack),
         split.shadowColor(
           new Color(splitting[i][2]).darken(3),
           0.3,
@@ -324,14 +334,14 @@ export default makeScene2D(function* (view) {
   view.add(raw_instruction_example);
   yield* raw_instruction_example.popIn();
   yield* waitUntil("CPU");
-  yield* raw_instruction_example.scale(2,1);
-  
+  yield* raw_instruction_example.scale(2, 1);
+
   yield* waitUntil("registers");
-  yield all(
-    raw_instruction_example.popOut(),
-    interpreted_bits.popOut(),
+  yield all(raw_instruction_example.popOut(), interpreted_bits.popOut());
+  yield* camera.lookTo(
+    level2_cpu.decode.getGlobalPosition().add(new Vector3(0.05, 0, 0)),
+    1
   );
-  yield* camera.lookTo(level2_cpu.decode.getGlobalPosition().add(new Vector3(0.05,0,0)),1);
 
   const registerRows = createRefArray<Glass>();
   const registerFrameSize: [number, number] = [2160, 1470];
@@ -435,10 +445,9 @@ export default makeScene2D(function* (view) {
     register_contents.skew([0, 0], 1, easeOutCubic),
     register_contents.position(
       () =>
-        scene.projectToScreen(level2_cpu.decode.getGlobalPosition()).add([
-          1500,
-          -570,
-        ]),
+        scene
+          .projectToScreen(level2_cpu.decode.getGlobalPosition())
+          .add([1500, -570]),
       2,
       easeOutBack
     )
@@ -448,20 +457,78 @@ export default makeScene2D(function* (view) {
     ...registerRows.map((row) => row.scale(1, 0.33, easeOutBack))
   );
 
-  yield* waitUntil('restore');
+  yield* waitUntil("restore");
   yield* all(
-    register_contents.position(0,1),
-    register_contents.scale(0,1),
-    camera.zoomOut(0.5,1,easeInOutCubic),
-    camera.moveTo(new Vector3(-1,1,1), 1,easeInOutCubic),
-  )
+    register_contents.position(0, 1),
+    register_contents.scale(0, 1),
+    camera.zoomOut(0.5, 1, easeInOutCubic),
+    camera.moveTo(new Vector3(-1, 1, 1), 1, easeInOutCubic)
+  );
 
   yield* waitUntil("code");
 
-  const code = (
+  const codeRef = createRef<Code>();
+  const programwindow = createRef<Node>();
+  const ramwindow = createRef<Node>();
+  const unitwindow = createRef<Node>();
+  const windows = [programwindow, ramwindow, unitwindow];
+  const navbar = createRef<Rect>();
+
+  function* toggleWindowMode(window: Reference<Node>) {
+    const icons = navbar().children();
+    const icon =
+      window == programwindow
+        ? icons[0]
+        : window == ramwindow
+        ? icons[1]
+        : icons[2];
+
+    yield all(
+      ...icons.map((ic) =>
+        ic != icon
+          ? all(
+              ic.shadowBlur(0, 1),
+              ic.childAs<Icon>(0).color("#fffa", 1),
+              ic.scale(0.8, 1)
+            )
+          : all(
+              ic.childAs<Icon>(0).color("#fff", 1),
+              ic.shadowBlur(50, 1),
+              ic.scale(1, 1)
+            )
+      )
+    );
+    yield* all(
+      ...windows.map((windowref) =>
+        windowref != window
+          ? windowref().opacity(0, 0.3)
+          : windowref().opacity(1, 0.3)
+      )
+    );
+  }
+
+  const values_refs = createRefArray<Txt>();
+  const addresses_refs = createRefArray<Txt>();
+  function* highlightMemoryByte(i: number, newtext?: string) {
+    if (newtext) yield all(values_refs[i].text(newtext, 1));
+    yield* all(
+      values_refs[i].fill("#ff0", 1),
+      values_refs[i].opacity(1, 1),
+      values_refs[i].shadowBlur(50, 1),
+      values_refs[i].shadowColor("#ff05", 1),
+      addresses_refs[i].fill("#ff0", 1),
+      values_refs[i].shadowBlur(50, 1),
+      values_refs[i].shadowColor("#ff05", 1),
+      addresses_refs[i].fill("#ff0", 1),
+      addresses_refs[i].shadowBlur(50, 1),
+      addresses_refs[i].shadowColor("#ff05", 1)
+    );
+  }
+
+  const window = (
     <Glass
-      size={[2000, 1800]}
-      x={-950}
+      size={[2500, 1800]}
+      x={-650}
       lightness={-0.1}
       fill={"#0005"}
       scaleY={0}
@@ -469,20 +536,128 @@ export default makeScene2D(function* (view) {
       borderModifier={-1}
       clip
     >
-      <Code
-        zIndex={1}
-        fontSize={80}
-        width={2000}
-        top={[0, -20]}
-        height={1100}
-        highlighter={new AsmHighlighter()}
-        code={""}
-      />
+      <Rect
+        ref={navbar}
+        scale={0.75}
+        x={830}
+        zIndex={5}
+        y={-800}
+        width={2500}
+        height={150}
+      >
+        <Glass scale={0} size={150} radius={400}>
+          <Icon
+            icon={"mdi:code-braces"}
+            size={140}
+            color={"#fff"}
+            shadowColor={"#fffa"}
+            shadowBlur={50}
+            zIndex={3}
+          />
+        </Glass>
+        <Glass scale={0} x={200} size={150} radius={400}>
+          <Icon
+            icon={"mdi:grid"}
+            size={100}
+            color={"#fffa"}
+            shadowColor={"#fffa"}
+            zIndex={3}
+          />
+        </Glass>
+        <Glass scale={0} x={400} size={150} radius={400}>
+          <Icon
+            icon={"mdi:chip"}
+            size={130}
+            color={"#fffa"}
+            shadowColor={"#fffa"}
+            zIndex={3}
+          />
+        </Glass>
+      </Rect>
+      <Node zIndex={1} ref={programwindow} cache>
+        <Code
+          zIndex={1}
+          fontSize={80}
+          width={2000}
+          top={[0, -20]}
+          height={1100}
+          highlighter={new AsmHighlighter()}
+          ref={codeRef}
+          code={""}
+        />
+        <Rect
+          zIndex={2}
+          compositeOperation={"darken"}
+          fill={
+            new Gradient({
+              fromY: -800,
+              toY: 1000,
+              stops: [
+                { offset: 0, color: "#0003" },
+                { offset: 1, color: "#fff0" },
+              ],
+            })
+          }
+          size={[2500, 1800]}
+        ></Rect>
+      </Node>
+      <Node zIndex={2} ref={ramwindow} opacity={0} cache>
+        <Grid
+          size={[2500, 2500]}
+          spacing={[800, 300]}
+          stroke={"#fff5"}
+          lineWidth={3.5}
+        />
+        {range(24).map((i) => {
+          const x = (i % 4) * 810 - 1200;
+          const y = Math.floor(i / 4) * 300 - 800;
+          return (
+            <Txt
+              position={new Vector2(x, y)}
+              fontSize={100}
+              fontFamily={"Fira Code"}
+              fill={"#fffa"}
+              ref={values_refs}
+              opacity={Math.floor((i + 4) / 4) / 4}
+              text={
+                i == 10 || i == 17
+                  ? i == 17
+                    ? "000...101"
+                    : "000..011"
+                  : generator
+                      .nextInt(0, Math.pow(2, 3) - 1)
+                      .toString(2)
+                      .padEnd(3, "0") +
+                    "..." +
+                    generator
+                      .nextInt(0, Math.pow(2, 3) - 1)
+                      .toString(2)
+                      .padEnd(3, "0")
+              }
+            ></Txt>
+          );
+        })}
+        {range(24).map((i) => {
+          const x = (i % 4) * 810 - 1200;
+          const y = Math.floor(i / 4) * 300 - 650;
+          return (
+            <Txt
+              ref={addresses_refs}
+              position={new Vector2(x, y)}
+              fill={"#fff5"}
+              fontFamily={"Fira Code"}
+              text={"0x00" + i.toString(16)}
+            ></Txt>
+          );
+        })}
+        <Rect fill={"#0005"} size={[2500, 2500]} />
+      </Node>
+      <Node zIndex={3} ref={unitwindow} opacity={0}></Node>
     </Glass>
   ) as Glass;
-  view.add(code);
+  view.add(window);
 
-  const program = code.childAs<Code>(0);
+  const program = codeRef();
   let lineCursor = 0;
   let isFirstLine = true;
   const appendLine = (content: string, duration = 0.6) => {
@@ -496,21 +671,47 @@ export default makeScene2D(function* (view) {
     return all(animation);
   };
 
-  yield* code.scale(1, 1);
+  yield* window.scale(1, 1);
 
-  
   yield* waitUntil("operands-intro");
-  yield* appendLine("; Let's do a demo!\n; we write memory as [x]\n; registers as RX\n; values as #x\n\n");
+  yield sequence(
+    0.2,
+    ...navbar()
+      .children()
+      .map((child) => child.scale(0.8, 0.6, easeOutBack))
+  );
+  yield* appendLine(
+    "; Let's do a demo!\n; we write memory as [x]\n; registers as RX\n; values as #x\n\n"
+  );
 
   yield* waitUntil("load-r0");
-  yield* appendLine("LOAD R0, [0x10] 0000");
+  yield* appendLine("LOAD R0, [0x10] 1000");
 
   yield* waitUntil("imm-flag");
+  yield* toggleWindowMode(ramwindow);
+
+  values_refs.forEach((ref) => ref.save());
+  addresses_refs.forEach((ref) => ref.save());
+
+  yield* waitFor(0.5);
+  yield* highlightMemoryByte(10, "3");
+  yield* highlightMemoryByte(17, "5");
+  yield* waitFor(0.5);
 
   yield* waitUntil("imm-off");
+  yield* toggleWindowMode(programwindow);
+  values_refs.forEach((ref) => ref.restore());
+  addresses_refs.forEach((ref) => ref.restore());
+
 
   yield* waitUntil("load-r1");
-  yield* appendLine("LOAD R1, [0x11] 0000 ; same trick");
+  yield* appendLine("LOAD R1, [0x11] 1000 ; same trick");
+
+  yield* waitUntil("memory");
+  yield* toggleWindowMode(ramwindow);
+  yield* waitFor(1)
+  yield* toggleWindowMode(programwindow);
+
 
   yield* waitUntil("add-r0-r1");
   yield* appendLine("ADD R0, R1 0000 ; R0 += R1");
@@ -539,7 +740,7 @@ export default makeScene2D(function* (view) {
   yield* waitUntil("while-intro");
   yield* appendLine("\n; While loop:");
 
-  yield program.y(-500,1);
+  yield program.y(-500, 1);
   yield* waitUntil("loop-load");
   yield* appendLine("LOAD R2, [0x10] 0000 ;");
 
@@ -550,18 +751,18 @@ export default makeScene2D(function* (view) {
   yield* appendLine("SUB R2, #1 0000 ;");
 
   yield* waitUntil("loop-store");
-  yield* appendLine("STORE  R2, [0x10] 0000 ; Persist the countdown");
+  yield* appendLine("STORE R2, [0x10] 0000 ; Persist the countdown");
 
   yield* waitUntil("loop-cmp");
-  yield* appendLine("CMP    R2, #0 0000 ; Zero flag tells us when to stop");
+  yield* appendLine("CMP R2, #0 0000 ; refresh the flags");
 
   yield* waitUntil("loop-branch");
-  yield* appendLine("BREQ   loop_end 0000 ; If zero, break out");
+  yield* appendLine("GRT0 R2, [0xf30] 0000 ;  (f30 is the SUB above)");
 
   yield* waitUntil("loop-jump");
-  yield* appendLine("JMP    loop_start 0000 ; JUMP rewrites PC for our loop");
+  yield* appendLine("JMP [0xf31] 0000 ; Otherwise continue after the loop");
   yield* waitUntil("loop-end");
-  yield* appendLine("loop_end:");
+  yield* appendLine("HLT; // this is f31. HLT does nothing");
 
   yield* program.selection(DEFAULT, 1);
 

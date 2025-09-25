@@ -16,7 +16,7 @@ export class Glass extends Rect {
   @signal()
   public declare readonly translucency: SimpleSignal<number, this>;
 
-  @initial(50)
+  @initial(10)
   @signal()
   public declare readonly blurstrength: SimpleSignal<number, this>;
 
@@ -65,7 +65,6 @@ export class Glass extends Rect {
           shaders={{
             fragment: gaussianblur,
             uniforms: {
-              strength: 10,
               opacity: this.translucency,
               darkness: this.lightness,
               borderModifier: this.borderModifier,

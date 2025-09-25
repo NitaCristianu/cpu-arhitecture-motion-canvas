@@ -21,7 +21,7 @@ import level2CpuScene4 from "./scenes/level-2-cpu-scene-4?scene";
 
 export default makeProject({
   scenes: [
-    // example,
+    example,
     introScene,
     ramConcept,
     level0CpuScene1,
