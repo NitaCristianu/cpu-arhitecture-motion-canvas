@@ -35,19 +35,19 @@
     },
     {
       "name": "modifier-destination",
-      "targetTime": 14.116824559037411
+      "targetTime": 15.116824559037411
     },
     {
       "name": "modifier-jump",
-      "targetTime": 16.716824559037413
+      "targetTime": 18.716824559037413
     },
     {
       "name": "modifier-condition",
-      "targetTime": 19.31682455903741
+      "targetTime": 22.31682455903741
     },
     {
       "name": "next",
-      "targetTime": 54.275335402610146
+      "targetTime": 28.598766787512872
     }
   ],
   "seed": 1481779856

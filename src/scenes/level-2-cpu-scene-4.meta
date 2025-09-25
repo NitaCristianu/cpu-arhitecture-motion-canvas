@@ -30,8 +30,104 @@
       "targetTime": 25.139825920240042
     },
     {
+      "name": "restore",
+      "targetTime": 29.182994807537884
+    },
+    {
+      "name": "code",
+      "targetTime": 31.78440096376858
+    },
+    {
+      "name": "operands-intro",
+      "targetTime": 32.784400963768576
+    },
+    {
+      "name": "load-r0",
+      "targetTime": 33.38440096376858
+    },
+    {
+      "name": "imm-flag",
+      "targetTime": 33.98440096376858
+    },
+    {
+      "name": "imm-off",
+      "targetTime": 34.58440096376858
+    },
+    {
+      "name": "load-r1",
+      "targetTime": 35.18440096376858
+    },
+    {
+      "name": "add-r0-r1",
+      "targetTime": 35.78440096376858
+    },
+    {
+      "name": "sum-note",
+      "targetTime": 36.384400963768584
+    },
+    {
+      "name": "store-r0",
+      "targetTime": 36.984400963768586
+    },
+    {
+      "name": "flags-check",
+      "targetTime": 37.58440096376859
+    },
+    {
+      "name": "cmp-zero",
+      "targetTime": 38.18440096376859
+    },
+    {
+      "name": "branch-negative",
+      "targetTime": 38.78440096376859
+    },
+    {
+      "name": "inc-positive",
+      "targetTime": 39.98440096376859
+    },
+    {
+      "name": "label-skip",
+      "targetTime": 40.584400963768594
+    },
+    {
+      "name": "while-intro",
+      "targetTime": 41.184400963768596
+    },
+    {
+      "name": "loop-load",
+      "targetTime": 41.7844009637686
+    },
+    {
+      "name": "loop-label",
+      "targetTime": 42.3844009637686
+    },
+    {
+      "name": "loop-sub",
+      "targetTime": 42.9844009637686
+    },
+    {
+      "name": "loop-store",
+      "targetTime": 43.5844009637686
+    },
+    {
+      "name": "loop-cmp",
+      "targetTime": 44.1844009637686
+    },
+    {
+      "name": "loop-branch",
+      "targetTime": 44.784400963768604
+    },
+    {
+      "name": "loop-jump",
+      "targetTime": 45.384400963768606
+    },
+    {
+      "name": "loop-end",
+      "targetTime": 45.98440096376861
+    },
+    {
       "name": "next",
-      "targetTime": 31.532183213048015
+      "targetTime": 47.58440096376861
     }
   ],
   "seed": 3291741135

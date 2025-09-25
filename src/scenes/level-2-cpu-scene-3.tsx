@@ -616,7 +616,7 @@ export default makeScene2D(function* (view) {
 
   yield* all(
 
-    modifiers.position([-150, 0], 1, easeInOutBack),
+    modifiers.position([-1050, 0], 1, easeInOutBack),
 
     modifiers.scale(3, 1, easeInOutBack),
 
@@ -687,7 +687,7 @@ export default makeScene2D(function* (view) {
   view.add(glass_info);
 
   let infoShown = false;
-  const codeAnchor = new Vector2(777, 473);
+  const codeBase = new Vector2(1011, -5);
 
   const presentModifier = function* (options: {
     index: number;
@@ -713,11 +713,12 @@ export default makeScene2D(function* (view) {
     );
 
     const panes = examples.map((example) => {
+      const offset = new Vector2(example.offset[0], example.offset[1]);
       const pane = (
         <Glass
           zIndex={5}
-          size={[1200, 220]}
-          position={() => new Vector2(codeAnchor.x + example.offset[0], codeAnchor.y + example.offset[1])}
+          size={[1550, 220]}
+          position={() => new Vector2(codeBase.x + offset.x, codeBase.y + offset.y)}
           scale={0}
           translucency={1}
           borderModifier={-1}
@@ -725,7 +726,8 @@ export default makeScene2D(function* (view) {
           <Code
             zIndex={1}
             fontSize={80}
-            width={1200}
+            width={1550}
+            textAlign={'left'}
             height={600}
             highlighter={new AsmHighlighter()}
             code={example.code}
@@ -736,45 +738,18 @@ export default makeScene2D(function* (view) {
       return pane;
     });
 
-    const rays = panes.map((pane) => {
-      const ray = (
-        <Ray
-          from={() => bitRect.absolutePosition()}
-          to={() => pane.position()}
-          lineWidth={14}
-          opacity={0.4}
-          lineDash={[20, 20]}
-          stroke={"white"}
-          startOffset={50}
-          endOffset={50}
-          endArrow
-          end={0}
-        />
-      ) as Ray;
-      view.add(ray);
-      return ray;
-    });
-
     yield sequence(
       0.2,
-      ...panes.map((pane, i) =>
-        all(
-          rays[i].end(1, 0.8, easeOutCubic),
-          pane.scale(1, 0.8, easeOutBack)
-        )
-      )
+      ...panes.map((pane) => pane.scale(1, 0.8, easeOutBack))
     );
 
-    yield* waitFor(1.2);
+    yield* waitFor(2);
 
     yield* all(
-      ...panes.map((pane) => pane.scale(0, 0.4, easeInCubic)),
-      ...panes.map((pane) => pane.opacity(0, 0.4, easeInCubic)),
-      ...rays.map((ray) => ray.opacity(0, 0.3, easeInCubic))
+      ...panes.map((pane) => pane.scale(0, 0.4, easeInCubic))
     );
 
     panes.forEach((pane) => pane.remove());
-    rays.forEach((ray) => ray.remove());
 
     yield* cleanup();
   };
@@ -796,12 +771,12 @@ export default makeScene2D(function* (view) {
     examples: [
 
       { code: `\
-
-ADD R0, R1 ; add register R1`, offset: [0, -140] },
+; add register R1
+ADD R0, R1`, offset: [0, -140] },
 
       { code: `\
-
-ADD R0, #1 ; add literal 1`, offset: [0, 140] },
+; add literal 1
+ADD R0, #1`, offset: [0, 140] },
 
     ],
 
@@ -824,12 +799,12 @@ ADD R0, #1 ; add literal 1`, offset: [0, 140] },
     examples: [
 
       { code: `\
-
-ADD R0, R1 ; result stays in R0`, offset: [0, -140] },
+; result stays in R0
+ADD R0, R1`, offset: [0, -140] },
 
       { code: `\
-
-ADD.D R0, R1 ; D=1 writes result to memory`, offset: [0, 140] },
+; D=1 writes result to memory
+ADD.D R0, R1`, offset: [0, 140] },
 
     ],
 
@@ -852,8 +827,8 @@ ADD.D R0, R1 ; D=1 writes result to memory`, offset: [0, 140] },
     examples: [
 
       { code: `\
-
-ADD R2, R3 ; normal fall-through`, offset: [0, -140] },
+; normal fall-through
+ADD R2, R3`, offset: [0, -140] },
 
       { code: `\
 
@@ -880,12 +855,12 @@ JMP #0x40 ; branch to address 0x40`, offset: [0, 140] },
     examples: [
 
       { code: `\
-
-ADD R4, R5 ; always executes`, offset: [0, -140] },
+; always executes
+ADD R4, R5`, offset: [0, -140] },
 
       { code: `\
-
-ADD.CZ R4, R5 ; execute only when Z flag is 0`, offset: [0, 140] },
+; execute only when Z flag is 0
+ADD.CZ R4, R5`, offset: [0, 140] },
 
     ],
 

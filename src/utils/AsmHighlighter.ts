@@ -1,4 +1,4 @@
-// AsmHighlighter.ts
+﻿// AsmHighlighter.ts
 import { CodeHighlighter, HighlightResult } from "@motion-canvas/2d";
 
 type AsmToken = { offset: number; content: string; color: string };
@@ -12,6 +12,7 @@ export type AsmTheme = {
   number: string;    // 42
   punc: string;      // [ ] , etc
   comment: string;   // ; ...
+  modifier: string;  // instruction modifier bits
 };
 
 const DEFAULT_THEME: AsmTheme = {
@@ -23,6 +24,7 @@ const DEFAULT_THEME: AsmTheme = {
   number:   "#ff9e64",
   punc:     "#89ddff",
   comment:  "#8b95c0",
+  modifier: "#9ece6a",
 };
 
 export class AsmHighlighter implements CodeHighlighter<AsmToken[]> {
@@ -67,7 +69,7 @@ export class AsmHighlighter implements CodeHighlighter<AsmToken[]> {
     const NL = /^\n/;
 
     const COMMENT  = /^;[^\n]*/;
-    const KEYWORD  = /^(?:LOAD|STORE|MOV|ADD|SUB|INC|DIV|DEC|AND|OR|XOR|NOT|SHL|SHR|CMP|JMP|BRGT|BREQ|BRNEG|NOP|HLT|PUSH|POP|CALL|RET|VADD|VSUB|VMUL|VDIV)\b/;
+    const KEYWORD  = /^(?:LOAD|STORE|MOV|ADD|SUB|INC|DIV|DEC|AND|OR|XOR|NOT|SHL|SHR|CMP|JMP|BRGT|BREQ|BRNEG|NOP|HLT|PUSH|POP|CALL|RET|VADD|VSUB|VMUL|VDIV|GRT0)\b/;
     const REGISTER = /^(?:ACC|PC|IR|SP|BP|ALU|FPU|VPU|R(?:1[0-5]|[0-9]))\b/;
 
     const HEX      = /^0x[0-9A-Fa-f]+/;
@@ -89,8 +91,17 @@ export class AsmHighlighter implements CodeHighlighter<AsmToken[]> {
 
       const mH  = s.match(HEX);      if (mH)  { push(mH[0], this.theme.hex);      continue; }
       const mI  = s.match(IMM);      if (mI)  { push(mI[0], this.theme.immediate);continue; }
-      const mN  = s.match(NUM);      if (mN)  { push(mN[0], this.theme.number);   continue; }
-
+      const mN  = s.match(NUM);
+      if (mN)  {
+        const rest = s.slice(mN[0].length);
+        const newlineIndex = rest.search(/\r?\n/);
+        const sameLineRest = newlineIndex === -1 ? rest : rest.slice(0, newlineIndex);
+        const isModifier =
+          sameLineRest.trim().length === 0 ||
+          sameLineRest.trimStart().startsWith(';');
+        push(mN[0], isModifier ? this.theme.modifier : this.theme.number);
+        continue;
+      }
       const mB  = s.match(BRACKET);  if (mB)  { push(mB[0], this.theme.punc);     continue; }
       const mCo = s.match(COMMA);    if (mCo) { push(mCo[0], this.theme.punc);    continue; }
 
@@ -99,3 +110,7 @@ export class AsmHighlighter implements CodeHighlighter<AsmToken[]> {
     return out;
   }
 }
+
+
+
+
