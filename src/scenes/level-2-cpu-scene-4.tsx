@@ -1,14 +1,18 @@
 import {
+  Circle,
   Code,
+  findAllCodeRanges,
   Gradient,
   Grid,
   Icon,
   Layout,
+  Line,
   lines,
   makeScene2D,
   Node,
   Rect,
   Txt,
+  word,
 } from "@motion-canvas/2d";
 import {
   all,
@@ -17,7 +21,9 @@ import {
   Color,
   createRef,
   createRefArray,
+  createSignal,
   DEFAULT,
+  easeInBack,
   easeInCubic,
   easeInOutCubic,
   easeOutBack,
@@ -486,16 +492,8 @@ export default makeScene2D(function* (view) {
     yield all(
       ...icons.map((ic) =>
         ic != icon
-          ? all(
-              ic.shadowBlur(0, 1),
-              ic.childAs<Icon>(0).color("#fffa", 1),
-              ic.scale(0.8, 1)
-            )
-          : all(
-              ic.childAs<Icon>(0).color("#fff", 1),
-              ic.shadowBlur(50, 1),
-              ic.scale(1, 1)
-            )
+          ? all(ic.childAs<Icon>(0).color("#fffa", 1), ic.scale(0.6, 1))
+          : all(ic.childAs<Icon>(0).color("#fff", 1), ic.scale(1, 1))
       )
     );
     yield* all(
@@ -524,11 +522,17 @@ export default makeScene2D(function* (view) {
       addresses_refs[i].shadowColor("#ff05", 1)
     );
   }
+  const flags = [
+    createSignal(0),
+    createSignal(0),
+    createSignal(0),
+    createSignal(0),
+  ];
 
   const window = (
     <Glass
       size={[2500, 1800]}
-      x={-650}
+      x={-500}
       lightness={-0.1}
       fill={"#0005"}
       scaleY={0}
@@ -652,7 +656,106 @@ export default makeScene2D(function* (view) {
         })}
         <Rect fill={"#0005"} size={[2500, 2500]} />
       </Node>
-      <Node zIndex={3} ref={unitwindow} opacity={0}></Node>
+      <Node zIndex={3} ref={unitwindow} opacity={0}>
+        <Grid
+          size={"100%"}
+          spacing={400}
+          stroke={"#fff5"}
+          lineWidth={2}
+          zIndex={-1}
+        ></Grid>
+        <Glass size={[1200, 800]} fill={"#e9a61622"}>
+          <Txt
+            fontSize={220}
+            y={-30}
+            fill={"#0005"}
+            zIndex={1}
+            fontWeight={800}
+          >
+            ALU
+          </Txt>{" "}
+          <Txt fontSize={50} y={90} fill={"#0005"} zIndex={1} fontWeight={200}>
+            By Banana Logic
+          </Txt>
+          <Line
+            points={[
+              [-1000, 0],
+              [-700, 100],
+              [-300, 0],
+            ]}
+            radius={400}
+            lineWidth={5}
+            x={-300}
+            stroke={"white"}
+            zIndex={-1}
+          />
+          <Line
+            points={[
+              [900, 0],
+              [1500, -150],
+              [2000, 0],
+            ]}
+            radius={400}
+            lineWidth={5}
+            x={-300}
+            stroke={"white"}
+            zIndex={-1}
+          />
+          <Line
+            points={[
+              [0, -400],
+              [200, -1150],
+              [0, -1200],
+            ]}
+            radius={400}
+            lineWidth={5}
+            stroke={"white"}
+            zIndex={-1}
+          />
+          <Glass size={[500, 100]} zIndex={1} y={250}>
+            <Circle
+              shadowBlur={40}
+              fill={"rgba(243, 222, 222, 1)"}
+              shadowColor={"#f0babaff"}
+              size={50}
+              zIndex={1}
+              x={-150}
+              scale={() => 0.75 + 0.25 * flags[0]()}
+              opacity={() => 0.5 + 0.5 * flags[0]()}
+            ></Circle>
+            <Circle
+              shadowBlur={40}
+              fill={"rgba(222, 236, 243, 1)"}
+              shadowColor={"#bae5f0ff"}
+              size={50}
+              zIndex={1}
+              x={-50}
+              scale={() => 0.75 + 0.25 * flags[1]()}
+              opacity={() => 0.5 + 0.5 * flags[1]()}
+            ></Circle>
+            <Circle
+              shadowBlur={40}
+              fill={"rgba(147, 255, 192, 1)"}
+              shadowColor={"#baf0d7ff"}
+              size={50}
+              zIndex={1}
+              x={50}
+              scale={() => 0.75 + 0.25 * flags[2]()}
+              opacity={() => 0.5 + 0.5 * flags[2]()}
+            ></Circle>
+            <Circle
+              shadowBlur={40}
+              fill={"rgba(243, 222, 243, 1)"}
+              shadowColor={"#ebbaf0ff"}
+              size={50}
+              zIndex={1}
+              x={150}
+              scale={() => 0.75 + 0.25 * flags[3]()}
+              opacity={() => 0.5 + 0.5 * flags[3]()}
+            ></Circle>
+          </Glass>
+        </Glass>
+      </Node>
     </Glass>
   ) as Glass;
   view.add(window);
@@ -671,6 +774,146 @@ export default makeScene2D(function* (view) {
     return all(animation);
   };
 
+  const registers = ["R0", "R1", "R2", "R3", "R4"].map((name, i) => (
+    <Glass width={1000} height={200} x={1100} scaleX={0} y={i * 250 - 500}>
+      <Txt
+        text={name}
+        fill={"#fffd"}
+        fontFamily={"Poppins"}
+        zIndex={1}
+        x={-400}
+        fontSize={90}
+        fontWeight={500}
+      />
+
+      <Txt
+        text={"0000 0000"}
+        fill={"#fffd"}
+        fontFamily={"Fira Code"}
+        zIndex={1}
+        x={200}
+        fontSize={90}
+        fontWeight={500}
+      />
+    </Glass>
+  ));
+  registers.forEach((r) => view.add(r));
+
+  function* setRegister(i: number, value: number) {
+    const register = registers[i];
+    const t = register.childAs<Txt>(1);
+    const val =
+      value % 2 == 0
+        ? value.toString(2).padStart(8, "0")
+        : value.toString(2).padEnd(8, "0");
+    yield t.scale(1.1, 0.4).wait(0.2).back(0.4);
+    yield* t.text(
+      val[7] +
+        val[6] +
+        val[5] +
+        val[4] +
+        " " +
+        val[3] +
+        val[2] +
+        val[1] +
+        val[0],
+      0.5
+    );
+    yield* waitFor(0.5);
+  }
+
+  function* addRegisters(i: number, j: number, a: number, b: number) {
+    const register0 = registers[i] as Glass;
+    const register1 = registers[j] as Glass;
+    const t = register0.childAs<Txt>(1);
+
+    const val =
+      (a + b) % 2 == 0
+        ? (a + b).toString(2).padStart(8, "0")
+        : (a + b).toString(2).padEnd(8, "0");
+
+    const arrow = (
+      <Line
+        points={[
+          register1.right(),
+          register0.right().add(register1.right()).div(2).addX(100),
+          register0.right(),
+        ]}
+        stroke={"#fff"}
+        endOffset={20}
+        startOffset={20}
+        radius={100}
+        endArrow
+        lineWidth={10}
+        end={0}
+        lineDash={[30, 10]}
+      />
+    ) as Line;
+    view.add(arrow);
+
+    yield chain(arrow.end(1, 0.5), arrow.start(1, 0.5));
+    yield t.scale(1.1, 0.4).wait(0.2).back(0.4);
+    yield* t.text(
+      val[7] +
+        val[6] +
+        val[5] +
+        val[4] +
+        " " +
+        val[3] +
+        val[2] +
+        val[1] +
+        val[0],
+      0.5
+    );
+    yield* waitFor(0.5);
+  }
+
+  function* cloneRegisters(i: number, j: number, value: number) {
+    const register0 = registers[i] as Glass;
+    const register1 = registers[j] as Glass;
+    const t = register0.childAs<Txt>(1);
+
+    const val =
+      value % 2 == 0
+        ? value.toString(2).padStart(8, "0")
+        : value.toString(2).padEnd(8, "0");
+
+    const arrow = (
+      <Line
+        points={[
+          register1.right(),
+          register0.right().add(register1.right()).div(2).addX(100),
+          register0.right(),
+        ]}
+        stroke={"#fff"}
+        endOffset={20}
+        startOffset={20}
+        radius={100}
+        endArrow
+        lineWidth={10}
+        end={0}
+        lineDash={[30, 10]}
+      />
+    ) as Line;
+    view.add(arrow);
+
+    yield chain(arrow.end(1, 0.5), arrow.start(1, 0.5));
+    yield t.scale(1.1, 0.4).wait(0.2).back(0.4);
+    yield* t.text(
+      val[7] +
+        val[6] +
+        val[5] +
+        val[4] +
+        " " +
+        val[3] +
+        val[2] +
+        val[1] +
+        val[0],
+      0.5
+    );
+    yield* waitFor(0.5);
+  }
+
   yield* window.scale(1, 1);
 
   yield* waitUntil("operands-intro");
@@ -684,8 +927,13 @@ export default makeScene2D(function* (view) {
     "; Let's do a demo!\n; we write memory as [x]\n; registers as RX\n; values as #x\n\n"
   );
 
+  yield sequence(
+    0.1,
+    ...registers.map((r) => all(r.scale(1, 0.7, easeOutBack)))
+  );
   yield* waitUntil("load-r0");
-  yield* appendLine("LOAD R0, [0x10] 1000");
+  yield* appendLine("LOAD R0, [0x0a]");
+  yield* setRegister(0, 3);
 
   yield* waitUntil("imm-flag");
   yield* toggleWindowMode(ramwindow);
@@ -703,64 +951,72 @@ export default makeScene2D(function* (view) {
   values_refs.forEach((ref) => ref.restore());
   addresses_refs.forEach((ref) => ref.restore());
 
-
   yield* waitUntil("load-r1");
-  yield* appendLine("LOAD R1, [0x11] 1000 ; same trick");
+  yield* setRegister(1, 5);
+
+  yield* appendLine("LOAD R1, [0x11] ; same trick");
 
   yield* waitUntil("memory");
   yield* toggleWindowMode(ramwindow);
-  yield* waitFor(1)
+  yield* waitFor(1);
   yield* toggleWindowMode(programwindow);
 
-
   yield* waitUntil("add-r0-r1");
-  yield* appendLine("ADD R0, R1 0000 ; R0 += R1");
-
-  yield* waitUntil("sum-note");
-  // yield* appendLine("; R0 now holds 8 (3 + 5)");
+  yield* appendLine("ADD R0, R1 ; R0 += R1");
+  yield* addRegisters(0, 1, 3, 5);
 
   yield* waitUntil("store-r0");
-  yield* appendLine("STORE  R0, [0x14] 0000 ;");
+  yield* appendLine("STORE  R0, [0x04]\n ");
 
-  yield* waitUntil("flags-check");
-  // yield* appendLine("; Check Z/N flags before optionally bumping the result");
+  yield* waitUntil("where-modifiers");
+  yield* all(program.code.append(" 1100", 0.5));
+  yield* waitFor(0.5);
+  yield* program.code.remove(program.findFirstRange("1100"), 0.5);
+  yield* waitUntil("first-op");
+  yield* program.selection(lines(6, 6), 1);
+  yield* program.selection(word(6, 8, 10), 1);
+  yield* waitFor(0.5);
+  yield* toggleWindowMode(ramwindow);
+  yield* waitFor(0.5);
+  yield* toggleWindowMode(programwindow);
+
+  yield* waitFor(0.5);
+  const explination_string_raw =
+    "\nLOAD R0, [0x0a]\noperation is translated to\n[00000100 1100 000000000000 000000001010]";
+  yield* program.code.append(explination_string_raw, 1);
+  yield* program.selection(lines(12, 15), 1);
+  yield* program.selection(word(14, 15, 12), 0.5);
+  yield* waitFor(0.5);
+
+  yield* program.selection(DEFAULT, 0.5);
+  yield* program.code.remove(lines(11, 15), 1);
 
   yield* waitUntil("cmp-zero");
-  yield* appendLine("\nGRT0 R0, [0xf20] 0000; jmp to f20 if > 0");
+  yield window.x(0, 1);
+  yield sequence(0.1, ...registers.map((r) => all(r.x(2500, 0.7, easeInBack))));
+  yield* appendLine("; Comparation:");
+  yield* appendLine("GRT0 R0, [0xf20] ; jmp to f20 if > 0");
+  yield* appendLine("JMP [0xf21] ; otherwise skip to f21");
+  yield* appendLine("INC R0 ; here is 0xf20");
+  yield* appendLine("HLT ; // this is f21. HLT does nothing ");
 
-  yield* waitUntil("branch-negative");
-  yield* appendLine("JMP [0xf21] 0000 ; otherwise skip to ");
-
-  yield* waitUntil("inc-positive");
-  yield* appendLine("ADD R0, #1 1000; // this is f20 ");
-  yield* appendLine("HLT; // this is f21. HLT does nothing ");
-
-  yield* waitUntil("label-skip");
+  yield* waitUntil("alu");
+  yield* toggleWindowMode(unitwindow);
+  yield* waitFor(0.3);
+  yield* sequence(0.1, flags[0](1, 0.5), flags[1](1, 0.5));
+  yield* waitFor(0.3);
+  yield* toggleWindowMode(programwindow);
 
   yield* waitUntil("while-intro");
   yield* appendLine("\n; While loop:");
 
   yield program.y(-500, 1);
   yield* waitUntil("loop-load");
-  yield* appendLine("LOAD R2, [0x10] 0000 ;");
-
-  yield* waitUntil("loop-label");
-  // yield* appendLine("loop_start:");
-
-  yield* waitUntil("loop-sub");
-  yield* appendLine("SUB R2, #1 0000 ;");
-
-  yield* waitUntil("loop-store");
-  yield* appendLine("STORE R2, [0x10] 0000 ; Persist the countdown");
-
-  yield* waitUntil("loop-cmp");
-  yield* appendLine("CMP R2, #0 0000 ; refresh the flags");
-
-  yield* waitUntil("loop-branch");
-  yield* appendLine("GRT0 R2, [0xf30] 0000 ;  (f30 is the SUB above)");
-
-  yield* waitUntil("loop-jump");
-  yield* appendLine("JMP [0xf31] 0000 ; Otherwise continue after the loop");
+  yield* appendLine("LOAD R2, [0x10]");
+  yield* appendLine("SUB R2, #1");
+  yield* appendLine("STORE R2, [0x10] ; store in memory");
+  yield* appendLine("GRT0 R2, [0xf30] ;  (f30 is the SUB above)");
+  yield* appendLine("JMP [0xf31] ; Otherwise continue after the loop");
   yield* waitUntil("loop-end");
   yield* appendLine("HLT; // this is f31. HLT does nothing");
 
