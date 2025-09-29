@@ -6,48 +6,52 @@
       "targetTime": 0.4595599334769813
     },
     {
+      "name": "expand",
+      "targetTime": 4.714802917555787
+    },
+    {
       "name": "opcode",
-      "targetTime": 5.469559933476983
-    },
-    {
-      "name": "operand",
-      "targetTime": 6.516824559037409
-    },
-    {
-      "name": "operand-b",
-      "targetTime": 6.516824559037409
+      "targetTime": 7.074802917555786
     },
     {
       "name": "modifier-intro",
-      "targetTime": 6.516824559037409
+      "targetTime": 7.591084005382255
+    },
+    {
+      "name": "operand",
+      "targetTime": 7.935848009448235
+    },
+    {
+      "name": "operand-b",
+      "targetTime": 8.378045319011122
     },
     {
       "name": "larger",
-      "targetTime": 6.516824559037409
+      "targetTime": 8.91248709228297
     },
     {
       "name": "modifier-focus",
-      "targetTime": 10.51682455903741
+      "targetTime": 12.91248709228297
     },
     {
       "name": "modifier-m",
-      "targetTime": 11.51682455903741
+      "targetTime": 15.281803060240179
     },
     {
       "name": "modifier-destination",
-      "targetTime": 15.116824559037411
+      "targetTime": 18.88180306024018
     },
     {
       "name": "modifier-jump",
-      "targetTime": 18.716824559037413
+      "targetTime": 22.48180306024018
     },
     {
       "name": "modifier-condition",
-      "targetTime": 22.31682455903741
+      "targetTime": 26.081803060240176
     },
     {
       "name": "next",
-      "targetTime": 28.598766787512872
+      "targetTime": 32.363745288715634
     }
   ],
   "seed": 1481779856

@@ -53,6 +53,7 @@ export default class Scene3D extends Layout {
   public onRender: RenderCallback;
   private composerInitialized = false;
 
+
   public projectToScreen(point3D: Vector3): Vector2 {
     const cameraNode: CameraThrash = this.findFirst(
       (child) => child instanceof CameraThrash
@@ -62,7 +63,8 @@ export default class Scene3D extends Layout {
     const camera = cameraNode.configuredCamera();
     const projected = point3D.clone().project(camera); // NDC [-1,1]
 
-    const { width, height } = this.computedSize();
+    const width = 4096;
+    const height = 2048;
 
     return new Vector2(
       projected.x * 0.5 * width, // range: [-width/2, width/2]
@@ -101,7 +103,9 @@ export default class Scene3D extends Layout {
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
-    const { width, height } = this.computedSize();
+    // const { width, height } = this.computedSize();
+    const width = 4096;
+    const height = 2048;
     const scene = this.scene;
     const renderer = this.configuredRenderer();
 
@@ -139,7 +143,7 @@ export default class Scene3D extends Layout {
 
     composer.addPass(
       new UnrealBloomPass(
-        new ThreeVector2(this.width(), this.height()),
+        new ThreeVector2(4096, 2048),
         0.6,
         0.8,
         0.4
@@ -147,8 +151,8 @@ export default class Scene3D extends Layout {
     );
     const fxaaPass = new ShaderPass(FXAAShader);
     fxaaPass.material.uniforms["resolution"].value.set(
-      1 / window.innerWidth,
-      1 / window.innerHeight
+      1 / 4096,
+      1 / 2048
     );
     composer.addPass(fxaaPass);
 
@@ -160,7 +164,6 @@ export default class Scene3D extends Layout {
 
   @computed()
   private configuredRenderer(): WebGLRenderer {
-    const size = this.computedSize();
 
     const renderer = this.renderer;
 
@@ -170,8 +173,8 @@ export default class Scene3D extends Layout {
     renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = SRGBColorSpace;
 
-    renderer.setSize(size.width, size.height);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(4096, 2048);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 
     return renderer;
   }

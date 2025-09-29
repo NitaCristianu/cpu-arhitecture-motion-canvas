@@ -27,79 +27,83 @@
     },
     {
       "name": "registers",
-      "targetTime": 25.139825920240042
+      "targetTime": 27.363018464781376
     },
     {
       "name": "restore",
-      "targetTime": 29.182994807537884
+      "targetTime": 31.40618735207922
     },
     {
       "name": "code",
-      "targetTime": 31.78440096376858
+      "targetTime": 34.00759350830991
     },
     {
       "name": "operands-intro",
-      "targetTime": 32.784400963768576
+      "targetTime": 35.00759350830991
     },
     {
       "name": "load-r0",
-      "targetTime": 33.38440096376858
+      "targetTime": 35.60759350830991
     },
     {
       "name": "imm-flag",
-      "targetTime": 34.98440096376858
+      "targetTime": 37.20759350830991
     },
     {
       "name": "imm-off",
-      "targetTime": 38.284400963768576
+      "targetTime": 40.50759350830991
     },
     {
       "name": "load-r1",
-      "targetTime": 39.693096878032804
+      "targetTime": 41.91628942257414
     },
     {
       "name": "memory",
-      "targetTime": 42.94235099925174
+      "targetTime": 45.16554354379307
     },
     {
       "name": "add-r0-r1",
-      "targetTime": 45.962957277976095
+      "targetTime": 48.18614982251743
     },
     {
       "name": "store-r0",
-      "targetTime": 48.53401626910827
+      "targetTime": 50.757208813649605
     },
     {
       "name": "where-modifiers",
-      "targetTime": 49.76271769590489
+      "targetTime": 51.98591024044622
     },
     {
       "name": "first-op",
-      "targetTime": 51.58909605997903
+      "targetTime": 53.81228860452036
     },
     {
       "name": "cmp-zero",
-      "targetTime": 60.29989560802325
+      "targetTime": 62.52308815256458
     },
     {
       "name": "alu",
-      "targetTime": 62.699895608023255
+      "targetTime": 65.52308815256457
     },
     {
       "name": "while-intro",
-      "targetTime": 64.43230421516921
+      "targetTime": 69.89792043458412
     },
     {
       "name": "loop-load",
-      "targetTime": 65.0323042151692
+      "targetTime": 71.0715786753836
     },
     {
       "name": "loop-end",
-      "targetTime": 69.00281104632447
+      "targetTime": 74.37449411368483
+    },
+    {
+      "name": "restore0",
+      "targetTime": 75.97449411368483
     },
     {
       "name": "next",
-      "targetTime": 75.21409033612544
+      "targetTime": 82.95839977967373
     }
   ],
   "seed": 3291741135

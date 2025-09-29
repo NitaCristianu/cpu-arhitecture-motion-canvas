@@ -664,7 +664,28 @@ export default makeScene2D(function* (view) {
           lineWidth={2}
           zIndex={-1}
         ></Grid>
-        <Glass size={[1200, 800]} fill={"#e9a61622"}>
+        <Rect
+          radius={64}
+          stroke={
+            new Gradient({
+              from: new Vector2(100, 200),
+              to: new Vector2(0, 0),
+              stops: [
+                {
+                  offset: 0,
+                  color: "#fffa",
+                },
+                {
+                  offset: 1,
+                  color: "#fff1",
+                },
+              ],
+            })
+          }
+          lineWidth={2}
+          size={[1200, 800]}
+          fill={"#e9a61622"}
+        >
           <Txt
             fontSize={220}
             y={-30}
@@ -712,7 +733,13 @@ export default makeScene2D(function* (view) {
             stroke={"white"}
             zIndex={-1}
           />
-          <Glass size={[500, 100]} zIndex={1} y={250}>
+          <Rect
+            fill="#0c09025a"
+            radius={64}
+            size={[500, 150]}
+            zIndex={1}
+            y={250}
+          >
             <Circle
               shadowBlur={40}
               fill={"rgba(243, 222, 222, 1)"}
@@ -720,19 +747,37 @@ export default makeScene2D(function* (view) {
               size={50}
               zIndex={1}
               x={-150}
+              y={-30}
               scale={() => 0.75 + 0.25 * flags[0]()}
-              opacity={() => 0.5 + 0.5 * flags[0]()}
-            ></Circle>
+              opacity={() => 0.25 + 0.75 * flags[0]()}
+            >
+              <Txt
+                y={65}
+                fontFamily={"Poppins"}
+                fill={"rgba(243, 222, 222, 1)"}
+              >
+                Z
+              </Txt>
+            </Circle>
             <Circle
               shadowBlur={40}
               fill={"rgba(222, 236, 243, 1)"}
               shadowColor={"#bae5f0ff"}
               size={50}
+              y={-30}
               zIndex={1}
               x={-50}
               scale={() => 0.75 + 0.25 * flags[1]()}
-              opacity={() => 0.5 + 0.5 * flags[1]()}
-            ></Circle>
+              opacity={() => 0.2 + 0.75 * flags[1]()}
+            >
+              <Txt
+                y={65}
+                fontFamily={"Poppins"}
+                fill={"rgba(222, 236, 243, 1)"}
+              >
+                N
+              </Txt>
+            </Circle>
             <Circle
               shadowBlur={40}
               fill={"rgba(147, 255, 192, 1)"}
@@ -741,8 +786,17 @@ export default makeScene2D(function* (view) {
               zIndex={1}
               x={50}
               scale={() => 0.75 + 0.25 * flags[2]()}
-              opacity={() => 0.5 + 0.5 * flags[2]()}
-            ></Circle>
+              y={-30}
+              opacity={() => 0.25 + 0.75 * flags[2]()}
+            >
+              <Txt
+                y={65}
+                fontFamily={"Poppins"}
+                fill={"rgba(147, 255, 192, 1)"}
+              >
+                V
+              </Txt>
+            </Circle>
             <Circle
               shadowBlur={40}
               fill={"rgba(243, 222, 243, 1)"}
@@ -751,10 +805,19 @@ export default makeScene2D(function* (view) {
               zIndex={1}
               x={150}
               scale={() => 0.75 + 0.25 * flags[3]()}
-              opacity={() => 0.5 + 0.5 * flags[3]()}
-            ></Circle>
-          </Glass>
-        </Glass>
+              opacity={() => 0.25 + 0.75 * flags[3]()}
+              y={-30}
+            >
+              <Txt
+                y={65}
+                fontFamily={"Poppins"}
+                fill={"rgba(243, 222, 243, 1)"}
+              >
+                DZ
+              </Txt>
+            </Circle>
+          </Rect>
+        </Rect>
       </Node>
     </Glass>
   ) as Glass;
@@ -997,17 +1060,19 @@ export default makeScene2D(function* (view) {
   yield* appendLine("; Comparation:");
   yield* appendLine("GRT0 R0, [0xf20] ; jmp to f20 if > 0");
   yield* appendLine("JMP [0xf21] ; otherwise skip to f21");
-  yield* appendLine("INC R0 ; here is 0xf20");
+  yield* appendLine("ADD R0, #1; here is 0xf20");
   yield* appendLine("HLT ; // this is f21. HLT does nothing ");
 
   yield* waitUntil("alu");
   yield* toggleWindowMode(unitwindow);
   yield* waitFor(0.3);
+  yield unitwindow().scale(3, 1);
+  yield unitwindow().y(-150, 1);
   yield* sequence(0.1, flags[0](1, 0.5), flags[1](1, 0.5));
-  yield* waitFor(0.3);
-  yield* toggleWindowMode(programwindow);
-
+  yield* waitFor(1);
+  
   yield* waitUntil("while-intro");
+  yield* toggleWindowMode(programwindow);
   yield* appendLine("\n; While loop:");
 
   yield program.y(-500, 1);
@@ -1021,6 +1086,35 @@ export default makeScene2D(function* (view) {
   yield* appendLine("HLT; // this is f31. HLT does nothing");
 
   yield* program.selection(DEFAULT, 1);
+
+  yield* waitUntil("restore0");
+  yield window.scale(0, 1.2);
+  yield* camera.moveTo(
+    camera.localPosition().clone().multiply(new Vector3(-1.5, 0.1, -1.9)),
+    2
+  );
+  const overlay = <Rect opacity={0} size={'100%'} fill={'#000'}/>
+  view.add(overlay);
+  const level2Txt = <Txt
+    fontFamily={"Poppins"}
+    fontWeight={700}
+    shadowBlur={50}
+    shadowColor={"#ff0a"}
+    fontSize={420}
+    fill={"#ff0"}
+    key="title"
+  /> as Txt;
+  view.add(level2Txt);
+
+  yield all(
+    overlay.opacity(0.7,1),
+    level2Txt.text("LEVEL 2", 1.5),
+  )
+
+  yield* camera.moveTo(
+    camera.localPosition().clone().multiply(new Vector3(-1.3, 2.5, 1.2)),
+    2
+  );
 
   yield* waitUntil("next");
 });
