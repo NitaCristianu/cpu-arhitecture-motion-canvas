@@ -3,6 +3,7 @@ import {
   PerspectiveCamera,
   OrthographicCamera,
   Vector3,
+  CatmullRomCurve3,
 } from "three";
 import Object, { ObjectProps } from "./utils/Object";
 import { initial, signal, computed } from "@motion-canvas/2d";
@@ -26,7 +27,7 @@ export interface CameraProps extends ObjectProps {
 /*───────────────────────────────────────────────*/
 export default class Camera extends Object {
   /* ── Signals ───────────────────────────────── */
-  @initial(new PerspectiveCamera(20, 16 / 9, 0.05, 2000))
+  @initial(new PerspectiveCamera(20, 2, 0.05, 2000))
   @signal()
   public declare readonly camera: SimpleSignal<ThreeCamera | null, this>;
 
@@ -79,7 +80,74 @@ export default class Camera extends Object {
   private weightedTarget(target: Vector3, overrideWeighted : number = null): Vector3 {
     return target.clone().lerp(this.anchor(), overrideWeighted ? overrideWeighted : this.anchorWeight());
   }
-  
+
+  /**
+   * Follows a smooth Catmull-Rom spline through the provided waypoints.
+   * Maintains approximately constant speed for continuous motion.
+   */
+  public *followWaypoints(
+    waypoints: readonly Vector3[],
+    duration = 2,
+    options: {
+      closed?: boolean;
+      includeCurrentPosition?: boolean;
+      tension?: number;
+      curveType?: "centripetal" | "chordal" | "catmullrom";
+    } = {},
+  ) {
+    if (!waypoints || waypoints.length === 0) {
+      return;
+    }
+
+    const {
+      closed = false,
+      includeCurrentPosition = true,
+      tension = 0.5,
+      curveType = "centripetal",
+    } = options;
+
+    const controlPoints: Vector3[] = [];
+
+    if (includeCurrentPosition) {
+      controlPoints.push(this.localPosition().clone());
+    }
+
+    for (const waypoint of waypoints) {
+      controlPoints.push(waypoint.clone());
+    }
+
+    if (controlPoints.length < 2) {
+      return;
+    }
+
+    const filtered: Vector3[] = [controlPoints[0]];
+    for (let i = 1; i < controlPoints.length; i++) {
+      if (!controlPoints[i].equals(filtered[filtered.length - 1])) {
+        filtered.push(controlPoints[i]);
+      }
+    }
+
+    if (filtered.length < 2) {
+      return;
+    }
+
+    const curve = new CatmullRomCurve3(
+      filtered,
+      closed,
+      curveType,
+      tension,
+    );
+
+    const safeDuration = Math.max(1e-3, duration);
+    yield* tween(safeDuration, (progress) => {
+      const nextPosition = curve.getPointAt(progress);
+      this.localPosition(nextPosition.clone());
+    });
+
+    const finalTarget = closed ? filtered[0] : filtered[filtered.length - 1];
+    this.localPosition(finalTarget.clone());
+  }
+
   public *moveToWeighted(
     target: Vector3,
     duration = 0.5,

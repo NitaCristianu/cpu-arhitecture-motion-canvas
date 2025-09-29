@@ -63,12 +63,14 @@ export default class Scene3D extends Layout {
     const camera = cameraNode.configuredCamera();
     const projected = point3D.clone().project(camera); // NDC [-1,1]
 
-    const width = 4096;
-    const height = 2048;
+    const size = this.computedSize();
+    const width = size.width || 4096;
+    const height = size.height || 2048;
+    const yOffset = height * (475 / 2048);
 
     return new Vector2(
       projected.x * 0.5 * width, // range: [-width/2, width/2]
-      -projected.y * 0.5 * height + 475 // flip Y to match screen space
+      -projected.y * 0.5 * height + yOffset // flip Y to match screen space
     );
   }
 
@@ -103,21 +105,20 @@ export default class Scene3D extends Layout {
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
-    // const { width, height } = this.computedSize();
-    const width = 4096;
-    const height = 2048;
+    const { width, height } = this.computedSize();
     const scene = this.scene;
     const renderer = this.configuredRenderer();
 
     if (width > 0 && height > 0) {
       this.onRender(renderer, scene, this.configuredCameraInstance());
-      // context.imageSmoothingEnabled = false;
+      const sourceWidth = renderer.domElement.width || width;
+      const sourceHeight = renderer.domElement.height || height;
       context.drawImage(
         renderer.domElement,
         0,
         0,
-        width,
-        height,
+        sourceWidth,
+        sourceHeight,
         width / -2,
         height / -2,
         width,
@@ -141,18 +142,20 @@ export default class Scene3D extends Layout {
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
 
+    const renderSize = renderer.getSize(new ThreeVector2());
     composer.addPass(
       new UnrealBloomPass(
-        new ThreeVector2(4096, 2048),
+        renderSize.clone(),
         0.6,
         0.8,
         0.4
       )
     );
     const fxaaPass = new ShaderPass(FXAAShader);
-    fxaaPass.material.uniforms["resolution"].value.set(
-      1 / 4096,
-      1 / 2048
+    const fxaaResolution = fxaaPass.material.uniforms["resolution"].value;
+    fxaaResolution.set(
+      1 / Math.max(renderSize.x, 1),
+      1 / Math.max(renderSize.y, 1)
     );
     composer.addPass(fxaaPass);
 
@@ -164,6 +167,7 @@ export default class Scene3D extends Layout {
 
   @computed()
   private configuredRenderer(): WebGLRenderer {
+    const size = this.computedSize();
 
     const renderer = this.renderer;
 
@@ -173,8 +177,12 @@ export default class Scene3D extends Layout {
     renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = SRGBColorSpace;
 
-    renderer.setSize(4096, 2048);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    const targetWidth = Math.max(1, Math.round(size.width || 4096));
+    const targetHeight = Math.max(1, Math.round(size.height || 2048));
+
+    renderer.setSize(targetWidth, targetHeight);
+    const pixelRatio = typeof window !== "undefined" && window.devicePixelRatio ? window.devicePixelRatio : 1;
+    renderer.setPixelRatio(pixelRatio);
 
     return renderer;
   }

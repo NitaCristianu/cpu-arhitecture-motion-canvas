@@ -9,126 +9,231 @@ import Mesh from "../../libs/Thrash/objects/Mesh";
 import Group from "../../libs/Thrash/objects/Group";
 import Sphere from "../../libs/Thrash/objects/Sphere";
 
-/* ── DIMENSIONS ───────────────────────────────────── */
-const T = 0.02; // thin Z-depth for all logic blocks
-const S = 0.1; // base XY size of small units
-const L = 0.18; // large unit width
-const H = 0.13; // large unit height
-const wire_sizes = [8, 8, 8, 8, 6, 10, 6, 6, 8, 8, 6, 16, 16];
+const T = 0.02;
+const S = 0.1;
+const L = 0.18;
+const H = 0.13;
+const INSTRUCTION_BUS_WIDTH = 24;
 
 export const FLAG_DEFS = {
-  Z: { on: 0x00ff00, off: 0x222222 }, // green
-  N: { on: 0xff00ff, off: 0x222222 }, // magenta
-  V: { on: 0xffff00, off: 0x222222 }, // yellow
-  DZ: { on: 0x00ffff, off: 0x222222 }, // cyan
-};
+  Z: { on: 0x00ff00, off: 0x222222 },
+  N: { on: 0xff00ff, off: 0x222222 },
+  V: { on: 0xffff00, off: 0x222222 },
+  DZ: { on: 0x00ffff, off: 0x222222 },
+} as const;
 
 export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
-  const container = new Group({ key: "CPU 2 Group" });
-  /* ── RAM (tall slab on the right) ─────────────────── */
+  const container = new Group({ key: "CPU 3 Group" });
+
   const ram = new Box({
-    key: "level_2 RAM",
+    key: "level_3 RAM",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x07174a }),
-    localScale: new Vector3(0, 0, 0), // thin in X, tall in Y
-    localPosition: new Vector3(0.5, -0.4, 0),
-    localRotation: new Vector3(0, -Math.PI / 2, Math.PI / 2), // slight twist
-  });
-  /* ── CPU container (rotated flat) ─────────────────── */
-  const cpu = new Group({
-    key: "Level 2 CPU",
     localScale: new Vector3(0, 0, 0),
-    localRotation: new Vector3(-Math.PI / 2, 0, 0), // face “up”
-    localPosition: new Vector3(0, -0.35, 0),
-  });
-  const cpu_base = new Box({
-    key: "level_2 BASE",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x323232 }),
-    localScale: new Vector3(0.65, 0.6, T * 5),
-    localPosition: new Vector3(-0.02, 0, -0.02 - T * 2),
+    localPosition: new Vector3(0.82, -0.38, 0),
+    localRotation: new Vector3(0, -Math.PI / 2, Math.PI / 2),
   });
 
-  /* child blocks — positions are inside cpu-space (XY because we rotated) */
+  const cpu = new Group({
+    key: "Level 3 CPU",
+    localScale: new Vector3(0, 0, 0),
+    localRotation: new Vector3(-Math.PI / 2, 0, 0),
+    localPosition: new Vector3(0, -0.35, 0),
+  });
+
+  const cpu_base = new Box({
+    key: "level_3 BASE",
+    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x323232 }),
+    localScale: new Vector3(1.05, 0.74, T * 6),
+    localPosition: new Vector3(-0.03, -0.01, -0.02 - T * 2),
+  });
+
   const cu = new Box({
-    key: "level_2 CU",
+    key: "level_3 CU",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x4caf50 }),
     localScale: new Vector3(L / 2, H, T),
-    localPosition: new Vector3(-0.18, -0.05, 0),
+    localPosition: new Vector3(-0.32, -0.05, 0),
   });
 
   const alu = new Box({
-    key: "level_2 ALU",
+    key: "level_3 ALU",
     material: new MeshPhysicalMaterial({
-      color: 0x00a0ff,
-      metalness: 0.5,
+      color: COLORS.alu,
+      metalness: 0.6,
     }),
     localScale: new Vector3(L, H, T),
-    localPosition: new Vector3(0.0, -0.05, 0),
+    localPosition: new Vector3(-0.06, -0.05, 0),
+  });
+
+  const fpu = new Box({
+    key: "level_3 FPU",
+    material: new MeshPhysicalMaterial({
+      color: COLORS.fpu,
+      metalness: 0.7,
+      roughness: 0.4,
+    }),
+    localScale: new Vector3(L, H * 1.1, T),
+    localPosition: new Vector3(0.14, -0.05, 0),
   });
 
   const ir = new Box({
-    key: "level_2 IR",
+    key: "level_3 IR",
     material: new MeshPhysicalMaterial({
-      color: 0x00a0ff,
-      metalness: 0.5,
+      color: COLORS.bus,
+      metalness: 0.6,
     }),
-    localScale: new Vector3(L / 3, L / 3, T),
-    localPosition: new Vector3(-0.25, 0.23, 0),
+    localScale: new Vector3((L / 3) * 1.3, (L / 3) * 1.3, T),
+    localPosition: new Vector3(-0.26, 0.25, 0),
+  });
+
+  const decode = new Box({
+    key: "level_3 DECODE",
+    material: new MeshPhysicalMaterial({
+      metalness: 0.5,
+      color: 0xff9800,
+    }),
+    localScale: new Vector3(L / 2, L / 3, T),
+    localPosition: new Vector3(-0.15, 0.13, 0),
   });
 
   const mc = new Box({
-    key: "level_2 MC",
+    key: "level_3 MC",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xbe22e8 }),
-    localScale: new Vector3(L * 0.5, H * 0.8, T),
-    localPosition: new Vector3(0.22, -0.05, 0),
+    localScale: new Vector3(L * 0.55, H * 0.85, T),
+    localPosition: new Vector3(0.34, -0.08, 0),
   });
 
+  const cache = new Group({
+    key: "level_3 CACHE",
+    localPosition: new Vector3(0.5, -0.06, 0),
+  });
+
+  const cacheBody = new Box({
+    key: "level_3 CACHE_BODY",
+    material: new MeshPhysicalMaterial({
+      metalness: 0.7,
+      roughness: 0.4,
+      color: COLORS.cache,
+    }),
+    localScale: new Vector3(S * 1.2, S * 2.2, T),
+  });
+
+  const cacheData = new Box({
+    key: "level_3 CACHE_DATA",
+    material: new MeshPhysicalMaterial({
+      metalness: 0.8,
+      roughness: 0.3,
+      color: COLORS.busData,
+      emissive: 0x0c1c40,
+    }),
+    localScale: new Vector3(S * 0.55, S * 0.85, T * 0.9),
+    localPosition: new Vector3(-0.04, 0.14, 0.01),
+  });
+
+  const cacheInstr = new Box({
+    key: "level_3 CACHE_INSTR",
+    material: new MeshPhysicalMaterial({
+      metalness: 0.8,
+      roughness: 0.3,
+      color: COLORS.busAddr,
+      emissive: 0x0e162f,
+    }),
+    localScale: new Vector3(S * 0.55, S * 0.85, T * 0.9),
+    localPosition: new Vector3(0.04, -0.14, 0.01),
+  });
+
+  cache.add(cacheBody);
+  cache.add(cacheData);
+  cache.add(cacheInstr);
+
   const gpr = new Box({
-    key: "level_2 GPR",
+    key: "level_3 GPR",
     material: new MeshPhysicalMaterial({
       metalness: 1,
-      roughness: 2,
+      roughness: 0.9,
       color: 0xcccccc,
     }),
     localScale: new Vector3(S, S * 1.5, T),
-    localPosition: new Vector3(0, 0.17, 0),
+    localPosition: new Vector3(-0.06, 0.22, 0),
   });
 
+  const fpr = new Box({
+    key: "level_3 FPR",
+    material: new MeshPhysicalMaterial({
+      metalness: 0.9,
+      roughness: 0.3,
+      color: 0xa9d6ff,
+      emissive: 0x132544,
+    }),
+    localScale: new Vector3(S * 1.1, S * 2, T),
+    localPosition: new Vector3(0.14, 0.24, 0),
+  });
+
+  const stackPointers = new Group({
+    key: "level_3 STACK",
+    localPosition: new Vector3(0.08, 0.3, 0),
+  });
+
+  const bp = new Box({
+    key: "level_3 BP",
+    material: new MeshPhysicalMaterial({
+      color: 0x0077c2,
+      metalness: 0.8,
+      roughness: 0.3,
+      emissive: 0x001b33,
+    }),
+    localScale: new Vector3(S * 0.4, S * 0.55, T * 0.9),
+    localPosition: new Vector3(-0.04, 0.02, 0),
+  });
+
+  const sp = new Box({
+    key: "level_3 SP",
+    material: new MeshPhysicalMaterial({
+      color: 0x009688,
+      metalness: 0.8,
+      roughness: 0.3,
+      emissive: 0x00211a,
+    }),
+    localScale: new Vector3(S * 0.4, S * 0.55, T * 0.9),
+    localPosition: new Vector3(0.04, -0.02, 0),
+  });
+
+  const stackLogic = new Box({
+    key: "level_3 STACK_LOGIC",
+    material: new MeshPhysicalMaterial({
+      metalness: 0.6,
+      roughness: 0.5,
+      color: COLORS.control,
+    }),
+    localScale: new Vector3(S * 0.35, S * 0.35, T * 0.9),
+    localPosition: new Vector3(0, -0.14, 0),
+  });
+
+  stackPointers.add(bp);
+  stackPointers.add(sp);
+  stackPointers.add(stackLogic);
+
   const clock = new Box({
-    key: "level_2 CLOCK",
+    key: "level_3 CLOCK",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xffffff }),
     localScale: new Vector3(S * 0.3, S * 0.4, T),
     localPosition: new Vector3(-0.3, -0.22, 0),
   });
 
   const pc = new Box({
-    key: "level_2 PC",
+    key: "level_3 PC",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xff0000 }),
-    localScale: new Vector3(L * 0.3, L * 0.3, T),
-    localPosition: new Vector3(0, -0.22, 0),
-  });
-
-  const decode = new Box({
-    key: "level_2 DECODE",
-    material: new MeshPhysicalMaterial({
-      metalness: 0.5,
-      color: 0xff9800, // orange for distinction
-    }),
-    localScale: new Vector3(L / 2, L / 3, T),
-    localPosition: new Vector3(-0.15, 0.13, 0), // near IR, left-center
+    localScale: new Vector3(L * 0.35, L * 0.35, T),
+    localPosition: new Vector3(0, -0.24, 0),
   });
 
   const alu_flags = new Group({
-    key: "level_2 FLAGS",
+    key: "level_3 FLAGS",
     localScale: new Vector3(1, 1, 1),
-    localPosition: alu
-      .localPosition()
-      .clone()
-      .add(new Vector3(0, -0.05, 0.012)),
+    localPosition: alu.localPosition().clone().add(new Vector3(0, -0.05, 0.012)),
   });
 
-  // Individual flag lights (Z, N, V, DZ) — smaller & brighter
   const flag_Z = new Sphere({
-    key: "level 2FLAG_Z",
+    key: "level_3 FLAG_Z",
     material: new MeshPhysicalMaterial({
       color: FLAG_DEFS.Z.off,
       metalness: 1,
@@ -140,7 +245,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   });
 
   const flag_N = new Sphere({
-    key: "level 2 FLAG_N",
+    key: "level_3 FLAG_N",
     material: new MeshPhysicalMaterial({
       color: FLAG_DEFS.N.off,
       metalness: 1,
@@ -152,7 +257,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   });
 
   const flag_V = new Sphere({
-    key: "level 2 FLAG_V",
+    key: "level_3 FLAG_V",
     material: new MeshPhysicalMaterial({
       color: FLAG_DEFS.V.off,
       metalness: 1,
@@ -164,7 +269,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   });
 
   const flag_DZ = new Sphere({
-    key: "level 2 FLAG_DZ",
+    key: "level_3 FLAG_DZ",
     material: new MeshPhysicalMaterial({
       color: FLAG_DEFS.DZ.off,
       metalness: 1,
@@ -175,231 +280,295 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     localPosition: new Vector3(0.03, 0, 0),
   });
 
-  const wire_cu_iu = (
+  alu_flags.add(flag_Z);
+  alu_flags.add(flag_N);
+  alu_flags.add(flag_V);
+  alu_flags.add(flag_DZ);
+
+  const wire_cu_alu = (
     <Line
       points={[
-        cu
-          .localPosition()
-          .clone()
-          .add(new Vector3(cu.localScale().x / 2, 0, 0)),
+        cu.localPosition().clone().add(new Vector3(cu.localScale().x / 2, 0, 0)),
         cu
           .localPosition()
           .clone()
           .lerp(alu.localPosition(), 0.3)
           .add(new Vector3(0.02, 0.01, 0.005)),
-
-        alu
-          .localPosition()
-          .clone()
-          .add(new Vector3(-alu.localScale().x / 2, 0, 0)),
+        alu.localPosition().clone().add(new Vector3(-alu.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="decoder"
       smooth
-      key="level_2 wire_cu_alu"
+      key="level_3 wire_cu_alu"
     />
   ) as Line;
 
-  const wire_iu_mc = (
+  const wire_cu_fpu = (
     <Line
       points={[
-        alu
+        cu.localPosition().clone().add(new Vector3(cu.localScale().x / 2, -0.01, 0)),
+        cu
           .localPosition()
           .clone()
-          .add(new Vector3(alu.localScale().x / 2, 0, 0)),
-        alu
-          .localPosition()
-          .clone()
-          .lerp(mc.localPosition(), 0.4)
-          .add(new Vector3(0.015, 0.01, 0.005)),
-        mc
-          .localPosition()
-          .clone()
-          .lerp(alu.localPosition(), 0.4)
-          .add(new Vector3(-0.015, 0.01, 0.005)),
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(-mc.localScale().x / 2, 0, 0)),
+          .lerp(fpu.localPosition(), 0.5)
+          .add(new Vector3(0.06, -0.02, 0.006)),
+        fpu.localPosition().clone().add(new Vector3(-fpu.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="control"
       smooth
-      key="level_2 wire_iu_mc"
+      key="level_3 wire_cu_fpu"
     />
   ) as Line;
 
-  const wire_mc_ram_data = (
+  const wire_alu_mc = (
     <Line
       points={[
+        alu.localPosition().clone().add(new Vector3(alu.localScale().x / 2, 0, 0)),
+        alu
+          .localPosition()
+          .clone()
+          .lerp(mc.localPosition(), 0.5)
+          .add(new Vector3(0.05, -0.02, 0.004)),
+        mc.localPosition().clone().add(new Vector3(-mc.localScale().x / 2, 0, 0)),
+      ]}
+      lineWidth={0}
+      color="control"
+      smooth
+      key="level_3 wire_alu_mc"
+    />
+  ) as Line;
+
+  const wire_fpu_mc = (
+    <Line
+      points={[
+        fpu.localPosition().clone().add(new Vector3(fpu.localScale().x / 2, 0, 0)),
+        fpu
+          .localPosition()
+          .clone()
+          .lerp(mc.localPosition(), 0.5)
+          .add(new Vector3(0.03, 0, 0.006)),
+        mc.localPosition().clone().add(new Vector3(-mc.localScale().x / 2, -0.02, 0)),
+      ]}
+      lineWidth={0}
+      color="fpu"
+      smooth
+      key="level_3 wire_fpu_mc"
+    />
+  ) as Line;
+
+  const wire_mc_cache_data = (
+    <Line
+      points={[
+        mc.localPosition().clone().add(new Vector3(mc.localScale().x / 2, -0.04, 0.02)),
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.29, 0.05)),
-        mc
+          .lerp(cache.localPosition(), 0.5)
+          .add(new Vector3(0.06, -0.04, 0.02)),
+        cache.localPosition().clone().add(new Vector3(-cacheBody.localScale().x / 2, 0.1, 0.02)),
+      ]}
+      lineWidth={0}
+      color="memory"
+      smooth
+      key="level_3 wire_mc_cache_data"
+    />
+  ) as Line;
+
+  const wire_cache_ram_data = (
+    <Line
+      points={[
+        cache.localPosition().clone().add(new Vector3(cacheBody.localScale().x / 2, 0.12, 0.02)),
+        cache
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(-0.05, -0.12, -0.02)),
+          .add(new Vector3(0.12, -0.12, -0.02)),
         ram.localPosition().clone().add(new Vector3(-0.1, 0.05, -0.03)),
       ]}
       lineWidth={0}
       color="memory"
       smooth
-      key="level_2 wire_mc_ram_Data"
+      key="level_3 wire_cache_ram_data"
     />
   ) as Line;
 
-  const wire_mc_ram_address = (
+  const wire_cache_ram_address = (
     <Line
       points={[
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.29, 0.05)),
-        mc
+        cache.localPosition().clone().add(new Vector3(cacheBody.localScale().x / 2, -0.12, 0.02)),
+        cache
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(-0.04, -0.12, 0.12)),
+          .add(new Vector3(0.14, -0.12, 0.1)),
         ram.localPosition().clone().add(new Vector3(-0.1, 0.05, 0.1)),
       ]}
       lineWidth={0}
-      color="bus"
+      color="busAddr"
       smooth
-      key="level_2 wire_mc_ram_Adress"
+      key="level_3 wire_cache_ram_address"
     />
   ) as Line;
 
   const wire_clock_cu = (
     <Line
       points={[
-        clock.localPosition().clone().add(new Vector3(0, 0, 0)),
+        clock.localPosition().clone(),
         clock
           .localPosition()
           .clone()
           .lerp(cu.localPosition(), 0.5)
           .add(new Vector3(-0.06, 0.01, 0.005)),
-        cu
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, 0, -cu.localScale().z / 2)),
+        cu.localPosition().clone().add(new Vector3(0, 0, -cu.localScale().z / 2)),
       ]}
       lineWidth={0}
       color="control"
       smooth
-      key="level_2 wire_clock_cu"
+      key="level_3 wire_clock_cu"
+    />
+  ) as Line;
+
+  const wire_gpr_alu = (
+    <Line
+      points={[
+        gpr.localPosition().clone().add(new Vector3(0, -gpr.localScale().y / 2, 0.01)),
+        gpr
+          .localPosition()
+          .clone()
+          .lerp(alu.localPosition(), 0.55)
+          .add(new Vector3(0.01, 0, 0.01)),
+        alu.localPosition().clone().add(new Vector3(0, alu.localScale().y / 2, 0.01)),
+      ]}
+      lineWidth={0}
+      color="register"
+      smooth
+      key="level_3 wire_gpr_alu"
+    />
+  ) as Line;
+
+  const wire_fpr_fpu = (
+    <Line
+      points={[
+        fpr.localPosition().clone().add(new Vector3(0, -fpr.localScale().y / 2, 0.015)),
+        fpr
+          .localPosition()
+          .clone()
+          .lerp(fpu.localPosition(), 0.5)
+          .add(new Vector3(0.0, -0.05, 0.015)),
+        fpu.localPosition().clone().add(new Vector3(0, fpu.localScale().y / 2, 0.015)),
+      ]}
+      lineWidth={0}
+      color="fpu"
+      smooth
+      key="level_3 wire_fpr_fpu"
     />
   ) as Line;
 
   const wire_gpr_mc = (
     <Line
       points={[
-        gpr
-          .localPosition()
-          .clone()
-          .add(new Vector3(gpr.localScale().x / 2, 0, 0)),
+        gpr.localPosition().clone().add(new Vector3(gpr.localScale().x / 2, 0, 0)),
         gpr
           .localPosition()
           .clone()
           .lerp(mc.localPosition(), 0.4)
           .add(new Vector3(-0.02, 0, 0.01)),
-
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(-mc.localScale().x / 2, 0, 0)),
+        mc.localPosition().clone().add(new Vector3(-mc.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="memory"
       smooth
-      key="level_2 wire_gpr_mc"
+      key="level_3 wire_gpr_mc"
     />
   ) as Line;
 
-  const wire_gpr_iu = (
+  const wire_fpu_gpr = (
     <Line
       points={[
-        gpr
+        fpu.localPosition().clone().add(new Vector3(-fpu.localScale().x / 2 + 0.02, -fpu.localScale().y / 2, 0.01)),
+        fpu
           .localPosition()
           .clone()
-          .add(new Vector3(0, -gpr.localScale().y / 2, 0.01)),
-        gpr
-          .localPosition()
-          .clone()
-          .lerp(alu.localPosition(), 0.5)
-          .add(new Vector3(0.01, 0, 0.01)),
-
-        alu
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, alu.localScale().y / 2, 0.01)),
+          .lerp(gpr.localPosition(), 0.5)
+          .add(new Vector3(-0.05, -0.04, 0.01)),
+        gpr.localPosition().clone().add(new Vector3(gpr.localScale().x / 2, -0.02, 0.01)),
       ]}
       lineWidth={0}
-      color="register"
+      color="fpu"
       smooth
-      key="level_2 wire_gpr_iu"
+      key="level_3 wire_fpu_gpr"
     />
   ) as Line;
 
   const wire_cu_pc = (
     <Line
       points={[
-        // exit CU on the right
-        cu
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, cu.localScale().y / 2 - 0.13, 0)),
-        // go above ALU
+        cu.localPosition().clone().add(new Vector3(0, cu.localScale().y / 2 - 0.13, 0)),
         cu.localPosition().clone().add(new Vector3(0, -0.15, 0)),
-
-        pc
-          .localPosition()
-          .clone()
-          .add(new Vector3(-pc.localScale().y / 2, 0, 0)),
+        pc.localPosition().clone().add(new Vector3(-pc.localScale().y / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="alu"
       smooth
-      key="level_2 wire_cu_pc"
+      key="level_3 wire_cu_pc"
     />
   ) as Line;
 
   const wire_pc_mc = (
     <Line
       points={[
-        // exit PC on the right
-        pc
-          .localPosition()
-          .clone()
-          .add(new Vector3(pc.localScale().x / 2, 0, 0)),
-        // route along bottom margin
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(-mc.localScale().x / 2 - 0.04, -0.16, 0)),
-        // enter MC on the left
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, -mc.localScale().x / 2, 0)),
+        pc.localPosition().clone().add(new Vector3(pc.localScale().x / 2, 0, 0)),
+        mc.localPosition().clone().add(new Vector3(-mc.localScale().x / 2 - 0.04, -0.16, 0)),
+        mc.localPosition().clone().add(new Vector3(0, -mc.localScale().x / 2, 0)),
       ]}
       lineWidth={0}
       color="alu"
       smooth
-      key="level_2 wire_pc_mc"
+      key="level_3 wire_pc_mc"
     />
   ) as Line;
 
-  const wire_mc_ir = (
+  const wire_decode_cu = (
     <Line
       points={[
-        // exit MC at the top
-        mc
+        decode.localPosition().clone().add(new Vector3(0, -decode.localScale().y / 2, 0)),
+        decode
           .localPosition()
           .clone()
-          .add(new Vector3(0, mc.localScale().y / 2, 0)),
-        // hug top-right corner of CPU base, then traverse the top edge
+          .lerp(cu.localPosition(), 0.6)
+          .add(new Vector3(-0.01, -0.02, 0.005)),
+        cu.localPosition().clone().add(new Vector3(-cu.localScale().x / 2, 0, 0)),
+      ]}
+      lineWidth={0}
+      color="control"
+      smooth
+      key="level_3 wire_decode_cu"
+    />
+  ) as Line;
+
+  const wire_ir_decode = (
+    <Line
+      points={[
+        ir.localPosition().clone().add(new Vector3(0, -ir.localScale().y / 2, 0)),
+        ir
+          .localPosition()
+          .clone()
+          .lerp(decode.localPosition(), 0.5)
+          .add(new Vector3(-0.04, -0.06, 0)),
+        decode.localPosition().clone().add(new Vector3(-decode.localScale().x / 2, 0, 0)),
+      ]}
+      lineWidth={0}
+      color="busData"
+      smooth
+      key="level_3 wire_ir_decode"
+    />
+  ) as Line;
+
+  const wire_instruction_bus = (
+    <Line
+      points={[
+        mc.localPosition().clone().add(new Vector3(0, mc.localScale().y / 2, 0.03)),
         cpu_base
           .localPosition()
           .clone()
@@ -407,7 +576,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
             new Vector3(
               cpu_base.localScale().x / 2 - 0.25,
               cpu_base.localScale().y / 2 - 0.02,
-              0.06
+              0.08
             )
           ),
         cpu_base
@@ -417,145 +586,206 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
             new Vector3(
               -cpu_base.localScale().x / 2 + 0.15,
               cpu_base.localScale().y / 2 - 0.09,
-              0.07
+              0.09
             )
           ),
-
-        ir
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, ir.localScale().x / 2, -0.02)),
+        ir.localPosition().clone().add(new Vector3(0, ir.localScale().x / 2, -0.02)),
       ]}
       lineWidth={0}
-      color="busData"
+      color="bus"
       smooth
-      key="level_2 wire_mc_ir"
-    />
-  ) as Line;
-
-  const wire_ir_decode = (
-    <Line
-      points={[
-        ir
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, -ir.localScale().y / 2, 0)),
-        ir
-          .localPosition()
-          .clone()
-          .lerp(decode.localPosition(), 0.5)
-          .add(new Vector3(-0.04, -0.06, 0)),
-        decode
-          .localPosition()
-          .clone()
-          .add(new Vector3(-decode.localScale().x / 2, 0, 0)),
-      ]}
-      lineWidth={0}
-      color="busData"
-      smooth
-      key="level_2 wire_ir_decode"
-    />
-  ) as Line;
-
-  const wire_decode_cu = (
-    <Line
-      points={[
-        decode.localPosition().clone().add(new Vector3(0, 0, 0)),
-        decode
-          .localPosition()
-          .clone()
-          .lerp(cu.localPosition(), 0.5)
-          .add(new Vector3(0.02, 0.01, 0.01)),
-        cu
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, cu.localScale().y / 2, 0.01)),
-      ]}
-      lineWidth={0}
-      color="control"
-      smooth
-      key="level_2 wire_decode_cu"
+      key="level_3 wire_instruction_bus"
     />
   ) as Line;
 
   const wire_decode_gpr = (
     <Line
       points={[
-        // exit decode on bottom edge (closest to gpr)
-        decode
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, -decode.localScale().y / 2, 0)),
+        decode.localPosition().clone().add(new Vector3(0.06, -0.02, 0)),
         decode
           .localPosition()
           .clone()
           .lerp(gpr.localPosition(), 0.5)
-          .add(new Vector3(0, 0, 0.01)),
-        // enter gpr on top edge (closest to decode)
-        gpr
+          .add(new Vector3(0.02, 0, 0.005)),
+        gpr.localPosition().clone().add(new Vector3(-gpr.localScale().x / 2, 0, 0)),
+      ]}
+      lineWidth={0}
+      color="decoder"
+      smooth
+      key="level_3 wire_decode_gpr"
+    />
+  ) as Line;
+
+  const wire_decode_fpu = (
+    <Line
+      points={[
+        decode.localPosition().clone().add(new Vector3(decode.localScale().x / 2, 0, 0)),
+        decode
           .localPosition()
           .clone()
-          .add(new Vector3(0, gpr.localScale().y / 2, -0.04)),
+          .lerp(fpu.localPosition(), 0.55)
+          .add(new Vector3(0.04, 0, 0.006)),
+        fpu.localPosition().clone().add(new Vector3(-fpu.localScale().x / 2, 0.02, 0)),
+      ]}
+      lineWidth={0}
+      color="fpu"
+      smooth
+      key="level_3 wire_decode_fpu"
+    />
+  ) as Line;
+
+  const wire_decode_stack = (
+    <Line
+      points={[
+        decode.localPosition().clone().add(new Vector3(0.02, decode.localScale().y / 2, 0)),
+        decode
+          .localPosition()
+          .clone()
+          .lerp(stackPointers.localPosition(), 0.55)
+          .add(new Vector3(0.02, 0.03, 0.008)),
+        stackPointers.localPosition().clone().add(new Vector3(-0.02, -0.08, 0.01)),
       ]}
       lineWidth={0}
       color="control"
       smooth
-      key="level_2 wire_decode_gpr"
+      key="level_3 wire_decode_stack"
     />
   ) as Line;
 
-  [flag_Z, flag_N, flag_V, flag_DZ].forEach((f) => alu_flags.add(f));
+  const wire_stack_mc = (
+    <Line
+      points={[
+        stackPointers.localPosition().clone().add(new Vector3(0.02, -0.16, 0.01)),
+        stackPointers
+          .localPosition()
+          .clone()
+          .lerp(mc.localPosition(), 0.55)
+          .add(new Vector3(0.05, -0.04, 0.015)),
+        mc.localPosition().clone().add(new Vector3(-mc.localScale().x / 2, -0.02, 0)),
+      ]}
+      lineWidth={0}
+      color="memory"
+      smooth
+      key="level_3 wire_stack_mc"
+    />
+  ) as Line;
+
+  const wire_stack_pc = (
+    <Line
+      points={[
+        stackPointers.localPosition().clone().add(new Vector3(-0.06, -0.12, 0.01)),
+        stackPointers
+          .localPosition()
+          .clone()
+          .lerp(pc.localPosition(), 0.55)
+          .add(new Vector3(-0.02, -0.12, 0.012)),
+        pc.localPosition().clone().add(new Vector3(pc.localScale().x / 2, 0, 0)),
+      ]}
+      lineWidth={0}
+      color="control"
+      smooth
+      key="level_3 wire_stack_pc"
+    />
+  ) as Line;
 
   const wires = {
-    wire_cu_iu,
-    wire_iu_mc,
-    wire_mc_ram_data,
-    wire_mc_ram_address,
-    wire_clock_cu,
+    wire_cu_alu,
+    wire_cu_fpu,
+    wire_alu_mc,
+    wire_fpu_mc,
+    wire_gpr_alu,
+    wire_fpr_fpu,
     wire_gpr_mc,
-    wire_gpr_iu,
+    wire_fpu_gpr,
     wire_cu_pc,
     wire_pc_mc,
-    wire_mc_ir,
-    wire_decode_cu,
+    wire_clock_cu,
+    wire_instruction_bus,
     wire_ir_decode,
+    wire_decode_cu,
     wire_decode_gpr,
+    wire_decode_fpu,
+    wire_decode_stack,
+    wire_stack_mc,
+    wire_stack_pc,
+    wire_mc_cache_data,
+    wire_cache_ram_data,
+    wire_cache_ram_address,
   };
 
   const wires_array = Object.values(wires);
+
+  const wireWidths = new Map<Line, number>([
+    [wire_cu_alu, 8],
+    [wire_cu_fpu, 9],
+    [wire_alu_mc, 8],
+    [wire_fpu_mc, 9],
+    [wire_gpr_alu, 7],
+    [wire_fpr_fpu, 9],
+    [wire_gpr_mc, 7],
+    [wire_fpu_gpr, 7],
+    [wire_cu_pc, 6],
+    [wire_pc_mc, 6],
+    [wire_clock_cu, 6],
+    [wire_instruction_bus, INSTRUCTION_BUS_WIDTH],
+    [wire_ir_decode, 8],
+    [wire_decode_cu, 6],
+    [wire_decode_gpr, 6],
+    [wire_decode_fpu, 8],
+    [wire_decode_stack, 6],
+    [wire_stack_mc, 8],
+    [wire_stack_pc, 6],
+    [wire_mc_cache_data, 10],
+    [wire_cache_ram_data, 12],
+    [wire_cache_ram_address, 10],
+  ]);
 
   [
     pc,
     cu,
     alu,
+    fpu,
     ir,
     mc,
     gpr,
+    fpr,
+    stackPointers,
     clock,
     decode,
     cpu_base,
-    wire_cu_iu,
-    wire_iu_mc,
-    wire_clock_cu,
+    cache,
+    wire_cu_alu,
+    wire_cu_fpu,
+    wire_alu_mc,
+    wire_fpu_mc,
+    wire_gpr_alu,
+    wire_fpr_fpu,
     wire_gpr_mc,
-    wire_gpr_iu,
+    wire_fpu_gpr,
     wire_cu_pc,
     wire_pc_mc,
-    wire_mc_ir,
-    wire_decode_gpr,
-    wire_decode_cu,
+    wire_clock_cu,
+    wire_instruction_bus,
     wire_ir_decode,
+    wire_decode_cu,
+    wire_decode_gpr,
+    wire_decode_fpu,
+    wire_decode_stack,
+    wire_stack_mc,
+    wire_stack_pc,
+    wire_mc_cache_data,
     alu_flags,
   ].forEach((item) => cpu.add(item));
 
-  [wire_mc_ram_data, wire_mc_ram_address, cpu, ram].forEach((item) =>
+  [wire_cache_ram_data, wire_cache_ram_address, cpu, ram].forEach((item) =>
     container.add(item)
   );
+
   if (addToScene) {
     scene.add(container);
     scene.init();
   }
-  /** Convenience API you can call from a scene */
+
   const api = {
     group: cpu,
     base: cpu_base,
@@ -563,21 +793,35 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     ram,
     cu,
     alu,
+    fpu,
     mc,
     gpr,
+    fpr,
+    stackPointers,
+    cache,
     ir,
     pc,
     clock,
     decode,
+    cacheData,
+    cacheInstr,
+    bp,
+    sp,
     ...wires,
+    wire_cu_iu: wire_cu_alu,
+    wire_iu_mc: wire_alu_mc,
+    wire_gpr_iu: wire_gpr_alu,
+    wire_mc_ir: wire_instruction_bus,
+    wire_mc_ram_data: wire_cache_ram_data,
+    wire_mc_ram_address: wire_cache_ram_address,
     wires: wires_array,
     initWires: function* (
       wires: Line[] = wires_array,
       duration?: number
     ) {
       yield all(
-        ...wires.map((wire, i) =>
-          wire.widthTo(wire_sizes[i % wire_sizes.length], duration)
+        ...wires.map((wire) =>
+          wire.widthTo(wireWidths.get(wire) ?? 8, duration)
         )
       );
       yield all(...wires.map((wire) => wire.popInDraw()));
@@ -588,7 +832,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       N: flag_N,
       V: flag_V,
       DZ: flag_DZ,
-      defs: FLAG_DEFS, // <-- keep the ON/OFF colors here
+      defs: FLAG_DEFS,
 
       *set(flag: "Z" | "N" | "V" | "DZ", duration = 0.3) {
         const target = this[flag];
@@ -597,7 +841,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       },
       *clear(flag: "Z" | "N" | "V" | "DZ", duration = 0.3) {
         const target = this[flag];
-        yield target.pulse(1/1.2);
+        yield target.pulse(1 / 1.2);
         yield* target.glowTo(this.defs[flag].off, duration);
       },
       *clearAll(duration = 0.3) {
