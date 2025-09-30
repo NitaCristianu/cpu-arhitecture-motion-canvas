@@ -16,7 +16,7 @@ import { Vector3 } from "three";
 import Scene3D from "../libs/Thrash/Scene";
 import { Glass, GlassProps } from "./GlassRect";
 
-/*───────────────────────────────────────────────*/
+/*�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?*/
 /** Background / foreground colour pairs */
 const LABEL_COLORS = {
   sky: ["#D6ECFF", "#0077C8"],
@@ -33,13 +33,13 @@ const LABEL_COLORS = {
 } as const;
 export type LabelColorKey = keyof typeof LABEL_COLORS;
 
-/*───────────────────────────────────────────────*/
+/*�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?*/
 export interface Label3DProps extends GlassProps {
   /** Text to display inside the label. */
   text: SignalValue<string>;
   /** 3-D world position that this label should track. */
   worldPosition: Vector3 | (() => Vector3);
-  /** Scene that performs the world→screen projection. */
+  /** Scene that performs the world+screen projection. */
   scene: Scene3D;
   /** Colour key for tint / text. */
   color?: LabelColorKey;
@@ -49,11 +49,13 @@ export interface Label3DProps extends GlassProps {
   fontSize?: SignalValue<number>;
   
   ignorePosition? : boolean;
+  /** Optional override for the inner text color. */
+  textColor?: SignalValue<Color | string>;
 }
 
-/*───────────────────────────────────────────────*/
+/*�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?*/
 export class Label3D extends Glass {
-  /* ── Signals ─────────────────────────────── */
+  /* �"?�"? Signals �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
   @initial("sky")
   @signal()
   public declare readonly color: SimpleSignal<LabelColorKey, this>;
@@ -74,7 +76,7 @@ export class Label3D extends Glass {
   private worldPos: Vector3 | (() => Vector3);
   private readonly labelTxt: Txt;
 
-  /* ── Constructor ─────────────────────────── */
+  /* �"?�"? Constructor �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
   public constructor({
     text,
     color = "sky",
@@ -82,6 +84,7 @@ export class Label3D extends Glass {
     scene,
     offset2D,
     ignorePosition = false,
+    textColor,
     ...rest
   }: Label3DProps) {
     /* pick colours */
@@ -120,6 +123,7 @@ export class Label3D extends Glass {
       fontSize: 140,
     });
     this.labelTxt.fontSize(this.fontSize);
+    if (textColor) this.labelTxt.fill(textColor as any);
     this.add(this.labelTxt);
 
     /* reactive position */
@@ -144,7 +148,7 @@ export class Label3D extends Glass {
     this.position(p instanceof Vector2 ? p : f(p));
   }
 
-  /* ── Animations ──────────────────────────── */
+  /* �"?�"? Animations �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
   public *popIn(duration = 0.4, scaleEase = easeOutBack) {
     yield* all(this.scale(1, duration, scaleEase));
   }
@@ -153,3 +157,4 @@ export class Label3D extends Glass {
     yield* all(this.scale(0, duration, scaleEase));
   }
 }
+

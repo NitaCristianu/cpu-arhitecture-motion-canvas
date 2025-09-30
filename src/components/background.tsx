@@ -108,6 +108,13 @@ export const PRESETS = {
     "#0A2231", // navy charcoal
     "#0C3A4B", // muted teal-blue
   ],
+  // Floating-point unit themed: indigo/violet with cool glow accents
+  fpu:     [
+    "#E5D0FF", // soft lavender highlight
+    "#4B0082", // deep indigo core (matches COLORS.fpu)
+    "#A9D6FF", // icy blue accent (FPR vibe)
+    "#1A0F2E", // very dark purple base
+  ],
 } as const;
 
 export interface ShaderBackgroundProps extends RectProps {
