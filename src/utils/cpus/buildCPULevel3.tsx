@@ -13,7 +13,7 @@ const T = 0.02;
 const S = 0.1;
 const L = 0.18;
 const H = 0.13;
-const INSTRUCTION_BUS_WIDTH = 24;
+const INSTRUCTION_BUS_WIDTH = 12;
 
 export const FLAG_DEFS = {
   Z: { on: 0x00ff00, off: 0x222222 },
@@ -29,7 +29,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     key: "level_3 RAM",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x07174a }),
     localScale: new Vector3(0, 0, 0),
-    localPosition: new Vector3(0.82, -0.38, 0),
+    localPosition: new Vector3(0.98, -0.32, 0),
     localRotation: new Vector3(0, -Math.PI / 2, Math.PI / 2),
   });
 
@@ -43,15 +43,15 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const cpu_base = new Box({
     key: "level_3 BASE",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x323232 }),
-    localScale: new Vector3(1.05, 0.74, T * 6),
-    localPosition: new Vector3(-0.03, -0.01, -0.02 - T * 2),
+    localScale: new Vector3(1.12, 0.82, T * 6),
+    localPosition: new Vector3(0.04, 0.05, -0.02 - T * 2),
   });
 
   const cu = new Box({
     key: "level_3 CU",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x4caf50 }),
     localScale: new Vector3(L / 2, H, T),
-    localPosition: new Vector3(-0.32, -0.05, 0),
+    localPosition: new Vector3(-0.34, -0.1, 0),
   });
 
   const alu = new Box({
@@ -61,7 +61,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       metalness: 0.6,
     }),
     localScale: new Vector3(L, H, T),
-    localPosition: new Vector3(-0.06, -0.05, 0),
+    localPosition: new Vector3(-0.08, -0.1, 0),
   });
 
   const fpu = new Box({
@@ -72,7 +72,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       roughness: 0.4,
     }),
     localScale: new Vector3(L, H * 1.1, T),
-    localPosition: new Vector3(0.14, -0.05, 0),
+    localPosition: new Vector3(0.22, -0.1, 0),
   });
 
   const ir = new Box({
@@ -82,7 +82,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       metalness: 0.6,
     }),
     localScale: new Vector3((L / 3) * 1.3, (L / 3) * 1.3, T),
-    localPosition: new Vector3(-0.26, 0.25, 0),
+    localPosition: new Vector3(-0.34, 0.28, 0),
   });
 
   const decode = new Box({
@@ -92,19 +92,19 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       color: 0xff9800,
     }),
     localScale: new Vector3(L / 2, L / 3, T),
-    localPosition: new Vector3(-0.15, 0.13, 0),
+    localPosition: new Vector3(-0.2, 0.1, 0),
   });
 
   const mc = new Box({
     key: "level_3 MC",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xbe22e8 }),
     localScale: new Vector3(L * 0.55, H * 0.85, T),
-    localPosition: new Vector3(0.34, -0.08, 0),
+    localPosition: new Vector3(0.42, -0.12, 0),
   });
 
   const cache = new Group({
     key: "level_3 CACHE",
-    localPosition: new Vector3(0.5, -0.06, 0),
+    localPosition: new Vector3(0.7, -0.02, 0),
   });
 
   const cacheBody = new Box({
@@ -114,7 +114,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       roughness: 0.4,
       color: COLORS.cache,
     }),
-    localScale: new Vector3(S * 1.2, S * 2.2, T),
+    localScale: new Vector3(S * 1.24, S * 2.4, T),
   });
 
   const cacheData = new Box({
@@ -125,8 +125,8 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       color: COLORS.busData,
       emissive: 0x0c1c40,
     }),
-    localScale: new Vector3(S * 0.55, S * 0.85, T * 0.9),
-    localPosition: new Vector3(-0.04, 0.14, 0.01),
+    localScale: new Vector3(S * 0.6, S * 0.85, T * 0.9),
+    localPosition: new Vector3(-0.03, 0.12, 0.01),
   });
 
   const cacheInstr = new Box({
@@ -137,8 +137,8 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       color: COLORS.busAddr,
       emissive: 0x0e162f,
     }),
-    localScale: new Vector3(S * 0.55, S * 0.85, T * 0.9),
-    localPosition: new Vector3(0.04, -0.14, 0.01),
+    localScale: new Vector3(S * 0.6, S * 0.85, T * 0.9),
+    localPosition: new Vector3(0.03, -0.12, 0.01),
   });
 
   cache.add(cacheBody);
@@ -153,7 +153,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       color: 0xcccccc,
     }),
     localScale: new Vector3(S, S * 1.5, T),
-    localPosition: new Vector3(-0.06, 0.22, 0),
+    localPosition: new Vector3(-0.16, 0.3, 0),
   });
 
   const fpr = new Box({
@@ -165,12 +165,12 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       emissive: 0x132544,
     }),
     localScale: new Vector3(S * 1.1, S * 2, T),
-    localPosition: new Vector3(0.14, 0.24, 0),
+    localPosition: new Vector3(0.36, 0.32, 0),
   });
 
   const stackPointers = new Group({
     key: "level_3 STACK",
-    localPosition: new Vector3(0.08, 0.3, 0),
+    localPosition: new Vector3(0.12, 0.38, 0),
   });
 
   const bp = new Box({
@@ -182,7 +182,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       emissive: 0x001b33,
     }),
     localScale: new Vector3(S * 0.4, S * 0.55, T * 0.9),
-    localPosition: new Vector3(-0.04, 0.02, 0),
+    localPosition: new Vector3(-0.08, -0.02, 0),
   });
 
   const sp = new Box({
@@ -194,36 +194,36 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       emissive: 0x00211a,
     }),
     localScale: new Vector3(S * 0.4, S * 0.55, T * 0.9),
-    localPosition: new Vector3(0.04, -0.02, 0),
+    localPosition: new Vector3(0.08, -0.02, 0),
   });
 
-  const stackLogic = new Box({
-    key: "level_3 STACK_LOGIC",
-    material: new MeshPhysicalMaterial({
-      metalness: 0.6,
-      roughness: 0.5,
-      color: COLORS.control,
-    }),
-    localScale: new Vector3(S * 0.35, S * 0.35, T * 0.9),
-    localPosition: new Vector3(0, -0.14, 0),
-  });
+  // const stackLogic = new Box({
+  //   key: "level_3 STACK_LOGIC",
+  //   material: new MeshPhysicalMaterial({
+  //     metalness: 0.6,
+  //     roughness: 0.5,
+  //     color: COLORS.control,
+  //   }),
+  //   localScale: new Vector3(S * 0.35, S * 0.35, T * 0.9),
+  //   localPosition: new Vector3(0, -0.14, 0),
+  // });
 
   stackPointers.add(bp);
   stackPointers.add(sp);
-  stackPointers.add(stackLogic);
+  // stackPointers.add(stackLogic);
 
   const clock = new Box({
     key: "level_3 CLOCK",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xffffff }),
     localScale: new Vector3(S * 0.3, S * 0.4, T),
-    localPosition: new Vector3(-0.3, -0.22, 0),
+    localPosition: new Vector3(-0.46, -0.28, 0),
   });
 
   const pc = new Box({
     key: "level_3 PC",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xff0000 }),
     localScale: new Vector3(L * 0.35, L * 0.35, T),
-    localPosition: new Vector3(0, -0.24, 0),
+    localPosition: new Vector3(0.08, -0.28, 0),
   });
 
   const alu_flags = new Group({
@@ -365,8 +365,8 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
           .localPosition()
           .clone()
           .lerp(cache.localPosition(), 0.5)
-          .add(new Vector3(0.06, -0.04, 0.02)),
-        cache.localPosition().clone().add(new Vector3(-cacheBody.localScale().x / 2, 0.1, 0.02)),
+          .add(new Vector3(0.06, -0.04, 0.025)),
+        cache.localPosition().clone().add(new Vector3(-cacheBody.localScale().x / 2, 0.12, 0.02)),
       ]}
       lineWidth={0}
       color="memory"
@@ -378,12 +378,12 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const wire_cache_ram_data = (
     <Line
       points={[
-        cache.localPosition().clone().add(new Vector3(cacheBody.localScale().x / 2, 0.12, 0.02)),
+        cache.localPosition().clone().add(new Vector3(cacheBody.localScale().x / 2, 0.14, 0.02)),
         cache
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(0.12, -0.12, -0.02)),
+          .add(new Vector3(0.16, -0.1, -0.02)),
         ram.localPosition().clone().add(new Vector3(-0.1, 0.05, -0.03)),
       ]}
       lineWidth={0}
@@ -396,12 +396,12 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const wire_cache_ram_address = (
     <Line
       points={[
-        cache.localPosition().clone().add(new Vector3(cacheBody.localScale().x / 2, -0.12, 0.02)),
+        cache.localPosition().clone().add(new Vector3(cacheBody.localScale().x / 2, -0.14, 0.02)),
         cache
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(0.14, -0.12, 0.1)),
+          .add(new Vector3(0.18, -0.1, 0.1)),
         ram.localPosition().clone().add(new Vector3(-0.1, 0.05, 0.1)),
       ]}
       lineWidth={0}
@@ -568,28 +568,24 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const wire_instruction_bus = (
     <Line
       points={[
-        mc.localPosition().clone().add(new Vector3(0, mc.localScale().y / 2, 0.03)),
-        cpu_base
+        mc
           .localPosition()
           .clone()
-          .add(
-            new Vector3(
-              cpu_base.localScale().x / 2 - 0.25,
-              cpu_base.localScale().y / 2 - 0.02,
-              0.08
-            )
-          ),
-        cpu_base
+          .add(new Vector3(0.02, mc.localScale().y / 2, 0.03)),
+        mc
           .localPosition()
           .clone()
-          .add(
-            new Vector3(
-              -cpu_base.localScale().x / 2 + 0.15,
-              cpu_base.localScale().y / 2 - 0.09,
-              0.09
-            )
-          ),
-        ir.localPosition().clone().add(new Vector3(0, ir.localScale().x / 2, -0.02)),
+          .lerp(ir.localPosition(), 0.35)
+          .add(new Vector3(0.22, 0.32, 0.05)),
+        mc
+          .localPosition()
+          .clone()
+          .lerp(ir.localPosition(), 0.7)
+          .add(new Vector3(-0.22, 0.32, 0.05)),
+        ir
+          .localPosition()
+          .clone()
+          .add(new Vector3(0, ir.localScale().y / 2, -0.02)),
       ]}
       lineWidth={0}
       color="bus"
@@ -597,7 +593,8 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
       key="level_3 wire_instruction_bus"
     />
   ) as Line;
-
+  
+  
   const wire_decode_gpr = (
     <Line
       points={[
@@ -655,12 +652,12 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const wire_stack_mc = (
     <Line
       points={[
-        stackPointers.localPosition().clone().add(new Vector3(0.02, -0.16, 0.01)),
+        stackPointers.localPosition().clone().add(new Vector3(0, -0.18, 0.01)),
         stackPointers
           .localPosition()
           .clone()
           .lerp(mc.localPosition(), 0.55)
-          .add(new Vector3(0.05, -0.04, 0.015)),
+          .add(new Vector3(0.08, -0.05, 0.015)),
         mc.localPosition().clone().add(new Vector3(-mc.localScale().x / 2, -0.02, 0)),
       ]}
       lineWidth={0}
@@ -673,12 +670,12 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const wire_stack_pc = (
     <Line
       points={[
-        stackPointers.localPosition().clone().add(new Vector3(-0.06, -0.12, 0.01)),
+        stackPointers.localPosition().clone().add(new Vector3(-0.08, -0.14, 0.01)),
         stackPointers
           .localPosition()
           .clone()
           .lerp(pc.localPosition(), 0.55)
-          .add(new Vector3(-0.02, -0.12, 0.012)),
+          .add(new Vector3(-0.04, -0.14, 0.012)),
         pc.localPosition().clone().add(new Vector3(pc.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
@@ -716,28 +713,28 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const wires_array = Object.values(wires);
 
   const wireWidths = new Map<Line, number>([
-    [wire_cu_alu, 8],
-    [wire_cu_fpu, 9],
-    [wire_alu_mc, 8],
-    [wire_fpu_mc, 9],
-    [wire_gpr_alu, 7],
-    [wire_fpr_fpu, 9],
-    [wire_gpr_mc, 7],
-    [wire_fpu_gpr, 7],
+    [wire_cu_alu, 7],
+    [wire_cu_fpu, 7],
+    [wire_alu_mc, 7],
+    [wire_fpu_mc, 7],
+    [wire_gpr_alu, 6],
+    [wire_fpr_fpu, 7],
+    [wire_gpr_mc, 6],
+    [wire_fpu_gpr, 6],
     [wire_cu_pc, 6],
-    [wire_pc_mc, 6],
-    [wire_clock_cu, 6],
+    [wire_pc_mc, 5],
+    [wire_clock_cu, 5],
     [wire_instruction_bus, INSTRUCTION_BUS_WIDTH],
-    [wire_ir_decode, 8],
-    [wire_decode_cu, 6],
-    [wire_decode_gpr, 6],
-    [wire_decode_fpu, 8],
-    [wire_decode_stack, 6],
-    [wire_stack_mc, 8],
-    [wire_stack_pc, 6],
-    [wire_mc_cache_data, 10],
-    [wire_cache_ram_data, 12],
-    [wire_cache_ram_address, 10],
+    [wire_ir_decode, 7],
+    [wire_decode_cu, 5],
+    [wire_decode_gpr, 5],
+    [wire_decode_fpu, 6],
+    [wire_decode_stack, 5],
+    [wire_stack_mc, 6],
+    [wire_stack_pc, 5],
+    [wire_mc_cache_data, 7],
+    [wire_cache_ram_data, 9],
+    [wire_cache_ram_address, 8],
   ]);
 
   [

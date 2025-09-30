@@ -94,6 +94,7 @@ export default class Camera extends Object {
       tension?: number;
       curveType?: "centripetal" | "chordal" | "catmullrom";
     } = {},
+    ease = easeInOutCubic,
   ) {
     if (!waypoints || waypoints.length === 0) {
       return;
@@ -140,7 +141,7 @@ export default class Camera extends Object {
 
     const safeDuration = Math.max(1e-3, duration);
     yield* tween(safeDuration, (progress) => {
-      const nextPosition = curve.getPointAt(progress);
+      const nextPosition = curve.getPointAt(ease(progress));
       this.localPosition(nextPosition.clone());
     });
 
