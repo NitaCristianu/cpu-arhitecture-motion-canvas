@@ -31,6 +31,7 @@ import {
   range,
   easeInBack,
   easeOutBack,
+  easeOutCubic,
 } from "@motion-canvas/core";
 import { createScene } from "../components/presets";
 import { Vector3 } from "three";
@@ -374,12 +375,51 @@ export default makeScene2D(function* (view) {
   view.add(aluImage);
   yield* waitFor(3);
 
-  const alu_components = [{ name: "lu" }, { name: "au" }, { name: "fpu" }].map(
-    (data) => <Glass size={600} fill={"black"} radius={1000} scale={0} zIndex={2}>
-      <Icon icon={""}/>
-      <Txt></Txt> her iwll be on the bottom
+  const alu_components = (
+    [
+      { name: "LU", glyph: "D", icon: null },
+      { name: "AU", icon: "mdi:calculator-variant", glyph: null },
+      { name: "FPU", glyph: ".00", icon: null },
+    ] as const
+  ).map(({ name, icon, glyph }) => (
+    <Glass
+      size={600}
+      fill={"rgba(63, 84, 127, 0.6)"}
+      radius={1000}
+      scale={0}
+      zIndex={2}
+      removeShadow={1}
+    >
+      {icon ? (
+        <Icon zIndex={1} icon={icon} color={"#fffd"} width={260} y={-40} />
+      ) : (
+        <Txt
+          fontFamily={"Poppins"}
+          fontWeight={800}
+          fontSize={200}
+          fill={"#fffd"}
+          shadowBlur={16}
+          shadowColor={"#fff3"}
+          y={-40}
+          zIndex={1}
+        >
+          {glyph}
+        </Txt>
+      )}
+      <Txt
+        fontFamily={"Poppins"}
+        fontSize={56}
+        fontWeight={700}
+        fill={"#fffd"}
+        shadowBlur={12}
+        shadowColor={"#fff3"}
+        y={190}
+        zIndex={2}
+      >
+        {name}
+      </Txt>
     </Glass>
-  );
+  ));
   alu_components.forEach((comp) => view.add(comp));
 
   yield* all(
@@ -389,18 +429,82 @@ export default makeScene2D(function* (view) {
   );
 
   const context_title = createInfoCard("ALU COMPONENTS", {
-    props: { top: [0, -view.size().y / 2 - 250], zIndex :2 },
+    props: { top: [0, -view.size().y / 2 - 250], zIndex: 2 },
     width: 1900,
   });
   view.add(context_title.node);
 
-  yield context_title.node.y(context_title.node.y() + 350, 1)
-  yield aluImage.scale(0,.4,easeInBack)
+  yield* waitUntil("break");
+  yield context_title.node.y(context_title.node.y() + 350, 1);
+  yield aluImage.scale(0, 0.4, easeInBack);
   yield* sequence(
     0.15,
-    ...alu_components.map(
-      (child, i) => all(child.scale(1, .6, easeOutBack), child.position([-1000 + i * 1000, 0],.6))
+    ...alu_components.map((child, i) =>
+      all(
+        child.scale(1, 0.6, easeOutBack),
+        child.position([-1000 + i * 1000, -100], 0.6)
+      )
     )
+  );
+
+  const registers = range(2).map(
+    (i) =>
+      (
+        <Glass
+          width={i == 0 ? 900 : 1050}
+          height={200}
+          position={new Vector2(-500 + i * 1500, 500)}
+          zIndex={2}
+          scale={0}
+        >
+          <Txt
+            zIndex={1}
+            text={["INT", "FLOAT"][i] + " REGISTERS"}
+            fontSize={120}
+            fontFamily={"Poppins"}
+            shadowBlur={10}
+            shadowColor={"#000a"}
+            fill={"white"}
+          />
+        </Glass>
+      ) as Rect
+  );
+  const rays = alu_components.map(
+    (child: Rect, i) =>
+      (
+        <Ray
+          from={child.bottom}
+          end={0}
+          to={i < 2 ? registers[0].top : registers[1].top}
+          lineWidth={12}
+          lineDash={[30, 30]}
+          stroke={"white"}
+          zIndex={2}
+          endOffset={90}
+          startOffset={50}
+          endArrow
+        />
+      ) as Ray
+  );
+  rays.forEach((r) => view.add(r));
+  yield* waitUntil("registers");
+  registers.forEach((reg) => view.add(reg));
+  yield all(...rays.map((ray) => ray.end(1, 0.5)));
+  yield* sequence(
+    0.2,
+    ...registers.map((reg) =>
+      all(reg.scale(1, 0.5, easeOutCubic), reg.y(reg.y() + 100, 1))
+    )
+  );
+
+  yield* waitUntil("separate");
+  yield* all(
+    context_title.node.y(context_title.node.y() - 350, 1),
+    registers[1].x(0, 1),
+    registers[0].x(-2600, 1),
+    alu_components[2].x(0, 1),
+    alu_components[1].x(-2500, 1),
+    alu_components[0].x(-2500, 1)
   );
 
   yield* waitUntil("next");
