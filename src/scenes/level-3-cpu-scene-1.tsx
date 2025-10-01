@@ -507,5 +507,84 @@ export default makeScene2D(function* (view) {
     alu_components[0].x(-2500, 1)
   );
 
+  yield* waitUntil('aluchip');
+  rays.forEach((r, i)=>i != 2 ? r.remove() : null);
+
+  const alu = alu_components[2].clone({ zIndex: 2 }) as Glass;
+  alu.findFirst(n=>n instanceof Txt).remove();
+  alu.findLast(n=>n instanceof Txt).text("ALU");
+  // start at FPU tile position, hidden
+  alu.position(alu_components[2].position());
+  alu.scale(0);
+  // update bottom label to "ALU" and swap glyph to calculator icon
+  try { alu.childAs<Txt>(1).text("ALU", 0); } catch {}
+  try { alu.childAs<Txt>(0).scale(0, 0); } catch {}
+  alu.add(
+    <Icon zIndex={1} icon={"mdi:calculator-variant"} color={"#fffd"} width={260} y={-40} />
+  );
+  view.add(alu);
+
+  // create connection ray from ALU clone to INT registers
+  const aluRay = (
+    <Ray
+      from={alu.bottom}
+      to={registers[0].top}
+      end={0}
+      lineWidth={12}
+      lineDash={[30, 30]}
+      stroke={"white"}
+      zIndex={2}
+      endOffset={90}
+      startOffset={50}
+      endArrow
+    />
+  ) as Ray;
+  view.add(aluRay);
+
+  const title = <Txt
+    fill={'white'}
+    shadowBlur={50}
+    shadowColor={"#fff5"}
+    zIndex={2}
+    y={-740}
+    fontSize={120}
+    scaleY={0}
+    fontWeight={700}
+    opacity={.7}
+  >They became two separate chips.</Txt>;
+  view.add(title);
+
+  // pop-in, move clone to the right, shift FPU left, and draw the ray
+  yield* all(
+    alu.scale(1, 0.6, easeOutBack),
+    alu.position([600, -100], 0.8, easeInOutExpo),
+    alu_components[2].position([-600, -100], 0.8, easeInOutExpo),
+    delay(.2,aluRay.end(1, 0.8, easeOutSine)),
+    registers[0].x(600, .8, easeOutBack),
+    registers[1].x(-600, .8, easeOutBack)
+  );
+  yield* title.scale(1,.7)
+
+  yield* waitUntil('show bits');
+  const bits = [64, 128].map((n,i)=><Txt
+    fill={'white'}
+    text={`${n} bits`}
+    shadowBlur={50}
+    shadowColor={"#fff5"}
+    zIndex={2}
+    scale={0}
+    position={registers[1].position}
+    fontSize={120}
+    fontWeight={700}
+    opacity={.7}
+  ></Txt>);
+  bits.forEach(bit=>view.add(bit));
+
+  yield* registers[1].y(350,1);
+  yield* sequence(.5, ...bits.map((bit,i)=>all(
+    bit.position(bit.position().addY(50+150*(i+1)), 1),
+    bit.scale(1,.7,easeOutBack),
+  )))
+
   yield* waitUntil("next");
 });

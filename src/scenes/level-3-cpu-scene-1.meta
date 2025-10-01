@@ -18,8 +18,16 @@
       "targetTime": 35.055746669963064
     },
     {
+      "name": "aluchip",
+      "targetTime": 36.871120111926366
+    },
+    {
+      "name": "show bits",
+      "targetTime": 39.36774933683304
+    },
+    {
       "name": "next",
-      "targetTime": 45.565428685070636
+      "targetTime": 42.097310793459
     }
   ],
   "seed": 1789570898
