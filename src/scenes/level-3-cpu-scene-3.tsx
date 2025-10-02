@@ -438,11 +438,14 @@ int main(){\n  cout << outer() << endl;\n}`}
   const main_function_rect = (
     <Rect
       fill={"#fff4"}
+      shadowBlur={40}
+      shadowColor={"#efefefae"}
       scale={0}
       stroke={"#fffa"}
       lineWidth={3}
       lineDash={[20, 20]}
-      position={mainrange().position.addX(-60)}
+      position={mainrange().position.addX(-60).addY(-5)}
+      radius={32}
       size={mainrange().size}
       offset={-1}
     ></Rect>
@@ -450,12 +453,15 @@ int main(){\n  cout << outer() << endl;\n}`}
   const outer_function_rect = (
     <Rect
       fill={"#ff04"}
+      shadowBlur={40}
+      shadowColor={"#f2fa86a8"}
       scale={0}
-      stroke={"#ff0a"}
+      stroke={"#f6f6acaa"}
       lineWidth={3}
       lineDash={[20, 20]}
-      position={mainrange().position.addX(-60)}
-      size={mainrange().size}
+      radius={32}
+      position={outerrange().position.addX(-60).addY(-5)}
+      size={outerrange().size}
       offset={-1}
     ></Rect>
   );
@@ -494,6 +500,7 @@ int main(){\n  cout << outer() << endl;\n}`}
   yield sp_layer_1.x(sp_layer_1.x() + 90, 1);
   yield bp_layer_1.y(bp_layer_1.y() + cellsize(), 1);
   yield sp_layer_1.y(sp_layer_1.y() - cellsize(), 1);
+  yield outer_function_rect.scale(1,.7,easeOutCubic);
 
   yield* waitUntil("next");
 });
