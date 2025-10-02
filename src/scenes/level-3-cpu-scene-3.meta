@@ -6,8 +6,32 @@
       "targetTime": 0.4904992735115836
     },
     {
+      "name": "enter cpu",
+      "targetTime": 1.6904992735115836
+    },
+    {
+      "name": "restore",
+      "targetTime": 12.090499273511572
+    },
+    {
+      "name": "base pointer",
+      "targetTime": 15.428676365140475
+    },
+    {
+      "name": "stack pointer",
+      "targetTime": 16.501317270987958
+    },
+    {
+      "name": "nest",
+      "targetTime": 19.908979298730404
+    },
+    {
+      "name": "outer call",
+      "targetTime": 23.129906314974317
+    },
+    {
       "name": "next",
-      "targetTime": 2.555159006199877
+      "targetTime": 28.293058184928583
     }
   ],
   "seed": 821291899

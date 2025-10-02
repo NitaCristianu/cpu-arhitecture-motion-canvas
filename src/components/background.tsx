@@ -115,6 +115,31 @@ export const PRESETS = {
     "#A9D6FF", // icy blue accent (FPR vibe)
     "#1A0F2E", // very dark purple base
   ],
+  // Cinematic moods
+  goldenHour: [
+    "#FFB267", // amber rim light
+    "#FF715B", // warm key light
+    "#22577A", // teal shadow fill
+    "#13293D", // indigo falloff
+  ],
+  neoNoir: [
+    "#0D1B2A", // midnight base
+    "#1B263B", // steel blue shadows
+    "#415A77", // smoke blue mids
+    "#E0E1DD", // cold highlights
+  ],
+  cyberWave: [
+    "#3A0CA3", // electric indigo core
+    "#4895EF", // neon cerulean glow
+    "#F72585", // hot magenta accent
+    "#0B1221", // night backdrop
+  ],
+  analogDream: [
+    "#F3E0C8", // film grain highlight
+    "#C86B85", // rose midtone
+    "#355C7D", // dusk blue shadow
+    "#1A1E2A", // vignette edge
+  ],
 } as const;
 
 export interface ShaderBackgroundProps extends RectProps {
@@ -149,7 +174,7 @@ export class ShaderBackground extends Rect {
 
     super({
       ...props,
-      // if user didn’t override individual signals, seed them from preset
+      // if user didn't override individual signals, seed them from preset
       size : '100%'
     });
     this.shaders({
@@ -164,7 +189,7 @@ export class ShaderBackground extends Rect {
 
     // override any missing custom signals with preset
     if (props.preset) {
-      // only set if user didn’t pass color0 explicitly
+      // only set if user didn't pass color0 explicitly
       this.color0(presetColors[0]);
       this.color1(presetColors[1]);
       this.color2(presetColors[2]);
@@ -172,3 +197,4 @@ export class ShaderBackground extends Rect {
     }
   }
 }
+
