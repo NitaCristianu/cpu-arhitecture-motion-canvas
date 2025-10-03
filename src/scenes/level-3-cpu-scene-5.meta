@@ -1,0 +1,22 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 0
+    },
+    {
+      "name": "push intro",
+      "targetTime": 1.4966333918452928
+    },
+    {
+      "name": "pop intro",
+      "targetTime": 5.468372549206766
+    },
+    {
+      "name": "next",
+      "targetTime": 9.631025244012132
+    }
+  ],
+  "seed": 193284731
+}
