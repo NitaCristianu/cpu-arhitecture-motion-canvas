@@ -415,22 +415,23 @@ int main(){\n  cout << outer() << endl;\n}`}
   view.add(nested_code);
 
   const accent = "#e7e053ff";
+  const innerAccent = "#53d7f4ff";
 
   const mainrange = createSignal(() => {
     const range = nested_code.childAs<Code>(0).findFirstRange(`int main()`);
     const bboxes = nested_code.childAs<Code>(0).getSelectionBBox(range);
-    // "getSelectionBBox" returns an array of bboxes,
-    // one for each line in the range. You can just
-    // use the first one for this example.
     const first = bboxes[0];
     return first.expand([8, 46]);
   });
   const outerrange = createSignal(() => {
     const range = nested_code.childAs<Code>(0).findFirstRange(`int outer()`);
     const bboxes = nested_code.childAs<Code>(0).getSelectionBBox(range);
-    // "getSelectionBBox" returns an array of bboxes,
-    // one for each line in the range. You can just
-    // use the first one for this example.
+    const first = bboxes[0];
+    return first.expand([8, 46]);
+  });
+  const innerrange = createSignal(() => {
+    const range = nested_code.childAs<Code>(0).findFirstRange(`int inner()`);
+    const bboxes = nested_code.childAs<Code>(0).getSelectionBBox(range);
     const first = bboxes[0];
     return first.expand([8, 46]);
   });
@@ -465,8 +466,26 @@ int main(){\n  cout << outer() << endl;\n}`}
       offset={-1}
     ></Rect>
   );
+  const inner_function_rect = (
+    <Rect
+      fill={"#04ffa0"}
+      shadowBlur={40}
+      shadowColor={"#74f6ffaa"}
+      scale={0}
+      stroke={"#74f6ff"}
+      lineWidth={3}
+      lineDash={[20, 20]}
+      radius={32}
+      position={innerrange().position.addX(-60).addY(-5)}
+      size={innerrange().size}
+      offset={-1}
+    ></Rect>
+  );
+
   nested_code.add(main_function_rect);
   nested_code.add(outer_function_rect);
+  nested_code.add(inner_function_rect);
+
 
   const bp_layer_1 = BP_mark().clone({ opacity: 0 });
   bp_layer_1.absolutePosition(() => BP_mark().absolutePosition());
@@ -482,6 +501,20 @@ int main(){\n  cout << outer() << endl;\n}`}
 
   view.add(bp_layer_1);
   view.add(sp_layer_1);
+  const bp_layer_2 = bp_layer_1.clone({ opacity: 0 });
+  bp_layer_2.absolutePosition(() => bp_layer_1.absolutePosition());
+  bp_layer_2.childAs<Ray>(0).stroke(innerAccent);
+  bp_layer_2.childAs<Txt>(1).fill(innerAccent);
+  bp_layer_2.childAs<Txt>(1).shadowColor(new Color(innerAccent).alpha(0.5));
+
+  const sp_layer_2 = sp_layer_1.clone({ opacity: 0 });
+  sp_layer_2.absolutePosition(() => sp_layer_1.absolutePosition());
+  sp_layer_2.childAs<Ray>(1).stroke(innerAccent);
+  sp_layer_2.childAs<Txt>(0).fill(innerAccent);
+  sp_layer_2.childAs<Txt>(0).shadowColor(new Color(innerAccent).alpha(0.5));
+
+  view.add(bp_layer_2);
+  view.add(sp_layer_2);
 
   yield* nested_code.scale(1, 0.5);
   yield sp(10, 1);
@@ -502,5 +535,17 @@ int main(){\n  cout << outer() << endl;\n}`}
   yield sp_layer_1.y(sp_layer_1.y() - cellsize(), 1);
   yield outer_function_rect.scale(1,.7,easeOutCubic);
 
+  yield* waitUntil("inner call");
+  yield bp_layer_2.opacity(1, 0.7, easeOutCubic);
+  yield sp_layer_2.opacity(1, 0.7, easeOutCubic);
+  yield bp_layer_2.scale(0.55, 1);
+  yield sp_layer_2.scale(0.55, 1);
+  yield bp_layer_2.x(bp_layer_2.x() - 20, 1);
+  yield sp_layer_2.x(sp_layer_2.x() + 10, 1);
+  yield bp_layer_2.y(bp_layer_2.y() + cellsize(), 1);
+  yield sp_layer_2.y(sp_layer_2.y() - cellsize(), 1);
+  yield inner_function_rect.scale(1,.7,easeOutCubic);
+
   yield* waitUntil("next");
 });
+

@@ -30,6 +30,10 @@
       "targetTime": 23.129906314974317
     },
     {
+      "name": "inner call",
+      "targetTime": 24.129906314974317
+    },
+    {
       "name": "next",
       "targetTime": 28.293058184928583
     }
