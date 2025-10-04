@@ -1,4 +1,5 @@
 import {
+  blur,
   Code,
   Gradient,
   Icon,
@@ -219,8 +220,9 @@ export default makeScene2D(function* (view) {
 
       ...bitgroups.map((group, i) =>
         all(
-         
-          ...group.boxes.map((box) => box.fill(new Color(color).alpha(.2), 0.5, easeOutCubic)),
+          ...group.boxes.map((box) =>
+            box.fill(new Color(color).alpha(0.2), 0.5, easeOutCubic)
+          ),
 
           group.shadowBlur(100, 0.5, easeOutCubic),
 
@@ -406,7 +408,7 @@ export default makeScene2D(function* (view) {
   ] as PossibleVector2[];
 
   const opcodeHigh = bitgroups[0]!;
-
+  
   const opcodeLow = bitgroups[1]!;
 
   const modifiers = bitgroups[2]!;
@@ -442,7 +444,6 @@ export default makeScene2D(function* (view) {
 
   yield highlightByte([operandB32], "operand B", "#60a5fa");
 
-
   yield* waitUntil("larger");
 
   yield all(
@@ -476,11 +477,13 @@ export default makeScene2D(function* (view) {
   const otherGroups = [opcodeHigh, opcodeLow, operandA32, operandB32];
 
   yield* all(
-    modifiers.position([-1050, 0], 1, easeInOutBack),
+    modifiers.position([-1050, 0], 2, easeInOutBack),
 
-    modifiers.scale(3, 1, easeInOutBack),
+    modifiers.scale(3, 2, easeInOutBack),
 
-    ...otherGroups.map((group) => group.opacity(0.1, 0.8))
+    ...otherGroups.map((group) =>
+      all(group.opacity(0.1, 0.8), group.filters([blur(400)], 1))
+    )
   );
 
   const subtitle = (
@@ -710,7 +713,6 @@ GRT0 R4, [0xf0]`,
   });
 
   yield* waitUntil("next");
-
 
   yield* all(
     glass_info.x(-3000, 0.8, easeInCubic),

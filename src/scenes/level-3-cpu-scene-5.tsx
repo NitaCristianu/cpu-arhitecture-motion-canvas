@@ -13,10 +13,13 @@ import {
 } from "@motion-canvas/2d";
 import {
   all,
+  chain,
   createRefArray,
   DEFAULT,
   delay,
+  easeInOutBack,
   easeInOutSine,
+  easeInSine,
   easeOutBack,
   easeOutCubic,
   easeOutSine,
@@ -351,7 +354,7 @@ ADD_FN:
   view.add(code);
 
   yield code.y(-500, 2, easeOutCubic);
-  yield* all(...items.map((item) => item.opacity(0.2, 1)));
+  yield* all(...items.map((item) => item.opacity(0.1, 1)));
   yield* all(code.scale(0.7, 1), code.position(0, 1));
 
   yield* waitUntil("highlight1");
@@ -442,9 +445,11 @@ ADD_FN:
   );
   view.add(video_timeline);
   yield* video_timeline.y(800, 1);
-  yield* video_timeline.childAs<Ray>(0).end(chapters.stack,1.5, easeInOutSine);
-  yield* video_timeline.y(1400, 1).do(()=>video_timeline.remove());
-  
+  yield* video_timeline.childAs<Ray>(0).end(chapters.stack, 1.5, easeInOutSine);
+  yield* video_timeline.y(1400, 1).do(() => video_timeline.remove());
+
+  const rules = createRefArray<Rect>();
+
   const assumptions = (
     <Glass
       size={[1200, 1600]}
@@ -480,7 +485,8 @@ ADD_FN:
       {[
         {
           title: "Stack grows downward",
-          detail: "Each PUSH decrements SP by one slot; each POP increments it.",
+          detail:
+            "Each PUSH decrements SP by one slot; each POP increments it.",
           accent: "#5be7ff",
           badge: "SP",
         },
@@ -498,12 +504,14 @@ ADD_FN:
         },
         {
           title: "One slot per cell",
-          detail: "Treat a slot as a single stack cell; skip byte versus word details.",
+          detail:
+            "Treat a slot as a single stack cell; skip byte versus word details.",
           accent: "#9d7bff",
           badge: "[]",
         },
       ].map(({ title, detail, accent, badge }, index) => (
         <Rect
+          ref={rules}
           width={960}
           height={220}
           y={-200 + index * 240}
@@ -569,13 +577,27 @@ ADD_FN:
 
   yield* waitUntil("assumptions");
   yield* all(
-    code.x(-800,1),
-    assumptions.x(1200,1),
-  )
+    code.x(0, 1),
+    code.scale([0.3, 0.5], 1),
+    assumptions.x(0, 1),
+    assumptions.scale(1.2, 1)
+  );
+
+  yield* sequence(
+    0.3,
+    ...rules.map((rule) =>
+      chain(
+        all(
+          rule.scale(1.1, 0.8, easeInOutBack),
+          rule.shadowBlur(50, 0.8, easeInOutBack)
+        ),
+        all(
+          rule.scale(1, 0.6, easeInOutSine),
+          rule.shadowBlur(90, 0.6, easeInOutSine)
+        )
+      )
+    )
+  );
 
   yield* waitUntil("next");
 });
-
-
-
-
