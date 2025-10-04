@@ -445,9 +445,126 @@ ADD_FN:
   yield* video_timeline.childAs<Ray>(0).end(chapters.stack,1.5, easeInOutSine);
   yield* video_timeline.y(1400, 1).do(()=>video_timeline.remove());
   
-  const assumptions = <Glass size={[1200, 1330]} x={3000}>
-    
-  </Glass>;
+  const assumptions = (
+    <Glass
+      size={[1200, 1600]}
+      x={3000}
+      padding={80}
+      radius={56}
+      shadowBlur={140}
+      shadowColor={"#020b1cdd"}
+      zIndex={1}
+    >
+      <Txt
+        fontSize={58}
+        fontWeight={600}
+        fill={"#8bb7ff"}
+        letterSpacing={4}
+        opacity={0.9}
+        y={-540}
+        zIndex={1}
+      >
+        I&apos;LL ASSUME
+      </Txt>
+      <Txt
+        fontSize={120}
+        fontWeight={800}
+        fill={"#ffffff"}
+        y={-440}
+        shadowBlur={60}
+        shadowColor={"#5be7ff55"}
+        zIndex={1}
+      >
+        STACK RULES
+      </Txt>
+      {[
+        {
+          title: "Stack grows downward",
+          detail: "Each PUSH decrements SP by one slot; each POP increments it.",
+          accent: "#5be7ff",
+          badge: "SP",
+        },
+        {
+          title: "CALL pushes return address",
+          detail: "CALL foo pushes the return address before the jump to foo.",
+          accent: "#ffbf5b",
+          badge: "<-",
+        },
+        {
+          title: "RET pops into PC",
+          detail: "RET pops that return address back into the program counter.",
+          accent: "#ff6bcb",
+          badge: "PC",
+        },
+        {
+          title: "One slot per cell",
+          detail: "Treat a slot as a single stack cell; skip byte versus word details.",
+          accent: "#9d7bff",
+          badge: "[]",
+        },
+      ].map(({ title, detail, accent, badge }, index) => (
+        <Rect
+          width={960}
+          height={220}
+          y={-200 + index * 240}
+          radius={48}
+          fill={"rgba(8, 16, 35, 0.85)"}
+          stroke={`${accent}55`}
+          lineWidth={2}
+          shadowBlur={90}
+          shadowColor={`${accent}33`}
+          zIndex={1}
+        >
+          <Circle
+            size={140}
+            position={[-340, 0]}
+            fill={`${accent}26`}
+            stroke={accent}
+            lineWidth={6}
+            shadowBlur={60}
+            shadowColor={`${accent}55`}
+            zIndex={1}
+          >
+            <Txt
+              fontSize={48}
+              fontWeight={700}
+              fill={"#ffffff"}
+              letterSpacing={2}
+              zIndex={1}
+            >
+              {badge}
+            </Txt>
+          </Circle>
+          <Txt
+            fontSize={43}
+            fontWeight={700}
+            fill={"#ffffff"}
+            position={[60, -60]}
+            width={600}
+            lineHeight={70}
+            shadowBlur={32}
+            shadowColor={`${accent}44`}
+            zIndex={1}
+          >
+            {title}
+          </Txt>
+          <Txt
+            fontSize={32}
+            fontWeight={500}
+            fill={"#c4d6ff"}
+            opacity={0.95}
+            position={[80, 20]}
+            width={640}
+            lineHeight={54}
+            textWrap
+            zIndex={1}
+          >
+            {detail}
+          </Txt>
+        </Rect>
+      ))}
+    </Glass>
+  );
   view.add(assumptions);
 
   yield* waitUntil("assumptions");
@@ -458,3 +575,7 @@ ADD_FN:
 
   yield* waitUntil("next");
 });
+
+
+
+
