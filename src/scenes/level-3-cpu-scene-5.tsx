@@ -6,13 +6,21 @@ import {
   Rect,
   Txt,
   Ray,
+  Code,
+  lines,
+  Node,
+  Gradient,
 } from "@motion-canvas/2d";
 import {
   all,
   createRefArray,
+  DEFAULT,
   delay,
+  easeInOutSine,
   easeOutBack,
   easeOutCubic,
+  easeOutSine,
+  loop,
   sequence,
   waitFor,
   waitUntil,
@@ -23,6 +31,8 @@ import {
   GlowBadge,
   GlowPanelTitle,
 } from "../components/TextPresets";
+import { Glass } from "../components/GlassRect";
+import { AsmHighlighter } from "../utils/AsmHighlighter";
 
 const PUSH_STEPS = [
   {
@@ -91,7 +101,7 @@ export default makeScene2D(function* (view) {
   const pushStepsRefs = createRefArray<Layout>();
   const popStepsRefs = createRefArray<Layout>();
 
-  const pushTimelineX = PUSH_X + TIMELINE_OFFSET ;
+  const pushTimelineX = PUSH_X + TIMELINE_OFFSET;
   const popTimelineX = POP_X - TIMELINE_OFFSET;
 
   const pushTimelineConnector = (
@@ -160,7 +170,6 @@ export default makeScene2D(function* (view) {
                 lineWidth={8}
                 stroke="#5be7ff88"
               />
-
             </Layout>
             <Txt
               fontSize={70}
@@ -181,7 +190,7 @@ export default makeScene2D(function* (view) {
             stroke="#5be7ff88"
             layout={false}
             lineWidth={4}
-            position={[CONNECTOR_LENGTH+170, -(CARD_PADDING+30)]}
+            position={[CONNECTOR_LENGTH + 170, -(CARD_PADDING + 30)]}
           />
         </Layout>
       ))}
@@ -226,7 +235,9 @@ export default makeScene2D(function* (view) {
                 <Layout layout alignItems="center" gap={32}>
                   <Ray
                     fromX={0}
-                    toX={-CONNECTOR_LENGTH-200 + (reversedIndex == 2 ? -30 : 0)}
+                    toX={
+                      -CONNECTOR_LENGTH - 200 + (reversedIndex == 2 ? -30 : 0)
+                    }
                     lineWidth={8}
                     stroke="#ffbf5b88"
                   />
@@ -250,7 +261,12 @@ export default makeScene2D(function* (view) {
                 stroke="#ffbf5b88"
                 lineWidth={4}
                 layout={false}
-                position={[-CONNECTOR_LENGTH-110 - ((reversedIndex==0) ?50 : (reversedIndex == 1) ? 160 :100), -(CARD_PADDING + 20)]}
+                position={[
+                  -CONNECTOR_LENGTH -
+                    110 -
+                    (reversedIndex == 0 ? 50 : reversedIndex == 1 ? 160 : 100),
+                  -(CARD_PADDING + 20),
+                ]}
               />
             </Layout>
           );
@@ -273,7 +289,7 @@ export default makeScene2D(function* (view) {
     ...pushStepsRefs.map((container) =>
       all(
         container.scale(1, 0.65, easeOutBack),
-        container.opacity(1, 0.55, easeOutCubic),
+        container.opacity(1, 0.55, easeOutCubic)
       )
     )
   );
@@ -293,6 +309,152 @@ export default makeScene2D(function* (view) {
       )
     )
   );
+
+  const items = view
+    .children()
+    .filter((child) => !(child instanceof ShaderBackground));
+  const code = (
+    <Glass size={[3600, 2200]} translucency={1} borderModifier={-1} y={3000}>
+      <Code
+        zIndex={1}
+        fontSize={80}
+        width={1800}
+        top={[-1000, -20]}
+        height={600}
+        highlighter={new AsmHighlighter()}
+        code={`\
+
+; --- Main Program ---
+PUSH R0     
+PUSH R1        
+CALL ADD_FN      
+POP  R2          
+HLT
+
+; --- Function: ADD_FN ---
+ADD_FN:
+  PUSH BP        
+  MOV  BP, SP
+
+  MOV  R3, [BP + 3]   
+  MOV  R4, [BP + 2]   
+  ADD  R3, R4         
+
+  MOV  [BP + 2], R3   
+
+  MOV  SP, BP         
+  POP  BP
+  RET`}
+      />
+    </Glass>
+  ) as Glass;
+  view.add(code);
+
+  yield code.y(-500, 2, easeOutCubic);
+  yield* all(...items.map((item) => item.opacity(0.2, 1)));
+  yield* all(code.scale(0.7, 1), code.position(0, 1));
+
+  yield* waitUntil("highlight1");
+  yield* all(
+    code
+      .childAs<Code>(0)
+      .selection(code.childAs<Code>(0).findFirstRange("MOV  BP, SP"), 0.4),
+    code.scale(2, 1),
+    code.position([1500, 0], 1)
+  );
+  yield* waitUntil("highlight return");
+  yield* all(
+    code.childAs<Code>(0).selection(DEFAULT, 0.4),
+    code.position([200, -800], 1),
+    code.scale(1.3, 1)
+  );
+  yield* waitUntil("restore code");
+  yield* all(
+    code.scale(0.6, 1),
+    code.position(0, 1),
+    loop(8, (i) =>
+      code.childAs<Code>(0).selection(lines(i * 3 - 3, i * 3), 0.2)
+    )
+  );
+  yield* code.childAs<Code>(0).selection(DEFAULT, 0.5);
+
+  yield* waitUntil("skip chapter");
+  const chapters = { intro: 0.05, fpu: 0.2, stack: 0.5, cache: 0.95, outro: 1 };
+  const timings = Object.values(chapters);
+  const video_timeline = (
+    <Node y={1400}>
+      <Ray
+        stroke={
+          new Gradient({
+            fromY: -30,
+            toY: 30,
+            stops: [
+              { offset: 0, color: "#f00" },
+              { offset: 1, color: "#f55" },
+            ],
+          })
+        }
+        end={0}
+        fromX={-1800}
+        toX={1800}
+        lineWidth={20}
+        zIndex={1}
+      >
+        <Circle
+          size={60}
+          position={() =>
+            video_timeline
+              .childAs<Ray>(0)
+              .getPointAtPercentage(video_timeline.childAs<Ray>(0).end())
+              .position
+          }
+          fill={
+            new Gradient({
+              fromY: -30,
+              toY: 30,
+              stops: [
+                { offset: 0, color: "#f00" },
+                { offset: 1, color: "#f55" },
+              ],
+            })
+          }
+        />
+      </Ray>
+      {...timings.map((val, i) => (
+        <Ray
+          stroke={"#fffa"}
+          from={() =>
+            video_timeline
+              .childAs<Ray>(0)
+              .getPointAtPercentage(i > 0 ? timings[i - 1] : 0).position
+          }
+          to={() =>
+            video_timeline.childAs<Ray>(0).getPointAtPercentage(val).position
+          }
+          shadowBlur={50}
+          startOffset={20}
+          endOffset={20}
+          shadowColor={"#000"}
+          lineWidth={15}
+        ></Ray>
+      ))}
+    </Node>
+  );
+  view.add(video_timeline);
+  yield* video_timeline.y(800, 1);
+  yield* video_timeline.childAs<Ray>(0).end(chapters.stack,1.5, easeInOutSine);
+  yield* video_timeline.y(1400, 1).do(()=>video_timeline.remove());
+  
+  const assumptions = <Glass size={[1200, 1330]} x={3000}>
+    
+  </Glass>;
+  view.add(assumptions);
+
+  yield* waitUntil("assumptions");
+  yield* all(
+    code.x(-800,1),
+    assumptions.x(1200,1),
+  )
 
   yield* waitUntil("next");
 });

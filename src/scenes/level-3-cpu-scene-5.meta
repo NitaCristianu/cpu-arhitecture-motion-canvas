@@ -11,11 +11,31 @@
     },
     {
       "name": "pop intro",
-      "targetTime": 5.468372549206766
+      "targetTime": 5.436973012222824
+    },
+    {
+      "name": "highlight1",
+      "targetTime": 9.847961206837041
+    },
+    {
+      "name": "highlight return",
+      "targetTime": 10.847961206837041
+    },
+    {
+      "name": "restore code",
+      "targetTime": 11.847961206837041
+    },
+    {
+      "name": "skip chapter",
+      "targetTime": 14.267981985883305
+    },
+    {
+      "name": "assumptions",
+      "targetTime": 17.767981985883303
     },
     {
       "name": "next",
-      "targetTime": 9.631025244012132
+      "targetTime": 20.573573116466285
     }
   ],
   "seed": 193284731
