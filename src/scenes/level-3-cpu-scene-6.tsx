@@ -1,4 +1,4 @@
-import { Grid, Icon, makeScene2D, Node, Txt } from "@motion-canvas/2d";
+import { Code, Rect, makeScene2D } from "@motion-canvas/2d";
 import { ShaderBackground } from "../components/background";
 import {
   createSignal,
@@ -7,18 +7,15 @@ import {
   waitUntil,
 } from "@motion-canvas/core";
 import { Glass } from "../components/GlassRect";
-import {
-  GlassBodyText,
-  GlassCaption,
-  GlowPanelTitle,
-} from "../components/TextPresets";
+import { GlassBodyText, GlowPanelTitle } from "../components/TextPresets";
+import { AsmHighlighter } from "../utils/AsmHighlighter";
 
 export default makeScene2D(function* (view) {
   view.fill("rgba(8, 1, 2, 1)");
   view.add(<ShaderBackground opacity={0.25} preset="cyberWave" />);
-  const camera = <Node />;
-
   const register_signal = createSignal<number>(0);
+  const stackHeight = () => 850 - 150 * register_signal();
+  const stackHeaderHeight = 200;
 
   const registers: {
     name: SignalValue<string>;
@@ -26,40 +23,207 @@ export default makeScene2D(function* (view) {
   }[] = [
     {
       name: createSignal<string>("R0"),
-      represents: "something cool",
+      represents: "Arg0/ACC",
     },
     {
       name: "R1",
-      represents: "something cool",
+      represents: "Arg1",
     },
     {
       name: "R2",
-      represents: "something cool",
+      represents: "Scratch",
     },
     {
       name: "PC",
-      represents: "something cool",
+      represents: "Next PC",
     },
     {
       name: "BP",
-      represents: "something cool",
+      represents: "Frame base",
     },
     {
       name: "SP",
-      represents: "something cool",
+      represents: "Stack top",
+    },
+  ];
+
+  const stackEntries: {
+    address: string;
+    content: string;
+    note: string;
+    highlight?: boolean;
+  }[] = [
+    {
+      address: "RET addr",
+      content: "[0x7FF4]",
+      note: "CALL pushes resume point",
+    },
+    {
+      address: "Prev BP",
+      content: "Prev BP",
+      note: "Restore caller frame",
+    },
+    {
+      address: "[0x7FF8]",
+      content: "R0 (3)",
+      note: "First argument",
+      highlight: true,
+    },
+    {
+      address: "[0x7FFA]",
+      content: "R1 (5)",
+      note: "Second argument",
+      highlight: true,
+    },
+    {
+      address: "[0x7FFC]",
+      content: "Scratch",
+      note: "Temp slot",
     },
   ];
 
   const code_rect = (
-    <Glass size={[1700, 1300]} x={-900} y={-100}></Glass>
+    <Glass size={[1700, 1300]} x={-900} y={-100}>
+      <Code
+        zIndex={2}
+        fontSize={40}
+        width={820}
+        height={560}
+        top={[-180, -10]}
+        highlighter={new AsmHighlighter()}
+        code={`\
+
+; --- Main Program ---
+PUSH R0         ; Push first number (3)
+PUSH R1         ; Push second number (5)
+
+CALL ADD_FN     ; Jump to function with args on stack
+
+POP  R2         ; Retrieve result into R2
+HLT             ; Halt execution
+
+; --- Function: ADD_FN ---
+ADD_FN:
+  PUSH BP       ; Preserve caller frame
+  MOV  BP, SP   ; Start a new stack frame
+
+  MOV  R3, [BP + 2] ; Load first argument
+  MOV  R4, [BP + 1] ; Load second argument
+  ADD  R3, R4       ; R3 = arg0 + arg1
+
+  MOV  [BP + 2], R3 ; Store result in caller slot
+
+  MOV  SP, BP   ; Tear down frame
+  POP  BP       ; Restore caller frame
+  RET           ; Return to caller`}
+      />
+    </Glass>
   ) as Glass;
 
   const stack_view = (
     <Glass
-      size={() => [1700, 1000 - 300 * register_signal()]}
+      size={() => [1700, stackHeight()]}
       x={900}
       y={() => 400 * register_signal()}
-    ></Glass>
+    >
+      <GlassBodyText
+        text={"Address"}
+        fontSize={46}
+        fontWeight={600}
+        textAlign={"left"}
+        x={-540}
+        y={() => -stackHeight() / 2 + 70}
+        zIndex={2}
+      />
+      <GlassBodyText
+        text={"Value"}
+        fontSize={46}
+        fontWeight={600}
+        textAlign={"center"}
+        x={-40}
+        y={() => -stackHeight() / 2 + 70}
+        zIndex={2}
+      />
+      <GlassBodyText
+        text={"Notes"}
+        fontSize={46}
+        fontWeight={600}
+        textAlign={"right"}
+        x={520}
+        y={() => -stackHeight() / 2 + 70}
+        zIndex={2}
+      />
+      <Rect
+        zIndex={1}
+        size={() => [1600, stackHeight() - stackHeaderHeight + 100]}
+        y={() => stackHeaderHeight / 2 - 50}
+        clip
+        lineWidth={0}
+      >
+        {stackEntries.flatMap((entry, index) => {
+          const rowY = () =>
+            -((stackHeight() - stackHeaderHeight) / 2) + 40 + index * 140;
+          return [
+            <Glass
+              key={`${entry.address}-addr`}
+              zIndex={2}
+              lightness={0.1}
+              translucency={0.9}
+              size={[420, 120]}
+              x={-540}
+              y={rowY}
+            >
+              <GlassBodyText
+                text={entry.address}
+                fontSize={52}
+                fontWeight={600}
+                textAlign={"left"}
+                zIndex={2}
+              />
+            </Glass>,
+            <Glass
+              key={`${entry.address}-value`}
+              zIndex={2}
+              lightness={0}
+              translucency={entry.highlight ? 1 : 0.85}
+              size={[360, 120]}
+              x={-40}
+              y={rowY}
+              fill={entry.highlight ? "#154d91aa" : undefined}
+            >
+              <GlassBodyText
+                text={entry.content}
+                fontSize={52}
+                fontWeight={600}
+                textAlign={"center"}
+                fill={entry.highlight ? "#bfe4ff" : "#ffffff"}
+                zIndex={2}
+              />
+            </Glass>,
+            <Glass
+              key={`${entry.address}-note`}
+              zIndex={2}
+              lightness={0.1}
+              translucency={0.9}
+              size={[520, 120]}
+              x={520}
+              y={rowY}
+            >
+              <GlassBodyText
+                text={entry.note}
+                fontSize={40}
+                opacity={0.85}
+                textAlign={"center"}
+                fill={entry.highlight ? "#9ed6ff" : "#cce3ff"}
+                width={480}
+                textWrap
+                zIndex={2}
+              />
+            </Glass>,
+          ];
+        })}
+      </Rect>
+    </Glass>
   );
   const register_space = (
     <Glass
@@ -69,12 +233,12 @@ export default makeScene2D(function* (view) {
       clip
     >
       <GlowPanelTitle
-        text={"Register contents meaning"} // modify title to be more precise
-        opacity={0.7}
-        fontWeight={500}
+        text={"Reg summary"}
+        opacity={0.85}
+        fontWeight={600}
         y={-250}
-        fontSize={90}
-        zIndex={1}
+        fontSize={96}
+        zIndex={2}
       />
       {...registers.map((register, i) => (
         <Glass
@@ -88,12 +252,15 @@ export default makeScene2D(function* (view) {
           <GlassBodyText
             text={register.name}
             width={690}
+            fontSize={60}
+            fontWeight={600}
+            textAlign={"left"}
             zIndex={1}
           ></GlassBodyText>
           <GlassBodyText
             text={register.represents}
             opacity={0.8}
-            fontSize={50}
+            fontSize={48}
             width={690}
             textAlign={"right"}
             zIndex={1}
@@ -105,18 +272,15 @@ export default makeScene2D(function* (view) {
   const context_view = (
     <Glass width={1700} height={150} top={code_rect.bottom().addY(50)}>
       <GlassBodyText
-        text={"initial text context here,this is max size"}
+        text={
+          "CALL saves return + BP so RET restores the frame cleanly."
+        }
         width={1500}
         left={[-850 + 50, 0]}
-        zIndex={1}
-      />
-      {/* <Icon
-        color={"#fff"}
-        icon={"mdi:code-braces"}
-        size={100}
-        right={[750 - 25, 0]}
+        fontSize={54}
+        opacity={0.9}
         zIndex={2}
-      /> */}
+      />
     </Glass>
   );
 
