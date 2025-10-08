@@ -5,6 +5,7 @@ import {
   easeInOutBack,
   SignalValue,
   waitUntil,
+  useRandom,
 } from "@motion-canvas/core";
 import { Glass } from "../components/GlassRect";
 import { GlassBodyText, GlowPanelTitle } from "../components/TextPresets";
@@ -16,6 +17,10 @@ export default makeScene2D(function* (view) {
   const register_signal = createSignal<number>(0);
   const stackHeight = () => 850 - 150 * register_signal();
   const stackHeaderHeight = 200;
+  const random = useRandom();
+  const randomBits = (bits: number) =>
+    random.nextInt(0, 1 << bits).toString(2).padStart(bits, "0");
+  const formatStackValue = () => `${randomBits(2)}.${randomBits(2)}`;
 
   const registers: {
     name: SignalValue<string>;
@@ -47,40 +52,38 @@ export default makeScene2D(function* (view) {
     },
   ];
 
-  const stackEntries: {
+  const stackEntryBases: {
     address: string;
-    content: string;
     note: string;
     highlight?: boolean;
   }[] = [
     {
-      address: "RET addr",
-      content: "[0x7FF4]",
+      address: "100",
       note: "CALL pushes resume point",
     },
     {
-      address: "Prev BP",
-      content: "Prev BP",
+      address: "099",
       note: "Restore caller frame",
     },
     {
-      address: "[0x7FF8]",
-      content: "R0 (3)",
+      address: "098",
       note: "First argument",
       highlight: true,
     },
     {
-      address: "[0x7FFA]",
-      content: "R1 (5)",
+      address: "097",
       note: "Second argument",
       highlight: true,
     },
     {
-      address: "[0x7FFC]",
-      content: "Scratch",
+      address: "096",
       note: "Temp slot",
     },
   ];
+  const stackEntries = stackEntryBases.map((entry) => ({
+    ...entry,
+    content: formatStackValue(),
+  }));
 
   const code_rect = (
     <Glass size={[1700, 1300]} x={-900} y={-100}>
@@ -299,3 +302,4 @@ ADD_FN:
 
   yield* waitUntil("next");
 });
+
