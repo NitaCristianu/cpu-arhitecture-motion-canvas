@@ -1,11 +1,29 @@
-import { Code, Rect, makeScene2D } from "@motion-canvas/2d";
+﻿import {
+  Code,
+  PossibleCodeScope,
+  Ray,
+  Rect,
+  Txt,
+  Line,
+  makeScene2D,
+  Gradient,
+} from "@motion-canvas/2d";
 import { ShaderBackground } from "../components/background";
 import {
+  all,
+  any,
+  chain,
+  createRefArray,
   createSignal,
+  DEFAULT,
+  easeInBack,
   easeInOutBack,
+  easeOutBack,
+  easeOutCubic,
+  run,
   SignalValue,
+  waitFor,
   waitUntil,
-  useRandom,
 } from "@motion-canvas/core";
 import { Glass } from "../components/GlassRect";
 import { GlassBodyText, GlowPanelTitle } from "../components/TextPresets";
@@ -15,19 +33,18 @@ export default makeScene2D(function* (view) {
   view.fill("rgba(8, 1, 2, 1)");
   view.add(<ShaderBackground opacity={0.25} preset="cyberWave" />);
   const register_signal = createSignal<number>(0);
-  const stackHeight = () => 850 - 150 * register_signal();
+  const stack_count = createSignal(0);
   const stackHeaderHeight = 200;
-  const random = useRandom();
-  const randomBits = (bits: number) =>
-    random.nextInt(0, 1 << bits).toString(2).padStart(bits, "0");
-  const formatStackValue = () => `${randomBits(2)}.${randomBits(2)}`;
+
+  const stackBaseSize = createSignal(() => ((stack_count() + 1) * 850) / 6);
+  const stackHeight = () => Math.max(stackBaseSize(), stackHeaderHeight + 100);
 
   const registers: {
     name: SignalValue<string>;
     represents: SignalValue<string>;
   }[] = [
     {
-      name: createSignal<string>("R0"),
+      name: "R0",
       represents: "Arg0/ACC",
     },
     {
@@ -52,47 +69,50 @@ export default makeScene2D(function* (view) {
     },
   ];
 
-  const stackEntryBases: {
+  const stackEntries: {
     address: string;
+    content: string;
     note: string;
     highlight?: boolean;
   }[] = [
     {
       address: "100",
+      content: "[0x7FF4]",
       note: "CALL pushes resume point",
     },
     {
-      address: "099",
+      address: "99",
+      content: "Prev BP",
       note: "Restore caller frame",
     },
     {
-      address: "098",
+      address: "928",
+      content: "R0 (3)",
       note: "First argument",
       highlight: true,
     },
     {
-      address: "097",
+      address: "97",
+      content: "R1 (5)",
       note: "Second argument",
       highlight: true,
     },
     {
-      address: "096",
+      address: "96",
+      content: "Scratch",
       note: "Temp slot",
     },
   ];
-  const stackEntries = stackEntryBases.map((entry) => ({
-    ...entry,
-    content: formatStackValue(),
-  }));
 
   const code_rect = (
-    <Glass size={[1700, 1300]} x={-900} y={-100}>
+    <Glass clip size={[1700, 1100]} x={-900} y={-200}>
       <Code
         zIndex={2}
-        fontSize={40}
-        width={820}
+        fontSize={37}
+        width={1700}
+        x={() => -code_rect.childAs<Code>(0).fontSize() * 5}
         height={560}
-        top={[-180, -10]}
+        textAlign={"left"}
         highlighter={new AsmHighlighter()}
         code={`\
 
@@ -122,6 +142,10 @@ ADD_FN:
       />
     </Glass>
   ) as Glass;
+
+  const array_address = createRefArray<Glass>();
+  const array_value = createRefArray<Glass>();
+  const array_notes = createRefArray<Glass>();
 
   const stack_view = (
     <Glass
@@ -166,6 +190,7 @@ ADD_FN:
         {stackEntries.flatMap((entry, index) => {
           const rowY = () =>
             -((stackHeight() - stackHeaderHeight) / 2) + 40 + index * 140;
+          const I = createSignal(index);
           return [
             <Glass
               key={`${entry.address}-addr`}
@@ -173,8 +198,10 @@ ADD_FN:
               lightness={0.1}
               translucency={0.9}
               size={[420, 120]}
+              ref={array_address}
               x={-540}
               y={rowY}
+              scale={() => Math.min(1, Math.min(I() - stack_count(), 0) * -1)}
             >
               <GlassBodyText
                 text={entry.address}
@@ -185,29 +212,34 @@ ADD_FN:
               />
             </Glass>,
             <Glass
+              scale={() => Math.min(1, Math.min(I() - stack_count(), 0) * -1)}
+              ref={array_value}
               key={`${entry.address}-value`}
               zIndex={2}
               lightness={0}
-              translucency={entry.highlight ? 1 : 0.85}
+              translucency={0.85}
               size={[360, 120]}
               x={-40}
               y={rowY}
-              fill={entry.highlight ? "#154d91aa" : undefined}
+              fill={undefined}
             >
               <GlassBodyText
+                ref={array_value}
                 text={entry.content}
                 fontSize={52}
                 fontWeight={600}
                 textAlign={"center"}
-                fill={entry.highlight ? "#bfe4ff" : "#ffffff"}
+                fill={"#ffffff"}
                 zIndex={2}
               />
             </Glass>,
             <Glass
+              scale={() => Math.min(1, Math.min(I() - stack_count(), 0) * -1)}
+              ref={array_notes}
               key={`${entry.address}-note`}
               zIndex={2}
               lightness={0.1}
-              translucency={0.9}
+              translucency={1}
               size={[520, 120]}
               x={520}
               y={rowY}
@@ -217,7 +249,7 @@ ADD_FN:
                 fontSize={40}
                 opacity={0.85}
                 textAlign={"center"}
-                fill={entry.highlight ? "#9ed6ff" : "#cce3ff"}
+                fill={"#cce3ff"}
                 width={480}
                 textWrap
                 zIndex={2}
@@ -228,6 +260,7 @@ ADD_FN:
       </Rect>
     </Glass>
   );
+
   const register_space = (
     <Glass
       size={() => [1000 + 700 * register_signal(), 700 * register_signal()]}
@@ -260,6 +293,17 @@ ADD_FN:
             textAlign={"left"}
             zIndex={1}
           ></GlassBodyText>
+          <Glass
+            width={270}
+            height={100}
+            removeShadow={0}
+            zIndex={2}
+            x={-100}
+            fill={"#0002"}
+            translucency={0.1}
+          >
+            <GlassBodyText text={"0000"} zIndex={1} fontFamily={"Fira Code"} />
+          </Glass>
           <GlassBodyText
             text={register.represents}
             opacity={0.8}
@@ -272,12 +316,11 @@ ADD_FN:
       ))}
     </Glass>
   );
+
   const context_view = (
-    <Glass width={1700} height={150} top={code_rect.bottom().addY(50)}>
+    <Glass width={1700} height={350} top={code_rect.bottom().addY(50)}>
       <GlassBodyText
-        text={
-          "CALL saves return + BP so RET restores the frame cleanly."
-        }
+        text={"CALL saves return + BP so RET restores the frame cleanly."}
         width={1500}
         left={[-850 + 50, 0]}
         fontSize={54}
@@ -296,10 +339,172 @@ ADD_FN:
     yield* register_signal(1, 2, easeInOutBack);
   }
 
+  function* hideRegisters() {
+    yield* register_signal(0, 1);
+  }
+
+  function* focusOnCode(
+    new_code: PossibleCodeScope,
+    context: string,
+    fs = 100
+  ) {
+    const comp = code_rect.childAs<Code>(0);
+    const cont = context_view.findFirst((is) => is instanceof Txt);
+    yield* all(comp.code(new_code, 1), comp.fontSize(fs, 1));
+    yield* all(cont.text(context, 1), context_view.scale(1.05, 1).back(1));
+  }
+
+  function* push_stack(
+    command: string | RegExp,
+    address: number,
+    value: string,
+    note: string
+  ) {
+    const code = code_rect.childAs<Code>(0);
+    const range = code.findFirstRange(command);
+    const bboxes = code.getSelectionBBox(range);
+
+    const box = bboxes[0].expand([8, 16]);
+    const start = box.position
+      .add(code_rect.position())
+      .add(code.position())
+      .addX(100)
+      .addY(50);
+
+    array_address[stack_count()].childAs<Txt>(0).text(address.toString());
+    array_value[stack_count()].childAs<Txt>(0).text(value);
+    array_notes[stack_count()].childAs<Txt>(0).text(note);
+
+    var end = array_address[stack_count()]
+      .absolutePosition()
+      .sub(view.position())
+      .addY(-50);
+    if (stack_count() < 1) end.addY(-50);
+    end.x = Math.min(end.x, 300);
+
+    const line = (
+      <Line
+        shadowBlur={50}
+        shadowColor={"white"}
+        points={[start, start.lerp(end, 0.5).addY(200), end]}
+        lineWidth={9}
+        end={0}
+        lineDash={[40, 40]}
+        stroke={
+          new Gradient({
+            fromX: -1200,
+            toX: -100,
+            stops: [
+              { offset: 0, color: "#fff0" },
+              { offset: 1, color: "#fff" },
+            ],
+          })
+        }
+        endOffset={230}
+        startOffset={190}
+        radius={400}
+        endArrow
+      />
+    ) as Line;
+    view.add(line);
+
+    yield code.selection(code.findFirstRange(command), 0.4);
+    yield line.end(1, 0.7, easeOutCubic);
+    yield* stack_count(stack_count() + 1, 1);
+    yield code.selection(DEFAULT, 0.7);
+    yield* line.start(1, 0.7, easeOutCubic).do(() => line.remove());
+  }
+
+  function* pop_stack(registername: "R0" | "R1" | "R2" | "PC" | "BP" | "SP") {
+    const code = code_rect.childAs<Code>(0);
+    const end_txt = register_space.findFirst(
+      (t) => t instanceof Txt && t.text() == registername
+    );
+
+    // array_address[stack_count()].childAs<Txt>(0).text(address.toString());
+    // array_value[stack_count()].childAs<Txt>(0).text(value);
+    // array_notes[stack_count()].childAs<Txt>(0).text(note);
+    const end = end_txt.absolutePosition().sub(view.position());
+    var start = array_value[stack_count()]
+      .absolutePosition()
+      .sub(view.position())
+      .addY(-50);
+    if (stack_count() < 1) end.addY(-50);
+    const sc = stack_count();
+
+    if (register_signal() > 0) {
+      const line = (
+        <Line
+          points={[start, start.lerp(end, 0.5).addY(200), end]}
+          lineWidth={9}
+          end={0}
+          lineDash={[40, 40]}
+          stroke={
+            new Gradient({
+              toY: -400,
+              fromY: 400,
+              stops: [
+                { offset: 0, color: "#fff0" },
+                { offset: 1, color: "#fff" },
+              ],
+            })
+          }
+          endOffset={40}
+          startOffset={0}
+          radius={400}
+          endArrow
+          shadowBlur={50}
+          shadowColor={"white"}
+        />
+      ) as Line;
+      view.add(line);
+
+      yield chain(
+        all(
+          line.end(1, 1, easeOutCubic),
+          array_value[sc].scale(1.1,.4),
+        ),
+        (
+          end_txt
+            .parent()
+            .findFirst(
+              (txt) => txt instanceof Txt && txt.text()[0] != "R"
+            ) as any
+        ).text(array_value[sc].findFirst((t) => t instanceof Txt).text(), 0.5),
+        all(
+          array_value[sc].scale(1,.5),
+          line.start(1, 0.7),
+        ),
+        run(function* () {
+          line.remove();
+        })
+      );
+    }
+
+    yield code.selection(code.findFirstRange("POP " + registername), 0.4);
+    yield* waitFor(1.5);
+    yield code.selection(code.findFirstRange("POP " + registername), 0.4);
+    yield* stack_count(stack_count() - 1, 1);
+  }
+
   yield* waitUntil("begin");
 
+  // some demo things
+
+  yield* focusOnCode("PUSH R0", "We push R0 to use it for adding");
+  yield* push_stack("PUSH R0", 100, "0101", "arg 1");
+  yield* focusOnCode("PUSH R0\nPUSH R1", "We push R1 to use it for adding");
+  yield* push_stack("PUSH R0", 99, "0101", "arg 1");
+  yield* push_stack("PUSH R1", 98, "1101", "arg 2");
+  yield* focusOnCode(
+    "PUSH R0\nPUSH R1\nPOP R0",
+    "We push R1 to use it for adding"
+  );
   yield* showRegisters();
+  yield* pop_stack("R0");
+
+  yield* push_stack("PUSH R1", 97, "1101", "arg 2");
+  yield* hideRegisters();
 
   yield* waitUntil("next");
 });
-
