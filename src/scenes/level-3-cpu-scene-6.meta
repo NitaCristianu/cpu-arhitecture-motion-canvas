@@ -6,8 +6,36 @@
       "targetTime": 1.6501556992934132
     },
     {
+      "name": "1-2",
+      "targetTime": 2.650155699293413
+    },
+    {
+      "name": "3-4",
+      "targetTime": 11.105706031769671
+    },
+    {
+      "name": "4-sense",
+      "targetTime": 20.005706031769673
+    },
+    {
+      "name": "5-6",
+      "targetTime": 25.291993312464843
+    },
+    {
+      "name": "store",
+      "targetTime": 28.291993312464843
+    },
+    {
+      "name": "7-8",
+      "targetTime": 30.34768353599249
+    },
+    {
+      "name": "back",
+      "targetTime": 53.410295831608934
+    },
+    {
       "name": "next",
-      "targetTime": 33.89203942664485
+      "targetTime": 61.657246743711845
     }
   ],
   "seed": 1369113608

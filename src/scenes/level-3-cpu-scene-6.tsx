@@ -7,6 +7,7 @@
   Line,
   makeScene2D,
   Gradient,
+  lines,
 } from "@motion-canvas/2d";
 import { ShaderBackground } from "../components/background";
 import {
@@ -16,6 +17,7 @@ import {
   createRefArray,
   createSignal,
   DEFAULT,
+  delay,
   easeInBack,
   easeInOutBack,
   easeOutBack,
@@ -45,7 +47,7 @@ export default makeScene2D(function* (view) {
   }[] = [
     {
       name: "R0",
-      represents: "Arg0/ACC",
+      represents: "Arg0",
     },
     {
       name: "R1",
@@ -53,11 +55,11 @@ export default makeScene2D(function* (view) {
     },
     {
       name: "R2",
-      represents: "Scratch",
+      represents: "---",
     },
     {
       name: "PC",
-      represents: "Next PC",
+      represents: "instr. addr.",
     },
     {
       name: "BP",
@@ -77,8 +79,8 @@ export default makeScene2D(function* (view) {
   }[] = [
     {
       address: "100",
-      content: "[0x7FF4]",
-      note: "CALL pushes resume point",
+      content: "0xff24",
+      note: "We assume SP is here",
     },
     {
       address: "99",
@@ -110,7 +112,7 @@ export default makeScene2D(function* (view) {
         zIndex={2}
         fontSize={37}
         width={1700}
-        x={() => -code_rect.childAs<Code>(0).fontSize() * 5}
+        x={() => -code_rect.childAs<Code>(0).fontSize() * 2}
         height={560}
         textAlign={"left"}
         highlighter={new AsmHighlighter()}
@@ -158,7 +160,7 @@ ADD_FN:
         fontSize={46}
         fontWeight={600}
         textAlign={"left"}
-        x={-540}
+        x={-650}
         y={() => -stackHeight() / 2 + 70}
         zIndex={2}
       />
@@ -197,16 +199,17 @@ ADD_FN:
               zIndex={2}
               lightness={0.1}
               translucency={0.9}
-              size={[420, 120]}
+              size={[220, 120]}
               ref={array_address}
-              x={-540}
+              x={-650}
               y={rowY}
               scale={() => Math.min(1, Math.min(I() - stack_count(), 0) * -1)}
             >
               <GlassBodyText
                 text={entry.address}
                 fontSize={52}
-                fontWeight={600}
+                fontFamily={"Fira Code"}
+                fontWeight={400}
                 textAlign={"left"}
                 zIndex={2}
               />
@@ -224,10 +227,10 @@ ADD_FN:
               fill={undefined}
             >
               <GlassBodyText
-                ref={array_value}
                 text={entry.content}
+                fontFamily={"Fira Code"}
                 fontSize={52}
-                fontWeight={600}
+                fontWeight={300}
                 textAlign={"center"}
                 fill={"#ffffff"}
                 zIndex={2}
@@ -261,6 +264,7 @@ ADD_FN:
     </Glass>
   );
 
+  const registers_texts = createRefArray<Txt>();
   const register_space = (
     <Glass
       size={() => [1000 + 700 * register_signal(), 700 * register_signal()]}
@@ -302,7 +306,24 @@ ADD_FN:
             fill={"#0002"}
             translucency={0.1}
           >
-            <GlassBodyText text={"0000"} zIndex={1} fontFamily={"Fira Code"} />
+            <GlassBodyText
+              ref={registers_texts}
+              text={
+                i == 4
+                  ? "1234"
+                  : i == 5
+                  ? "0096"
+                  : i == 0
+                  ? "0101"
+                  : i == 1
+                  ? "0011"
+                  : i == 3
+                  ? "MOV"
+                  : "0000"
+              }
+              zIndex={1}
+              fontFamily={"Fira Code"}
+            />
           </Glass>
           <GlassBodyText
             text={register.represents}
@@ -320,7 +341,6 @@ ADD_FN:
   const context_view = (
     <Glass width={1700} height={350} top={code_rect.bottom().addY(50)}>
       <GlassBodyText
-        text={"CALL saves return + BP so RET restores the frame cleanly."}
         width={1500}
         left={[-850 + 50, 0]}
         fontSize={54}
@@ -371,9 +391,10 @@ ADD_FN:
       .addX(100)
       .addY(50);
 
-    array_address[stack_count()].childAs<Txt>(0).text(address.toString());
-    array_value[stack_count()].childAs<Txt>(0).text(value);
-    array_notes[stack_count()].childAs<Txt>(0).text(note);
+    const sc = stack_count();
+    array_address[sc].childAs<Txt>(0).text(address.toString());
+    array_value[sc].childAs<Txt>(0).text(value);
+    array_notes[sc].childAs<Txt>(0).text(note);
 
     var end = array_address[stack_count()]
       .absolutePosition()
@@ -425,12 +446,13 @@ ADD_FN:
     // array_value[stack_count()].childAs<Txt>(0).text(value);
     // array_notes[stack_count()].childAs<Txt>(0).text(note);
     const end = end_txt.absolutePosition().sub(view.position());
-    var start = array_value[stack_count()]
+    const sc = stack_count();
+
+    var start = array_value[sc - 1]
       .absolutePosition()
       .sub(view.position())
       .addY(-50);
     if (stack_count() < 1) end.addY(-50);
-    const sc = stack_count();
 
     if (register_signal() > 0) {
       const line = (
@@ -460,21 +482,18 @@ ADD_FN:
       view.add(line);
 
       yield chain(
-        all(
-          line.end(1, 1, easeOutCubic),
-          array_value[sc].scale(1.1,.4),
-        ),
+        all(line.end(1, 1, easeOutCubic), array_value[sc - 1].scale(1.1, 0.4)),
         (
           end_txt
             .parent()
             .findFirst(
-              (txt) => txt instanceof Txt && txt.text()[0] != "R"
+              (txt) => txt instanceof Txt && txt.text().length > 2
             ) as any
-        ).text(array_value[sc].findFirst((t) => t instanceof Txt).text(), 0.5),
-        all(
-          array_value[sc].scale(1,.5),
-          line.start(1, 0.7),
+        ).text(
+          array_value[sc - 1].findFirst((t) => t instanceof Txt).text(),
+          0.5
         ),
+        all(array_value[sc - 1].scale(0, 0.5), line.start(1, 0.7)),
         run(function* () {
           line.remove();
         })
@@ -487,24 +506,192 @@ ADD_FN:
     yield* stack_count(stack_count() - 1, 1);
   }
 
+  function* changeRegister(i: number, val: string) {
+    yield* all(
+      registers_texts[i].parent().scale(1.1, 0.5).back(0.5),
+      registers_texts[i].text(val, 0.6)
+    );
+  }
+
+  function* movRegister(i: number, j: number) {
+    const ti = registers_texts[i];
+    const tj = registers_texts[j];
+    const value = ti.text();
+    const line = (
+      <Ray
+        stroke={"#ff0"}
+        shadowBlur={50}
+        shadowColor={"#ff0"}
+        end={0}
+        lineWidth={10}
+        from={ti.absolutePosition().sub(view.position())}
+        to={tj.absolutePosition().sub(view.position())}
+        endArrow
+        startOffset={150}
+        lineDash={[20, 20]}
+        endOffset={150}
+      />
+    ) as Ray;
+    view.add(line);
+
+    yield* line.end(1, 0.6, easeOutCubic);
+    yield changeRegister(j, value);
+    yield* line.start(1, 0.6);
+  }
+
   yield* waitUntil("begin");
 
   // some demo things
+  // yield* focusOnCode("PUSH R0", "We push R0 to use it for adding");
+  // yield* push_stack("PUSH R0", 100, "0101", "arg 1");
+  // yield* focusOnCode("PUSH R0\nPUSH R1", "We push R1 to use it for adding");
+  // yield* push_stack("PUSH R0", 99, "0101", "arg 1");
+  // yield* push_stack("PUSH R1", 98, "1101", "arg 2");
+  // yield* focusOnCode(
+  //   "PUSH R0\nPUSH R1\nPOP R0",
+  //   "We push R1 to use it for adding"
+  // );
+  // yield* showRegisters();
+  // yield* pop_stack("R0");
 
-  yield* focusOnCode("PUSH R0", "We push R0 to use it for adding");
-  yield* push_stack("PUSH R0", 100, "0101", "arg 1");
-  yield* focusOnCode("PUSH R0\nPUSH R1", "We push R1 to use it for adding");
-  yield* push_stack("PUSH R0", 99, "0101", "arg 1");
-  yield* push_stack("PUSH R1", 98, "1101", "arg 2");
+  // yield* push_stack("PUSH R1", 97, "1101", "arg 2");
+  // yield* hideRegisters();
+
+  // set sp to 100
+  yield* all(stack_count(1, 1));
+
+  yield* waitUntil("1-2");
+
   yield* focusOnCode(
-    "PUSH R0\nPUSH R1\nPOP R0",
-    "We push R1 to use it for adding"
+    `\
+PUSH R0        ; arg1
+PUSH R1        ; arg2
+CALL ADD_FN`,
+    "Let's set the arguments: \nwe push R0 and R1 on the stack\nthen we call the function"
+  );
+  yield* push_stack("PUSH R0", 99, "0101", "this is register 0 ( = 5 )");
+  yield* push_stack("PUSH R1", 98, "0011", "this is register 1 ( = 3 )");
+  yield* push_stack(
+    "CALL ADD_FN",
+    97,
+    "0xff0",
+    "this will be the return address"
+  );
+
+  yield* waitUntil("3-4");
+  yield* focusOnCode(
+    `\
+ADD_FN:
+  PUSH BP
+  MOV  BP, SP`,
+    `This is the prologue of the function.\nWe save BP so later we can return to it.
+    `
+  );
+  yield* push_stack("PUSH BP", 96, "0xff2", "old BP");
+  yield* showRegisters();
+
+  yield* code_rect.childAs<Code>(0).selection(lines(2), 0.5);
+  yield* movRegister(5, 4);
+  yield* code_rect.childAs<Code>(0).selection(DEFAULT, 0.5);
+
+  yield* waitUntil("4-sense");
+  yield* context_view
+    .childAs<Txt>(0)
+    .text(
+      "[BP+0] = saved BP , [BP+1] = return address\n[BP+2] = arg2 , [BP+3] = arg1",
+      1
+    );
+  yield* waitFor(3);
+  yield* context_view
+    .childAs<Txt>(0)
+    .text("BP will stay fixed, SP will move.", 1);
+
+  yield* waitUntil("5-6");
+  yield hideRegisters();
+  yield* focusOnCode(
+    `\
+MOV  R3, [BP + 3]   ; R3 = arg1
+MOV  R4, [BP + 2]   ; R4 = arg2
+ADD  R3, R4 ; simple R3 += R4
+MOV  [BP + 2], R3`,
+    "We load into register and\nperform a simple addition. We save the result in [BP+2]",
+    75
+  );
+  yield* waitUntil("store");
+  yield* all(
+    array_value[2].childAs<Txt>(0).text("RESULT", 1),
+    array_notes[2].childAs<Txt>(0).text("this will be the return value", 1),
+    array_value[2].scale(1.1, 0.7).back(0.7),
+    array_notes[2].scale(1.1, 0.7).back(0.7)
+  );
+  yield* waitUntil("7-8");
+  // epilogue
+  yield* focusOnCode(
+    `\
+MOV  SP, BP
+POP  BP
+RET`,
+    "We start the epilogue.\nWe return right before we called the function.",
+    120
   );
   yield* showRegisters();
-  yield* pop_stack("R0");
+  yield* code_rect.childAs<Code>(0).selection(lines(0), 0.5);
+  yield* movRegister(4, 5);
+  yield* waitFor(1);
+  yield registers_texts[3].text("POP", 1);
+  yield* pop_stack("BP");
+  yield* waitFor(1);
+  yield* registers_texts[3].text("RET", 1);
+  yield* pop_stack("PC");
+  yield* code_rect.childAs<Code>(0).selection(DEFAULT, 0.5);
+  yield* focusOnCode(
+    `\
+PUSH R0
+PUSH R1
+CALL ADD_FN
+POP R2 ; read result
+HLT`,
+    "We can finally retrieve the result\nfrom the stack and move on.",
+    100
+  );
+  yield* waitFor(1);
+  yield delay(1.4, array_notes[2].scale(0, 1));
+  yield* pop_stack("R2");
+  yield* code_rect.childAs<Code>(0).selection(DEFAULT, 0.5);
 
-  yield* push_stack("PUSH R1", 97, "1101", "arg 2");
-  yield* hideRegisters();
+  yield* waitUntil('back');
+  yield* focusOnCode(
+    `\
+; --- Main Program ---
+PUSH R0          ; arg1 (e.g., 3)
+PUSH R1          ; arg2 (e.g., 5)
+CALL ADD_FN      ; expects 2 args on stack
+POP  R2          ; result -> R2
+HLT
+
+; --- Function: ADD_FN ---
+ADD_FN:
+  PUSH BP        ; prologue
+  MOV  BP, SP
+
+  ; Stack layout now (top = BP):
+  ; [BP+0] = saved BP
+  ; [BP+1] = return address
+  ; [BP+2] = arg2  (second PUSH)
+  ; [BP+3] = arg1  (first PUSH)
+
+  MOV  R3, [BP + 3]   ; R3 = arg1
+  MOV  R4, [BP + 2]   ; R4 = arg2
+  ADD  R3, R4         ; R3 = arg1 + arg2
+
+  MOV  [BP + 2], R3   ; overwrite arg2 slot with result (caller POP gets it)
+
+  MOV  SP, BP         ; epilogue
+  POP  BP
+  RET`,
+    "These are the basics of handling stacks in CPUs :)",
+  33
+  );
 
   yield* waitUntil("next");
 });
