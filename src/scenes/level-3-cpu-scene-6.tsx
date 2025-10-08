@@ -14,6 +14,7 @@ import {
   all,
   any,
   chain,
+  createRef,
   createRefArray,
   createSignal,
   DEFAULT,
@@ -355,6 +356,62 @@ ADD_FN:
   view.add(register_space);
   view.add(context_view);
 
+  const bp_pos = createSignal(0);
+  const sp_pos = createSignal(0);
+
+  const BP = createRef<Glass>();
+  const SP = createRef<Glass>();
+
+  view.add(
+    <Glass
+      size={[120, 100]}
+      fill={"#2531cf40"}
+      translucency={0.5}
+      ref={BP}
+      scale={0}
+      y={() =>
+        array_address[0].absolutePosition().sub(view.position()).y +
+        140 * bp_pos()
+      }
+      x={450}
+      shadowColor={"rgba(122, 228, 254, 0.51)"}
+      shadowBlur={30}
+    >
+      <GlowPanelTitle
+        fontSize={60}
+        shadowColor={"#2235e32a"}
+        zIndex={1}
+        fill={"#e7f8ffdd"}
+        text={"BP"}
+      />
+    </Glass>
+  );
+
+  view.add(
+    <Glass
+      size={[120, 100]}
+      fill={"#cf4d2540"}
+      translucency={0.2}
+      ref={SP}
+      scale={0}
+      shadowBlur={30}
+      shadowColor={"rgba(247, 165, 133, .5)"}
+      y={() =>
+        array_address[0].absolutePosition().sub(view.position()).y +
+        140 * sp_pos()
+      }
+      x={590}
+    >
+      <GlowPanelTitle
+        fontSize={60}
+        shadowColor={"#ec64202a"}
+        zIndex={1}
+        fill={"#fff0e7dd"}
+        text={"SP"}
+      />
+    </Glass>
+  );
+
   function* showRegisters() {
     yield* register_signal(1, 2, easeInOutBack);
   }
@@ -432,6 +489,7 @@ ADD_FN:
     yield code.selection(code.findFirstRange(command), 0.4);
     yield line.end(1, 0.7, easeOutCubic);
     yield* stack_count(stack_count() + 1, 1);
+    yield sp_pos(sp_pos() + 1, 1);
     yield code.selection(DEFAULT, 0.7);
     yield* line.start(1, 0.7, easeOutCubic).do(() => line.remove());
   }
@@ -501,6 +559,7 @@ ADD_FN:
     }
 
     yield code.selection(code.findFirstRange("POP " + registername), 0.4);
+    yield sp_pos(sp_pos()-1, 1);
     yield* waitFor(1.5);
     yield code.selection(code.findFirstRange("POP " + registername), 0.4);
     yield* stack_count(stack_count() - 1, 1);
@@ -559,6 +618,7 @@ ADD_FN:
 
   // set sp to 100
   yield* all(stack_count(1, 1));
+  yield* SP().scale(1, 0.5, easeOutBack);
 
   yield* waitUntil("1-2");
 
@@ -587,10 +647,14 @@ ADD_FN:
     `This is the prologue of the function.\nWe save BP so later we can return to it.
     `
   );
+
   yield* push_stack("PUSH BP", 96, "0xff2", "old BP");
+  yield* waitFor(1);
+
   yield* showRegisters();
 
   yield* code_rect.childAs<Code>(0).selection(lines(2), 0.5);
+  yield delay(0.5, all(bp_pos(4, 0), BP().scale(1, 1, easeOutBack)));
   yield* movRegister(5, 4);
   yield* code_rect.childAs<Code>(0).selection(DEFAULT, 0.5);
 
@@ -639,7 +703,9 @@ RET`,
   yield* movRegister(4, 5);
   yield* waitFor(1);
   yield registers_texts[3].text("POP", 1);
+  yield delay(1.5, all(bp_pos(4, 0), BP().scale(0, .5, easeInBack)));
   yield* pop_stack("BP");
+  yield* code_rect.childAs<Code>(0).selection(DEFAULT, 0.5);
   yield* waitFor(1);
   yield* registers_texts[3].text("RET", 1);
   yield* pop_stack("PC");
@@ -656,10 +722,11 @@ HLT`,
   );
   yield* waitFor(1);
   yield delay(1.4, array_notes[2].scale(0, 1));
+  yield registers_texts[3].text("POP", 1);
   yield* pop_stack("R2");
   yield* code_rect.childAs<Code>(0).selection(DEFAULT, 0.5);
 
-  yield* waitUntil('back');
+  yield* waitUntil("back");
   yield* focusOnCode(
     `\
 ; --- Main Program ---
@@ -690,7 +757,7 @@ ADD_FN:
   POP  BP
   RET`,
     "These are the basics of handling stacks in CPUs :)",
-  33
+    33
   );
 
   yield* waitUntil("next");
