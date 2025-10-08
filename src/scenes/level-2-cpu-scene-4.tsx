@@ -659,7 +659,7 @@ export default makeScene2D(function* (view) {
       <Node zIndex={3} ref={unitwindow} opacity={0}>
         <Grid
           size={"100%"}
-          spacing={400}
+          spacing={1000}
           stroke={"#fff5"}
           lineWidth={2}
           zIndex={-1}

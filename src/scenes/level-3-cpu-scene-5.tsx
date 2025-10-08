@@ -319,7 +319,37 @@ export default makeScene2D(function* (view) {
   const code = (
     <Glass size={[3600, 2200]} translucency={1} borderModifier={-1} y={3000}>
       <Code
-        zIndex={1}
+        zIndex={2}
+        fontSize={80}
+        width={1800}
+        top={[-1000, -20]}
+        height={600}
+        highlighter={new AsmHighlighter()}
+        code={`\
+
+; --- Main Program ---
+PUSH R0     
+PUSH R1        
+CALL ADD_FN      
+POP  R2          
+HLT
+
+; --- Function: ADD_FN ---
+ADD_FN:
+  PUSH BP        
+  MOV  BP, SP
+
+  MOV  R3, [BP + 3]   
+  MOV  R4, [BP + 2]   
+  ADD  R3, R4         
+
+  MOV  [BP + 2], R3   
+
+  MOV  SP, BP         
+  POP  BP
+  RET`}
+      />
+      <Code
         fontSize={80}
         width={1800}
         top={[-1000, -20]}

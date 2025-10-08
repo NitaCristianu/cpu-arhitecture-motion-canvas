@@ -1,4 +1,4 @@
-import { Gradient, initial, Rect, RectProps, signal } from "@motion-canvas/2d";
+import { Gradient, Node, initial, Rect, RectProps, signal } from "@motion-canvas/2d";
 import gaussianblur from "../shaders/glassmorphic.glsl";
 import { Color, createRef, SignalValue, SimpleSignal, Vector2 } from "@motion-canvas/core";
 
@@ -81,7 +81,7 @@ export class Glass extends Rect {
           stroke={
             new Gradient({
               from: new Vector2(1, 2),
-              to: new Vector2(0, 0),
+              to: new Vector2(0,0),
               stops: [
                 {
                   offset: 0,
@@ -103,4 +103,5 @@ export class Glass extends Rect {
       );
     }
   }
+
 }
