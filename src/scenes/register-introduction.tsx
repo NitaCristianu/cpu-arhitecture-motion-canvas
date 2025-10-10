@@ -33,7 +33,7 @@ import {
   MeshToonMaterial,
   Vector3,
 } from "three";
-import { buildCPULevel0 } from "../utils/cpus/buildCPULevel0";
+import { buildCPULevel0, RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import Box from "../libs/Thrash/objects/Box";
 import { Label3D } from "../components/Label3D";
 import { createInfoCard } from "../utils/infocard";
@@ -77,19 +77,19 @@ export default makeScene2D(function* (view) {
     />
   )) as Box[];
   other_cpus.forEach((cpu) => scene.add(cpu));
-  const gpr = new Box({
+  const gpr = new Model({
     key: "GPR Presentation",
-    material: new MeshPhysicalMaterial({ color: 0xcccccc }),
-    //     localScale: new Vector3(.1, .1 * 1.5, .02),
     localScale: new Vector3(),
-    localPosition: new Vector3(0, -2, 0),
-  }) as Box;
+    localPosition: new Vector3(0, -2, 0.05),
+    sceneRotation: new Vector3(Math.PI / 2, 0, 0),
+    src: "/models/Chips/gpr.glb",
+  }) as Model;
   const cpu = buildCPULevel0(scene);
   scene.add(cpu);
   yield* cpu.gpr.opacityTo(0.2, 0);
   yield* cpu.clock.scaleTo(new Vector3(), 0);
   yield* cpu.gpr.scaleTo(
-    new Vector3(0.1, 0.1 * 1.5, 0.02).divideScalar(1.2),
+    new Vector3(0.1, 0.1, 0.1 / 1.5).divideScalar(1.2),
     0
   );
   yield* all(
@@ -131,23 +131,23 @@ export default makeScene2D(function* (view) {
   yield* all(
     lights_api.fadeIn(),
     camera.lookTo(new Vector3(0, -0.3, 0), 0.5),
-    gpr.reposition(new Vector3(0, -0.3, 0), 0.5, easeOutCubic),
-    gpr.popIn(0.5, new Vector3(0.1, 0.1 * 1.5, 0.02)),
+    gpr.reposition(new Vector3(0, -0.3, 0.05), 0.5, easeOutCubic),
+    gpr.popIn(0.5, new Vector3(0.1, 0.1, 0.1 / 1.5)),
     context_title.node.y(context_title.node.y() + 350, 1)
   );
-  yield* gpr.startIdleRotation(["y", "z", "x"], 8);
+  yield* gpr.startIdleRotation(["y", "z", "x"], 33);
   yield* waitUntil("introduce cpu");
 
   yield* all(
-    gpr.reposition(new Vector3(0, -0.009, 0), 0.5, easeOutCubic),
-    camera.lookTo(new Vector3(0, 0, 0), 0.5, easeOutCubic)
+    gpr.reposition(new Vector3(0, 0.069, 0.05), 0.5, easeOutCubic),
+    camera.lookTo(new Vector3(0, 0, 0), 0.5, easeOutCubic),
   );
   yield* any(
-    gpr.rotateTo(new Vector3(Math.PI / 2, 0, 0), 1),
-    delay(1, gpr.rotateTo(new Vector3(Math.PI / 2, 0, 0), 81)),
+    gpr.rotateTo(new Vector3(Math.PI / 2,  Math.PI, 0), 1),
+    delay(1, gpr.rotateTo(new Vector3(Math.PI / 2, Math.PI, 0), 81)),
     ...[cpu.group, cpu.ram].map((item) =>
       item.reposition(
-        item.localPosition().clone().add(new Vector3(0, 1.2, 0.21)),
+        item.localPosition().clone().add(new Vector3(0, 1.233, 0.21)),
         1,
         easeOutCubic
       )
@@ -157,7 +157,7 @@ export default makeScene2D(function* (view) {
   yield delay(0.6, lights_api.fadeOut(1.2));
   yield* any(
     cpu.gpr.scaleTo(
-      new Vector3(0.1, 0.1 * 1.5, 0.02).divideScalar(1.1),
+      new Vector3(0).divideScalar(1.1),
       0.6,
       easeOutCubic
     ),
@@ -174,12 +174,12 @@ export default makeScene2D(function* (view) {
   );
   yield* cpu.wire_mc_ram_address.updatePoints(
     cpu.wire_mc_ram_address._points.map((item) =>
-      item.add(new Vector3(-0.005, 0.335, 0.16))
+      item.add(new Vector3(-0.005, 0.4, 0.17))
     )
   );
   yield* cpu.wire_mc_ram_data.updatePoints(
     cpu.wire_mc_ram_data._points.map((item) =>
-      item.add(new Vector3(-0.005, 0.335, 0.16))
+      item.add(new Vector3(-0.005, 0.4, 0.17))
     )
   );
 
@@ -525,7 +525,7 @@ export default makeScene2D(function* (view) {
       2
     ),
     camera.lookTo(gpr.localPosition().clone().add(new Vector3(0, 0, 0.15)), 2),
-    cpu.ram.popIn(0.4, new Vector3(0.2, 0.6, 0.25)),
+    cpu.ram.popIn(0.4,RAM_SCALE),
     context_title.node.y(context_title.node.y() - 350, 1)
   );
   yield all(

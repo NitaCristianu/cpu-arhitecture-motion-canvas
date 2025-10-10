@@ -29,9 +29,8 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     key: "level_3 RAM",
     src: "/models/Chips/RAM.glb",
     localScale: new Vector3(0, 0, 0),
-    localPosition: new Vector3(0.98, -0.32, 0),
-    localRotation: new Vector3(0, -Math.PI / 2, Math.PI / 2),
-    sceneRotation: CHIP_ROTATION,
+    localPosition: new Vector3(0.98, -0.17, 0.08),
+    localRotation: new Vector3(0, Math.PI, 0),
   });
 
   const cpu = new Group({
@@ -60,7 +59,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     key: "level_3 ALU",
     src: "/models/Chips/ALU.glb",
     localScale: new Vector3(L, H, T),
-    localPosition: new Vector3(-0.08, -0.1, 0),
+    localPosition: new Vector3(-0.08, -0.1, 0.05),
     sceneRotation: CHIP_ROTATION,
   });
 
@@ -88,8 +87,8 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const decode = new Model({
     key: "level_3 DECODE",
     src: "/models/Chips/DU.glb",
-    localScale: new Vector3(L / 2, L / 3, T),
-    localPosition: new Vector3(-0.2, 0.1, 0),
+    localScale: new Vector3(L / 2, L / 2, (L / 2) / 1.5),
+    localPosition: new Vector3(-0.2, 0.1, 0.05),
     sceneRotation: CHIP_ROTATION,
   });
 
@@ -146,8 +145,8 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   const gpr = new Model({
     key: "level_3 GPR",
     src: "/models/Chips/gpr.glb",
-    localScale: new Vector3(S, S * 1.5, T),
-    localPosition: new Vector3(-0.16, 0.3, 0),
+    localScale: new Vector3(S, S, S / 1.5),
+    localPosition: new Vector3(-0.16, 0.3, 0.05),
     sceneRotation: CHIP_ROTATION,
   });
 
@@ -207,19 +206,37 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
   stackPointers.add(sp);
   // stackPointers.add(stackLogic);
 
-  const clock = new Model({
+  const clock = new Group({
     key: "level_3 CLOCK",
-    src: "/models/Chips/NewClock.glb",
     localScale: new Vector3(S * 0.3, S * 0.4, T),
     localPosition: new Vector3(-0.46, -0.28, 0),
-    sceneRotation: CHIP_ROTATION,
   });
+
+  clock.add(
+    new Box({
+      material: new MeshPhysicalMaterial({
+        metalness: 0.5,
+        color: 0x0000ff,
+      }),
+      localScale: new Vector3(0.5, 0.5, 2.2),
+    })
+  );
+
+  clock.add(
+    new Model({
+      key: "level_3 CLOCK_MODEL",
+      src: "/models/Chips/ButtonClock.glb",
+      localScale: new Vector3(1.5, 1.2, 1.5),
+      localPosition: new Vector3(0, 0, 0.03),
+      sceneRotation: CHIP_ROTATION,
+    })
+  );
 
   const pc = new Model({
     key: "level_3 PC",
     src: "/models/Chips/PC.glb",
-    localScale: new Vector3(L * 0.35, L * 0.35, T),
-    localPosition: new Vector3(0.08, -0.28, 0),
+    localScale: new Vector3(L * 0.35, L * 0.35, (L * 0.35) / 1.5),
+    localPosition: new Vector3(0.08, -0.28, 0.05),
     sceneRotation: CHIP_ROTATION,
   });
 

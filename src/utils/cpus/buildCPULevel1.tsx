@@ -21,9 +21,8 @@ export function buildCPULevel1(scene: Scene3D, addToScene : boolean = true) {
     key: "level_1 RAM",
     src: "/models/Chips/RAM.glb",
     localScale: new Vector3(0, 0, 0), // thin in X, tall in Y
-    localPosition: new Vector3(0.5, -0.4, 0),
-    localRotation: new Vector3(0, -Math.PI / 2, Math.PI / 2), // slight twist
-    sceneRotation: CHIP_ROTATION,
+    localPosition: new Vector3(0.5, -0.25, 0.08),
+    localRotation: new Vector3(0, Math.PI, 0),
   });
   /* ── CPU container (rotated flat) ─────────────────── */
   const cpu = new Group({
@@ -52,7 +51,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene : boolean = true) {
     key: "level_1 ALU",
     src: "/models/Chips/ALU.glb",
     localScale: new Vector3(L, H, T),
-    localPosition: new Vector3(0.0, -0.05, 0),
+    localPosition: new Vector3(0.0, -0.05, 0.05),
     sceneRotation: CHIP_ROTATION,
   });
 
@@ -70,30 +69,48 @@ export function buildCPULevel1(scene: Scene3D, addToScene : boolean = true) {
     key: "level_1 MC",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xbe22e8 }),
     localScale: new Vector3(L * 0.5, H * 0.8, T),
-    localPosition: new Vector3(0.22, -0.05, 0),
+    localPosition: new Vector3(0.22, 0, 0),
   });
 
   const gpr = new Model({
     key: "level_1 GPR",
     src: "/models/Chips/gpr.glb",
-    localScale: new Vector3(S, S * 1.5, T),
-    localPosition: new Vector3(0, 0.17, 0),
+    localScale: new Vector3(S, S, S / 1.5),
+    localPosition: new Vector3(0, 0.17, 0.05),
     sceneRotation: CHIP_ROTATION,
   });
 
-  const clock = new Model({
+  const clock = new Group({
     key: "level_1 CLOCK",
-    src: "/models/Chips/NewClock.glb",
     localScale: new Vector3(S * 0.3, S * 0.4, T),
     localPosition: new Vector3(-0.3, -0.22, 0),
-    sceneRotation: CHIP_ROTATION,
   });
+
+  clock.add(
+    new Box({
+      material: new MeshPhysicalMaterial({
+        metalness: 0.5,
+        color: 0x0000ff,
+      }),
+      localScale: new Vector3(0.5, 0.5, 2.2),
+    })
+  );
+
+  clock.add(
+    new Model({
+      key: "level_1 CLOCK_MODEL",
+      src: "/models/Chips/ButtonClock.glb",
+      localScale: new Vector3(1.5, 1.2, 1.5),
+      localPosition: new Vector3(0, 0, 0.03),
+      sceneRotation: CHIP_ROTATION,
+    })
+  );
 
   const pc = new Model({
     key: "level_1 PC",
     src: "/models/Chips/PC.glb",
-    localScale: new Vector3(L * 0.3, L * 0.3, T),
-    localPosition: new Vector3(0, -0.22, 0),
+    localScale: new Vector3(L * 0.3, L * 0.3, (L * 0.3) / 1.5),
+    localPosition: new Vector3(0, -0.22, 0.05),
     sceneRotation: CHIP_ROTATION,
   });
 

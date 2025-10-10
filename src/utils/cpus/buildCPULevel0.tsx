@@ -232,6 +232,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         gpr
           .localPosition()
           .clone()
+          .add(new Vector3(0,0,-.03)),
       ]}
       lineWidth={0}
       color="register"
@@ -245,12 +246,9 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
       points={[
         gpr
           .localPosition()
-          .clone(),
-        gpr
-          .localPosition()
           .clone()
-          .lerp(mc.localPosition(), 0.4)
-          .add(new Vector3(0.03, -0.05, 0.01)),
+          .add(new Vector3(0,0,-.03)),
+
         mc
           .localPosition()
           .clone()
@@ -273,7 +271,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         gpr
           .localPosition()
           .clone()
-          .add(new Vector3(0, -gpr.localScale().y / 2, 0.01)),
+          .add(new Vector3(0, -gpr.localScale().y / 2, -0.03)),
         gpr
           .localPosition()
           .clone()
