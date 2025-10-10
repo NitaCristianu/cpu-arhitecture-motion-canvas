@@ -21,7 +21,7 @@ import Camera from "../libs/Thrash/Camera";
 import Scene3D from "../libs/Thrash/Scene";
 import Line from "../libs/Thrash/objects/Line";
 import { Label3D } from "../components/Label3D";
-import { buildCPULevel0 } from "../utils/cpus/buildCPULevel0";
+import { buildCPULevel0, RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import Mesh from "../libs/Thrash/objects/Mesh";
 
 // GLOBAL USED ELEMENTS
@@ -181,7 +181,7 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
 
   yield* waitFor(0.15);
   yield* all(
-    ram.popIn(0.5, new Vector3(0.2, 0.6, 0.25), easeOutBack),
+    ram.popIn(0.5, RAM_SCALE, easeOutBack),
     camera.lookTo(ram.localPosition(), 0.5, easeInOutCubic)
   );
   yield* all(camera.lookTo(cpu.localPosition(), 0.6, easeOutSine));

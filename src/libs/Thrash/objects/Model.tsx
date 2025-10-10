@@ -1,49 +1,96 @@
-import { initial, signal } from "@motion-canvas/2d/lib/decorators";
-import { SimpleSignal, useLogger } from "@motion-canvas/core";
-import { MeshProps } from "./Mesh";  // Base ObjectProps interface
-import Mesh from "./Mesh";           // Base Object class
-import { Object3D } from "three";
-import { GLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import { useLogger, easeInOutCubic } from "@motion-canvas/core";
+import {
+  Box3,
+  Material,
+  Mesh as ThreeMesh,
+  Object3D,
+  Vector3,
+} from "three";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import Mesh, { MeshProps } from "./Mesh";
 
 export interface ModelProps extends MeshProps {
   /** Path or URL to the GLB/GLTF model file */
   src: string;
+  /** Optional rotation (in radians) to apply directly to the loaded GLTF scene */
+  sceneRotation?: Vector3;
+  /** When true, recenters the GLTF so its pivot is at the geometric center */
+  recenter?: boolean;
+  /**
+   * Normalize the GLTF so each axis measures 1 unit before this object's
+   * localScale is applied. This keeps legacy layout math (that relies on
+   * localScale) behaving as before the switch from primitive boxes.
+   */
+  normalize?: boolean;
 }
 
 export default class Model extends Mesh {
+  private materials: Material[] = [];
+  private scaleCompensation = new Vector3(1, 1, 1);
+  private static readonly DEFAULT_SCENE_ROTATION = new Vector3(0, 0, 0);
+
   public constructor(props: ModelProps) {
     super(props);
     const logger = useLogger();
     const loader = new GLTFLoader();
+
+    // Ensure core matches initial transforms before the asset loads
+    this.core.position.copy(this.localPosition());
+    this.applyScale(this.localScale());
+    const rot = this.localRotation();
+    this.core.rotation.set(rot.x, rot.y, rot.z);
 
     // Start loading the GLB model
     loader.load(
       props.src,
       (gltf: GLTF) => {
         // On successful load, add the model's scene to this object's core
-        this.core.add(gltf.scene);
+        const scene = gltf.scene;
 
-        // If a local rotation was provided in props, apply it to the core
-        if (props.localRotation) {
-          this.core.rotation.set(
-            props.localRotation.x,
-            props.localRotation.y,
-            props.localRotation.z
-          );
+        const recenter = props.recenter ?? true;
+        const normalize = props.normalize ?? true;
+
+        scene.updateMatrixWorld(true);
+
+        if (recenter) {
+          const initialBox = new Box3().setFromObject(scene);
+          const center = initialBox.getCenter(new Vector3());
+          scene.position.sub(center);
         }
-        this.core.position.set(
-          props.localPosition.x,
-          props.localPosition.y,
-          props.localPosition.z
 
-        )
-        this.core.scale.set(
-          props.localScale.x,
-          props.localScale.y,
-          props.localScale.z
+        const rotation = props.sceneRotation ??
+          Model.DEFAULT_SCENE_ROTATION.clone();
+        scene.rotation.set(rotation.x, rotation.y, rotation.z);
 
-        )
+        scene.updateMatrixWorld(true);
 
+        if (normalize) {
+          // Ensure localScale continues to match the logical dimensions that
+          // the layout + wiring math expect.
+          const orientedBox = new Box3().setFromObject(scene);
+          const size = orientedBox.getSize(new Vector3());
+          const safe = new Vector3(
+            size.x === 0 ? 1 : size.x,
+            size.y === 0 ? 1 : size.y,
+            size.z === 0 ? 1 : size.z
+          );
+          const maxDim = Math.max(safe.x, safe.y, safe.z, 1);
+          const sceneScale = 1 / maxDim;
+          scene.scale.setScalar(sceneScale);
+          this.scaleCompensation.set(
+            maxDim / safe.x,
+            maxDim / safe.y,
+            maxDim / safe.z
+          );
+          this.applyScale(this.localScale());
+        }
+
+        scene.updateMatrixWorld(true);
+
+        this.collectMaterials(scene);
+        this.material(this.materials[0] ?? null);
+        this.core.add(scene);
+        this.syncOpacity(this.opacity());
         // Log that the model has been loaded (with its file path)
         logger.info(`GLB loaded: ${props.src}`);
       },
@@ -53,5 +100,42 @@ export default class Model extends Mesh {
         logger.error(`Failed to load GLB: ${props.src}` + error);
       }
     );
+  }
+
+  private collectMaterials(root: Object3D) {
+    root.traverse((child) => {
+      if ((child as ThreeMesh).isMesh) {
+        const mesh = child as ThreeMesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        const material = mesh.material;
+        if (Array.isArray(material)) {
+          this.materials.push(...material);
+        } else if (material) {
+          this.materials.push(material);
+        }
+      }
+    });
+  }
+
+  private syncOpacity(opacity: number) {
+    this.materials.forEach((material) => {
+      material.transparent = true;
+      material.opacity = opacity;
+    });
+  }
+
+  protected override applyScale(v: Vector3) {
+    const adjusted = v.clone().multiply(this.scaleCompensation);
+    this.core.scale.copy(adjusted);
+  }
+
+  public override *opacityTo(
+    value: number,
+    duration: number = 0.4,
+    ease = easeInOutCubic
+  ) {
+    yield* super.opacityTo(value, duration, ease);
+    this.syncOpacity(value);
   }
 }

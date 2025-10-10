@@ -1,12 +1,10 @@
-import { MeshPhysicalMaterial, BoxGeometry, Vector3 } from "three";
-import COLORS from "../colors";
+import { MeshPhysicalMaterial, Vector3 } from "three";
 import Box from "../../libs/Thrash/objects/Box";
-import { connectBus } from "../connectBus";
 import Line from "../../libs/Thrash/objects/Line";
 import Scene3D from "../../libs/Thrash/Scene";
-import { all, useLogger } from "@motion-canvas/core";
-import Mesh from "../../libs/Thrash/objects/Mesh";
+import { all } from "@motion-canvas/core";
 import Group from "../../libs/Thrash/objects/Group";
+import Model from "../../libs/Thrash/objects/Model";
 
 /* ── DIMENSIONS ───────────────────────────────────── */
 const T = 0.02; // thin Z-depth for all logic blocks
@@ -14,18 +12,19 @@ const S = 0.1; // base XY size of small units
 const L = 0.18; // large unit width
 const H = 0.13; // large unit height
 const wire_sizes = [4, 4, 16, 16, 6, 6, 10, 6, 5];
+const CHIP_ROTATION = new Vector3(Math.PI / 2, 0, 0);
 
-export const RAM_SCALE = new Vector3(0.2, 0.6, 0.25);
+export const RAM_SCALE = new Vector3(.65,.1,1).multiplyScalar(.35);
 
 export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
-  const container = new Group({key : "CPU 0 Group"});
+  const container = new Group({ key: "CPU 0 Group" });
   /* ── RAM (tall slab on the right) ─────────────────── */
-  const ram = new Box({
+  const ram = new Model({
     key: "RAM",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x07174a }),
+    src: "/models/Chips/RAM.glb",
     localScale: new Vector3(0, 0, 0), // thin in X, tall in Y
-    localPosition: new Vector3(0.5, -0.4, 0),
-    localRotation: new Vector3(0, -Math.PI / 2, Math.PI / 2), // slight twist
+    localPosition: new Vector3(.5, -0.25, 0.08),
+    localRotation : new Vector3(0, Math.PI, 0)
   });
   /* ── CPU container (rotated flat) ─────────────────── */
   const cpu = new Group({
@@ -34,11 +33,12 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
     localRotation: new Vector3(-Math.PI / 2, 0, 0), // face “up”
     localPosition: new Vector3(0, -0.35, 0),
   });
-  const cpu_base = new Box({
+  const cpu_base = new Model({
     key: "BASE",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x323232 }),
+    src: "/models/Chips/Base.glb",
     localScale: new Vector3(0.65, 0.6, T * 5),
     localPosition: new Vector3(-0.02, 0, -0.02 - T * 2),
+    sceneRotation: CHIP_ROTATION,
   });
 
   /* child blocks — positions are inside cpu-space (XY because we rotated) */
@@ -49,49 +49,54 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
     localPosition: new Vector3(-0.18, -0.05, 0),
   });
 
-  const iu = new Box({
+  const iu = new Model({
     key: "IU",
-    material: new MeshPhysicalMaterial({
-      color: 0xffa000,
-      metalness: 0.5,
-    }),
-    localScale: new Vector3(L, H * 2, T),
-    localPosition: new Vector3(0.0, -0.1, 0),
+    src: "/models/Chips/IU.glb",
+    localScale: new Vector3(H, H, H/2),
+    localPosition: new Vector3(0.0, -0.14, 0.05),
+    sceneRotation: CHIP_ROTATION,
   });
 
   const mc = new Box({
     key: "MC",
     material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xbe22e8 }),
     localScale: new Vector3(L * 0.5, H * 0.8, T),
-    localPosition: new Vector3(0.22, -0.05, 0),
+    localPosition: new Vector3(0.22, 0, 0),
   });
 
-  const gpr = new Box({
+  const gpr = new Model({
     key: "GPR",
-    material: new MeshPhysicalMaterial({
-      metalness: 1,
-      roughness: 2,
-      color: 0xcccccc,
-    }),
-    localScale: new Vector3(S, S * 1.5, T),
-    localPosition: new Vector3(0, 0.17, 0),
+    src: "/models/Chips/gpr.glb",
+    localScale: new Vector3(S, S , S/1.5),
+    localPosition: new Vector3(0, 0.17, 0.05),
+    sceneRotation: CHIP_ROTATION,
   });
 
-  const clock = new Box({
+  const clock = new Group({
     key: "CLOCK",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xffffff }),
     localScale: new Vector3(S * 0.3, S * 0.4, T),
     localPosition: new Vector3(-0.3, -0.22, 0),
-    children: [
-      new Box({
-        material: new MeshPhysicalMaterial({
-          metalness: 0.5,
-          color: 0x0000ff,
-        }),
-        localScale: new Vector3(0.5, 0.5, 2.2),
-      }),
-    ],
   });
+
+  clock.add(
+    new Box({
+      material: new MeshPhysicalMaterial({
+        metalness: 0.5,
+        color: 0x0000ff,
+      }),
+      localScale: new Vector3(0.5, 0.5, 2.2),
+    })
+  );
+
+  clock.add(
+    new Model({
+      key: "CLOCK_MODEL",
+      src: "/models/Chips/ButtonClock.glb",
+      localScale: new Vector3(1.5, 1.2, 1.5),
+      localPosition : new Vector3(0,0,.03),
+      sceneRotation: CHIP_ROTATION,
+    })
+  );
 
   const wire_cu_iu = (
     <Line
@@ -113,7 +118,6 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         iu
           .localPosition()
           .clone()
-          .add(new Vector3(-iu.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="alu"
@@ -142,7 +146,6 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(-mc.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="alu"
@@ -157,13 +160,13 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.29, 0.05)),
+          .add(new Vector3(mc.localScale().x / 2, -0.35, 0)),
         mc
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(-0.05, -0.12, -0.02)),
-        ram.localPosition().clone().add(new Vector3(-0.1, 0.05, -0.03)),
+          .add(new Vector3(-0.05, -0.22, -0.07)),
+        ram.localPosition().clone().add(new Vector3(-0.1, 0, -0.1)),
       ]}
       lineWidth={0}
       color="memory"
@@ -178,13 +181,13 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.29, 0.05)),
+          .add(new Vector3(mc.localScale().x / 2, -0.35, 0)),
         mc
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(-0.04, -0.12, 0.12)),
-        ram.localPosition().clone().add(new Vector3(-0.1, 0.05, 0.1)),
+          .add(new Vector3(-0.04, -0.22, -0)),
+        ram.localPosition().clone().add(new Vector3(-0.1, 0, -0.045)),
       ]}
       lineWidth={0}
       color="bus"
@@ -225,11 +228,10 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
           .localPosition()
           .clone()
           .lerp(gpr.localPosition(), 0.5)
-          .add(new Vector3(-0.05, 0.12, 0.01)),
+          .add(new Vector3(-0.05, 0.05, 0.01)),
         gpr
           .localPosition()
           .clone()
-          .add(new Vector3(-gpr.localScale().x / 2, 0, 0.01)),
       ]}
       lineWidth={0}
       color="register"
@@ -243,8 +245,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
       points={[
         gpr
           .localPosition()
-          .clone()
-          .add(new Vector3(gpr.localScale().x / 2, 0, 0)),
+          .clone(),
         gpr
           .localPosition()
           .clone()
@@ -258,7 +259,6 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(-mc.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="memory"
@@ -283,7 +283,6 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         iu
           .localPosition()
           .clone()
-          .add(new Vector3(0, iu.localScale().y / 2, 0.01)),
       ]}
       lineWidth={0}
       color="register"

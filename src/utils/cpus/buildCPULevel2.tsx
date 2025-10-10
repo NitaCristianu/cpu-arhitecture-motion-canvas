@@ -1,13 +1,11 @@
-import { MeshPhysicalMaterial, BoxGeometry, Vector3 } from "three";
-import COLORS from "../colors";
+import { MeshPhysicalMaterial, Vector3 } from "three";
 import Box from "../../libs/Thrash/objects/Box";
-import { connectBus } from "../connectBus";
 import Line from "../../libs/Thrash/objects/Line";
 import Scene3D from "../../libs/Thrash/Scene";
 import { all } from "@motion-canvas/core";
-import Mesh from "../../libs/Thrash/objects/Mesh";
 import Group from "../../libs/Thrash/objects/Group";
 import Sphere from "../../libs/Thrash/objects/Sphere";
+import Model from "../../libs/Thrash/objects/Model";
 
 /* ── DIMENSIONS ───────────────────────────────────── */
 const T = 0.02; // thin Z-depth for all logic blocks
@@ -15,6 +13,7 @@ const S = 0.1; // base XY size of small units
 const L = 0.18; // large unit width
 const H = 0.13; // large unit height
 const wire_sizes = [8, 8, 8, 8, 6, 10, 6, 6, 8, 8, 6, 16, 16];
+const CHIP_ROTATION = new Vector3(Math.PI / 2, 0, 0);
 
 export const FLAG_DEFS = {
   Z: { on: 0x00ff00, off: 0x222222 }, // green
@@ -26,12 +25,13 @@ export const FLAG_DEFS = {
 export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
   const container = new Group({ key: "CPU 2 Group" });
   /* ── RAM (tall slab on the right) ─────────────────── */
-  const ram = new Box({
+  const ram = new Model({
     key: "level_2 RAM",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x07174a }),
+    src: "/models/Chips/RAM.glb",
     localScale: new Vector3(0, 0, 0), // thin in X, tall in Y
     localPosition: new Vector3(0.5, -0.4, 0),
     localRotation: new Vector3(0, -Math.PI / 2, Math.PI / 2), // slight twist
+    sceneRotation: CHIP_ROTATION,
   });
   /* ── CPU container (rotated flat) ─────────────────── */
   const cpu = new Group({
@@ -40,11 +40,12 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
     localRotation: new Vector3(-Math.PI / 2, 0, 0), // face “up”
     localPosition: new Vector3(0, -0.35, 0),
   });
-  const cpu_base = new Box({
+  const cpu_base = new Model({
     key: "level_2 BASE",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x323232 }),
+    src: "/models/Chips/Base.glb",
     localScale: new Vector3(0.65, 0.6, T * 5),
     localPosition: new Vector3(-0.02, 0, -0.02 - T * 2),
+    sceneRotation: CHIP_ROTATION,
   });
 
   /* child blocks — positions are inside cpu-space (XY because we rotated) */
@@ -55,14 +56,12 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
     localPosition: new Vector3(-0.18, -0.05, 0),
   });
 
-  const alu = new Box({
+  const alu = new Model({
     key: "level_2 ALU",
-    material: new MeshPhysicalMaterial({
-      color: 0x00a0ff,
-      metalness: 0.5,
-    }),
+    src: "/models/Chips/ALU.glb",
     localScale: new Vector3(L, H, T),
     localPosition: new Vector3(0.0, -0.05, 0),
+    sceneRotation: CHIP_ROTATION,
   });
 
   const ir = new Box({
@@ -82,39 +81,36 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
     localPosition: new Vector3(0.22, -0.05, 0),
   });
 
-  const gpr = new Box({
+  const gpr = new Model({
     key: "level_2 GPR",
-    material: new MeshPhysicalMaterial({
-      metalness: 1,
-      roughness: 2,
-      color: 0xcccccc,
-    }),
+    src: "/models/Chips/gpr.glb",
     localScale: new Vector3(S, S * 1.5, T),
     localPosition: new Vector3(0, 0.17, 0),
+    sceneRotation: CHIP_ROTATION,
   });
 
-  const clock = new Box({
+  const clock = new Model({
     key: "level_2 CLOCK",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xffffff }),
+    src: "/models/Chips/NewClock.glb",
     localScale: new Vector3(S * 0.3, S * 0.4, T),
     localPosition: new Vector3(-0.3, -0.22, 0),
+    sceneRotation: CHIP_ROTATION,
   });
 
-  const pc = new Box({
+  const pc = new Model({
     key: "level_2 PC",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xff0000 }),
+    src: "/models/Chips/PC.glb",
     localScale: new Vector3(L * 0.3, L * 0.3, T),
     localPosition: new Vector3(0, -0.22, 0),
+    sceneRotation: CHIP_ROTATION,
   });
 
-  const decode = new Box({
+  const decode = new Model({
     key: "level_2 DECODE",
-    material: new MeshPhysicalMaterial({
-      metalness: 0.5,
-      color: 0xff9800, // orange for distinction
-    }),
+    src: "/models/Chips/DU.glb",
     localScale: new Vector3(L / 2, L / 3, T),
     localPosition: new Vector3(-0.15, 0.13, 0), // near IR, left-center
+    sceneRotation: CHIP_ROTATION,
   });
 
   const alu_flags = new Group({

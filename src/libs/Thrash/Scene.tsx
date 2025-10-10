@@ -12,6 +12,7 @@ import {
   Vector3,
   WebGLRenderer,
   Vector2 as ThreeVector2,
+  FogExp2,
 } from "three";
 import CameraThrash from "./Camera";
 import { SimpleSignal } from "@motion-canvas/core/lib/signals";
@@ -84,6 +85,9 @@ export default class Scene3D extends Layout {
     });
 
     this.context = this.renderer.getContext();
+    const fogColor = new Color(0x05060a);
+    this.scene.fog = new FogExp2(fogColor, 0.02);
+    this.scene.background = fogColor.clone();
     this.onRender =
       onRender ??
       ((renderer, scene, camera) => {

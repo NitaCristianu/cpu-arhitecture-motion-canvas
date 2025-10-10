@@ -212,10 +212,14 @@ export default class Mesh extends Object {
           this.core.rotation.set(v.x, v.y, v.z);
           break;
         case this.localScale:
-          this.core.scale.copy(v);
+          this.applyScale(v);
           break;
       }
     });
+  }
+
+  protected applyScale(v: Vector3) {
+    this.core.scale.copy(v);
   }
 
   public *fadeTo(alpha: number, duration = 0.4, ease = easeInOutCubic) {
