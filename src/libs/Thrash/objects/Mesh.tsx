@@ -218,8 +218,9 @@ export default class Mesh extends Object {
     });
   }
 
-  protected applyScale(v: Vector3) {
-    this.core.scale.copy(v);
+  protected applyScale(v?: Vector3) {
+    const source = v ?? new Vector3(1, 1, 1);
+    this.core.scale.copy(source);
   }
 
   public *fadeTo(alpha: number, duration = 0.4, ease = easeInOutCubic) {

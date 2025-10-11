@@ -58,9 +58,16 @@ export default class Model extends Mesh {
           scene.position.sub(center);
         }
 
-        const rotation = props.sceneRotation ??
-          Model.DEFAULT_SCENE_ROTATION.clone();
-        scene.rotation.set(rotation.x, rotation.y, rotation.z);
+        const rotationSource = props.sceneRotation ?? Model.DEFAULT_SCENE_ROTATION;
+        const rotationVector =
+          rotationSource instanceof Vector3
+            ? rotationSource
+            : new Vector3(
+                (rotationSource as any)?.x ?? 0,
+                (rotationSource as any)?.y ?? 0,
+                (rotationSource as any)?.z ?? 0
+              );
+        scene.rotation.set(rotationVector.x, rotationVector.y, rotationVector.z);
 
         scene.updateMatrixWorld(true);
 
@@ -125,8 +132,9 @@ export default class Model extends Mesh {
     });
   }
 
-  protected override applyScale(v: Vector3) {
-    const adjusted = v.clone().multiply(this.scaleCompensation);
+  protected override applyScale(v?: Vector3) {
+    const source = v ?? new Vector3(1, 1, 1);
+    const adjusted = source.clone().multiply(this.scaleCompensation);
     this.core.scale.copy(adjusted);
   }
 

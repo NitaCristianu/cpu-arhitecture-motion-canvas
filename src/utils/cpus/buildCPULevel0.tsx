@@ -23,7 +23,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
     key: "RAM",
     src: "/models/Chips/RAM.glb",
     localScale: new Vector3(0, 0, 0), // thin in X, tall in Y
-    localPosition: new Vector3(.5, -0.25, 0.08),
+    localPosition: new Vector3(.5, -0.35, 0.08),
     localRotation : new Vector3(0, Math.PI, 0)
   });
   /* ── CPU container (rotated flat) ─────────────────── */
@@ -53,7 +53,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
     key: "IU",
     src: "/models/Chips/IU.glb",
     localScale: new Vector3(H, H, H/2),
-    localPosition: new Vector3(0.0, -0.14, 0.05),
+    localPosition: new Vector3(0.0, -0.14, -0.01),
     sceneRotation: CHIP_ROTATION,
   });
 
@@ -68,32 +68,32 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
     key: "GPR",
     src: "/models/Chips/gpr.glb",
     localScale: new Vector3(S, S , S/1.5),
-    localPosition: new Vector3(0, 0.17, 0.05),
+    localPosition: new Vector3(0, 0.17, 0.02),
     sceneRotation: CHIP_ROTATION,
   });
 
   const clock = new Group({
     key: "CLOCK",
-    localScale: new Vector3(S * 0.3, S * 0.4, T),
-    localPosition: new Vector3(-0.3, -0.22, 0),
+    localScale: new Vector3(S * 0.3, S * 0.4, T).multiplyScalar(1.5),
+    localPosition: new Vector3(-0.3, -0.22, -.01),
   });
 
   clock.add(
-    new Box({
-      material: new MeshPhysicalMaterial({
-        metalness: 0.5,
-        color: 0x0000ff,
-      }),
-      localScale: new Vector3(0.5, 0.5, 2.2),
+    new Model({
+      key: "CLOCK_BUTTON_TOP",
+      src: "/models/Chips/ButtonClock-Button.glb",
+      localScale: new Vector3(0.5, 0.4, 0.3).multiplyScalar(2),
+      localPosition : new Vector3(0,0.35,.67),
+      sceneRotation: CHIP_ROTATION,
     })
   );
 
   clock.add(
     new Model({
-      key: "CLOCK_MODEL",
-      src: "/models/Chips/ButtonClock.glb",
-      localScale: new Vector3(1.5, 1.2, 1.5),
-      localPosition : new Vector3(0,0,.03),
+      key: "CLOCK_FRAME",
+      src: "/models/Chips/ButtonClock-Frame.glb",
+      localScale: new Vector3(1.5, 1.1, 1.5),
+      localPosition: new Vector3(0, 0, 0.1),
       sceneRotation: CHIP_ROTATION,
     })
   );
@@ -165,8 +165,8 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(-0.05, -0.22, -0.07)),
-        ram.localPosition().clone().add(new Vector3(-0.1, 0, -0.1)),
+          .add(new Vector3(-0.05, -0.15, -0.07)),
+        ram.localPosition().clone().add(new Vector3(-0.1, -0.02, -0.1)),
       ]}
       lineWidth={0}
       color="memory"
@@ -186,8 +186,8 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(-0.04, -0.22, -0)),
-        ram.localPosition().clone().add(new Vector3(-0.1, 0, -0.045)),
+          .add(new Vector3(-0.04, -0.15, -0)),
+        ram.localPosition().clone().add(new Vector3(-0.1, -0.02, -0.045)),
       ]}
       lineWidth={0}
       color="bus"
@@ -232,7 +232,6 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         gpr
           .localPosition()
           .clone()
-          .add(new Vector3(0,0,-.03)),
       ]}
       lineWidth={0}
       color="register"
@@ -246,14 +245,13 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
       points={[
         gpr
           .localPosition()
-          .clone()
-          .add(new Vector3(0,0,-.03)),
-
+          .clone(),
+       
         mc
           .localPosition()
           .clone()
           .lerp(gpr.localPosition(), 0.3)
-          .add(new Vector3(-0.04, -0.02, 0.01)),
+          .add(new Vector3(-0.04, 0.02, 0.01)),
         mc
           .localPosition()
           .clone()
@@ -271,7 +269,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         gpr
           .localPosition()
           .clone()
-          .add(new Vector3(0, -gpr.localScale().y / 2, -0.03)),
+          .add(new Vector3(0, -gpr.localScale().y / 2, 0.01)),
         gpr
           .localPosition()
           .clone()

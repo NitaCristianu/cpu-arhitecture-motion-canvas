@@ -108,11 +108,11 @@ export default makeScene2D(function* (view) {
       key="cursor"
       src="/models/cursor.glb"
       localRotation={new Vector3(-0.4, 0.3, 0.7)}
-      localScale={new Vector3(1, 1, 1).multiplyScalar(0.05)}
+      localScale={new Vector3(1, 1, .2).multiplyScalar(0.15)}
       localPosition={cpu.clock
         .getGlobalPosition()
         .clone()
-        .add(new Vector3(-0.35, 2.49, 0.34))}
+        .add(new Vector3(-0.35, 2.46, 0.38))}
     />
   ) as Model;
   scene.add(gpr);
