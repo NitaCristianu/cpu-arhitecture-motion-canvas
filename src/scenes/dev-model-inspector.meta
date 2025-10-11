@@ -35,67 +35,67 @@
     },
     {
       "name": "l1-right",
-      "targetTime": 19.339837837404406
+      "targetTime": 19.381852865998358
     },
     {
       "name": "l1-back",
-      "targetTime": 21.139837837404407
+      "targetTime": 21.18185286599836
     },
     {
       "name": "l1-top",
-      "targetTime": 22.939837837404408
+      "targetTime": 22.98185286599836
     },
     {
       "name": "l1-hide",
-      "targetTime": 23.73983783740441
+      "targetTime": 23.78185286599836
     },
     {
       "name": "l2",
-      "targetTime": 24.139837837404407
+      "targetTime": 24.18185286599836
     },
     {
       "name": "l2-front",
-      "targetTime": 26.53983783740441
+      "targetTime": 26.58185286599836
     },
     {
       "name": "l2-right",
-      "targetTime": 28.33983783740441
+      "targetTime": 28.38185286599836
     },
     {
       "name": "l2-back",
-      "targetTime": 30.13983783740441
+      "targetTime": 30.181852865998362
     },
     {
       "name": "l2-top",
-      "targetTime": 31.93983783740441
+      "targetTime": 31.981852865998363
     },
     {
       "name": "l2-hide",
-      "targetTime": 32.73983783740441
+      "targetTime": 32.78185286599836
     },
     {
       "name": "l3",
-      "targetTime": 33.13983783740441
+      "targetTime": 33.18185286599836
     },
     {
       "name": "l3-front",
-      "targetTime": 35.539837837404406
+      "targetTime": 35.58185286599836
     },
     {
       "name": "l3-right",
-      "targetTime": 37.3398378374044
+      "targetTime": 37.381852865998354
     },
     {
       "name": "l3-back",
-      "targetTime": 39.1398378374044
+      "targetTime": 39.18185286599835
     },
     {
       "name": "l3-top",
-      "targetTime": 40.9398378374044
+      "targetTime": 40.98185286599835
     },
     {
       "name": "l3-hide",
-      "targetTime": 41.739837837404394
+      "targetTime": 41.781852865998346
     }
   ],
   "seed": 523325456

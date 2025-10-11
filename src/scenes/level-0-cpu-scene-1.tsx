@@ -18,7 +18,7 @@ import {
   waitUntil,
 } from "@motion-canvas/core";
 import { MeshPhongMaterial, MeshPhysicalMaterial, Vector3 } from "three";
-import { buildCPULevel0 } from "../utils/cpus/buildCPULevel0";
+import { buildCPULevel0, RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import Box from "../libs/Thrash/objects/Box";
 import { Label3D } from "../components/Label3D";
 import { createInfoCard } from "../utils/infocard";
@@ -34,7 +34,7 @@ export default makeScene2D(function* (view) {
   const inner_cpu = buildCPULevel0(scene);
   const outer_cpu = (
     <Box
-      material={new MeshPhongMaterial({ color: 0xffa000 })}
+      material={new MeshPhongMaterial({ color: '#130235' })}
       localScale={new Vector3(0, 0, 0)}
       localPosition={new Vector3(-0.02, -0.4, 0)}
     />
@@ -121,7 +121,7 @@ export default makeScene2D(function* (view) {
   yield* all(
     inner_cpu.group.popIn(0, new Vector3(0.5)),
     outer_cpu.popIn(1, new Vector3(0.66, 0.02 * 5 + 0.04, 0.61)),
-    inner_cpu.ram.popIn(0.5, new Vector3(0.2, 0.6, 0.25))
+    inner_cpu.ram.popIn(0.5, RAM_SCALE)
   );
   yield* all(
     inner_cpu.wire_mc_ram_address.widthTo(11, 1),

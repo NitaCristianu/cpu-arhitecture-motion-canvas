@@ -132,9 +132,8 @@ export default class Model extends Mesh {
     });
   }
 
-  protected override applyScale(v?: Vector3) {
-    const source = v ?? new Vector3(1, 1, 1);
-    const adjusted = source.clone().multiply(this.scaleCompensation);
+  protected override applyScale(v: Vector3) {
+    const adjusted = v.clone().multiply(this.scaleCompensation);
     this.core.scale.copy(adjusted);
   }
 

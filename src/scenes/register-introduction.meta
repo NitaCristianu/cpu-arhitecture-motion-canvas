@@ -27,39 +27,39 @@
     },
     {
       "name": "cleanup",
-      "targetTime": 23.24032662124257
+      "targetTime": 23.27920484893288
     },
     {
       "name": "clock",
-      "targetTime": 26.64032662124257
+      "targetTime": 26.67920484893288
     },
     {
       "name": "press",
-      "targetTime": 30.64032662124257
+      "targetTime": 30.67920484893288
     },
     {
       "name": "resume",
-      "targetTime": 32.640326621242565
+      "targetTime": 32.67920484893288
     },
     {
       "name": "tap",
-      "targetTime": 40.623659954575814
+      "targetTime": 40.66253818226613
     },
     {
       "name": "clean",
-      "targetTime": 60.54365995457609
+      "targetTime": 60.58253818226641
     },
     {
       "name": "others",
-      "targetTime": 61.54365995457609
+      "targetTime": 61.58253818226641
     },
     {
       "name": "second",
-      "targetTime": 68.34365995457611
+      "targetTime": 68.38253818226642
     },
     {
       "name": "next",
-      "targetTime": 76.26652225330156
+      "targetTime": 76.30540048099186
     }
   ],
   "seed": 4213255170
