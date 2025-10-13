@@ -202,20 +202,20 @@ export default makeScene2D(function* (view) {
     );
 
   yield delay(1, showlight.fadeIn());
-  yield highlightTarget(cpu.bp);
+  yield highlightTarget(cpu.bp as any);
   yield* all(
     camera.followWaypoints([bpView], 2.2, {}, easeInSine),
     camera.lookTo(bpPosition, 2.2)
   );
 
-  yield highlightTarget(cpu.sp);
+  yield highlightTarget(cpu.sp as any);
   yield* all(
     camera.followWaypoints([spView], 2.2, {}, easeOutSine),
     camera.lookTo(spPosition, 2.2)
   );
 
   const cacheEntry = cacheOrbitWaypoints[0];
-  yield highlightTarget(cpu.cache);
+  yield highlightTarget(cpu.cache as any);
   yield* all(
     camera.followWaypoints([cacheEntry], 1.8),
     camera.lookTo(cachePosition, 1.8)
@@ -228,7 +228,7 @@ export default makeScene2D(function* (view) {
     tension: 0.4,
   });
 
-  yield highlightTarget(cpu.fpu);
+  yield highlightTarget(cpu.fpu as any);
   yield* all(
     camera.followWaypoints([fpuView], 3),
     camera.lookTo(fpuPosition, 3)

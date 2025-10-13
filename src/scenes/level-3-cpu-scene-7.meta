@@ -1,0 +1,18 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 2.3784335776287238
+    },
+    {
+      "name": "electricity flow",
+      "targetTime": 6.378433577628724
+    },
+    {
+      "name": "next",
+      "targetTime": 12.23083478304276
+    }
+  ],
+  "seed": 2457742075
+}
