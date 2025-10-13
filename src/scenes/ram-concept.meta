@@ -3,23 +3,23 @@
   "timeEvents": [
     {
       "name": "zoom in",
-      "targetTime": 0.8
+      "targetTime": 4.721420484111229
     },
     {
       "name": "select bit",
-      "targetTime": 1.5
+      "targetTime": 9.98535402121852
     },
     {
       "name": "modify",
-      "targetTime": 8.5
+      "targetTime": 18.187312507244442
     },
     {
       "name": "address",
-      "targetTime": 8.5
+      "targetTime": 22.909968290921093
     },
     {
       "name": "end",
-      "targetTime": 17.77999999999998
+      "targetTime": 32.18996829092106
     }
   ],
   "seed": 1349546265

@@ -3,15 +3,15 @@
   "timeEvents": [
     {
       "name": "zoom in",
-      "targetTime": 0.3
+      "targetTime": 2.195304073556444
     },
     {
       "name": "go",
-      "targetTime": 3.9599999999999995
+      "targetTime": 5.855304073556443
     },
     {
       "name": "end",
-      "targetTime": 23.259999999999987
+      "targetTime": 29.406305998887586
     }
   ],
   "seed": 2368890563

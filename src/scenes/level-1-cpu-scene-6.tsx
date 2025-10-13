@@ -371,7 +371,7 @@ export default makeScene2D(function* (view) {
       PC
     </Txt>
   ) as Txt;
-  program_counter.absolutePosition(bytes[7].absolutePosition().addY(-700).addX(-1550));
+  program_counter.absolutePosition(bytes[7].absolutePosition().addY(-1700).addX(-1550));
   view.add(program_counter);
   const acc_value = createSignal(0);
   const pc_value = createSignal(7);
@@ -441,7 +441,7 @@ export default makeScene2D(function* (view) {
     yield t.shadowColor("#ff0", .7);
     yield* chain(
       waitFor(0.2),
-      program_counter.absolutePosition(pos.addY(-130), 0.5),
+      program_counter.absolutePosition(pos.addY(-300), 0.5),
       waitFor(0.2)
     );
     const acc = ACClabel.childAs<Bitnumber>(1);

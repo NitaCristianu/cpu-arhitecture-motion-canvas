@@ -3,75 +3,75 @@
   "timeEvents": [
     {
       "name": "begin",
-      "targetTime": 0
+      "targetTime": 1.3869413596805915
     },
     {
       "name": "gAtes",
-      "targetTime": 2.2
+      "targetTime": 4.66242318325425
     },
     {
       "name": "table",
-      "targetTime": 6.2
+      "targetTime": 8.662423183254251
     },
     {
       "name": "traits",
-      "targetTime": 9.448710491015015
+      "targetTime": 11.911133674269268
     },
     {
       "name": "logic functions",
-      "targetTime": 11.448710491015015
+      "targetTime": 14.651065168887945
     },
     {
       "name": "bananalogic",
-      "targetTime": 18.248710491015018
+      "targetTime": 23.173057376463795
     },
     {
       "name": "8bit",
-      "targetTime": 23.184869379728596
+      "targetTime": 28.977571310023308
     },
     {
       "name": "mul",
-      "targetTime": 25.31536998707874
+      "targetTime": 31.10807191737345
     },
     {
       "name": "numbers",
-      "targetTime": 28.165199770171103
+      "targetTime": 35.3413826193729
     },
     {
       "name": "representation",
-      "targetTime": 29.665199770171103
+      "targetTime": 38.42626555673056
     },
     {
       "name": "scroll",
-      "targetTime": 31.065199770171112
+      "targetTime": 39.826265556730576
     },
     {
       "name": "sub",
-      "targetTime": 36.06519977017111
+      "targetTime": 44.826265556730576
     },
     {
       "name": "cut",
-      "targetTime": 39.57129523188139
+      "targetTime": 49.48349662139845
     },
     {
       "name": "~bits",
-      "targetTime": 42.322766041101396
+      "targetTime": 52.234967430618454
     },
     {
       "name": "+1",
-      "targetTime": 43.322766041101396
+      "targetTime": 54.200060915926336
     },
     {
       "name": "examples",
-      "targetTime": 45.79268489299406
+      "targetTime": 57.123457429590175
     },
     {
       "name": "solve",
-      "targetTime": 47.04892441799708
+      "targetTime": 58.85642988107058
     },
     {
       "name": "next",
-      "targetTime": 48.79151981354389
+      "targetTime": 61.51760823251285
     }
   ],
   "seed": 953439808

@@ -69,7 +69,7 @@ export default makeScene2D(function* (view) {
   scene.init();
   view.add(scene);
 
-  yield* camera.zoomOut(.5, 0);
+  yield* camera.zoomOut(0.5, 0);
 
   const focusOf = (cpu: ReturnType<typeof buildCPULevel0>) =>
     cpu.base?.getGlobalPosition().clone() ??
@@ -127,19 +127,18 @@ export default makeScene2D(function* (view) {
     yield* popOutCpu(entries[index]);
   }
 
-  for (let index = 0; index < entries.length; index++) {
-    const { short, cpu } = entries[index];
-    yield* waitUntil(short);
-    yield* showCpu(index);
-    yield* moveCamera(cpu as any, "iso");
+  const level = 0;
+  const { short, cpu } = entries[level];
+  yield* waitUntil(short);
+  yield* showCpu(level);
+  yield* moveCamera(cpu as any, "iso");
 
-    for (const angle of ["front", "right", "back", "top"] as const) {
-      yield* waitFor(1);
-      yield* waitUntil(`${short}-${angle}`);
-      yield* moveCamera(cpu as any, angle);
-    }
-
-    yield* waitUntil(`${short}-hide`);
-    yield* hideCpu(index);
+  for (const angle of ["front", "right", "back", "top"] as const) {
+    yield* waitFor(1);
+    yield* waitUntil(`${short}-${angle}`);
+    yield* moveCamera(cpu as any, angle);
   }
+
+  yield* waitUntil(`${short}-hide`);
+  yield* hideCpu(level);
 });
