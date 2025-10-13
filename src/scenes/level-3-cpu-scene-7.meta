@@ -10,8 +10,32 @@
       "targetTime": 6.378433577628724
     },
     {
+      "name": "size",
+      "targetTime": 10.35176691096197
+    },
+    {
+      "name": "ticks",
+      "targetTime": 12.45027760255729
+    },
+    {
+      "name": "fetching",
+      "targetTime": 15.102963185605203
+    },
+    {
+      "name": "introduce cache",
+      "targetTime": 18.102963185605205
+    },
+    {
+      "name": "whatis",
+      "targetTime": 19.102963185605205
+    },
+    {
+      "name": "communicate",
+      "targetTime": 20.613049108329474
+    },
+    {
       "name": "next",
-      "targetTime": 12.23083478304276
+      "targetTime": 27.23046494298555
     }
   ],
   "seed": 2457742075

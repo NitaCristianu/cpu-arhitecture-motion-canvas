@@ -29,7 +29,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     key: "level_3 RAM",
     src: "/models/Chips/RAM.glb",
     localScale: new Vector3(0, 0, 0), // thin in X, tall in Y
-    localPosition: new Vector3(.9, -0.35, 0.08),
+    localPosition: new Vector3(0.9, -0.35, 0.08),
     localRotation: new Vector3(0, Math.PI, 0),
   });
 
@@ -387,18 +387,36 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     />
   ) as Line;
 
-  const wire_mc_cache_data = (
+  const wire_mc_cache_address = (
     <Line
       points={[
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.04, 0.02)),
+        mc.localPosition().clone(),
         mc
           .localPosition()
           .clone()
           .lerp(cache.localPosition(), 0.5)
           .add(new Vector3(0.06, -0.04, 0.025)),
+        cache
+          .localPosition()
+          .clone()
+          .add(new Vector3(cacheBody.localScale().x / 2 - 0.06, -0.12, 0.02)),
+      ]}
+      lineWidth={0}
+      color="busAddr"
+      smooth
+      key="level_3 wire_mc_cache_address"
+    />
+  ) as Line;
+
+  const wire_mc_cache_data = (
+    <Line
+      points={[
+        mc.localPosition().clone().add(new Vector3(0.03, .04, 0)),
+        mc
+          .localPosition()
+          .clone()
+          .lerp(cache.localPosition(), 0.5)
+          .add(new Vector3(-0.06, 0.1, 0.025)),
         cache
           .localPosition()
           .clone()
@@ -417,13 +435,19 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
         cache
           .localPosition()
           .clone()
-          .add(new Vector3(cacheBody.localScale().x / 2, 0.14, 0.02)),
+          .add(
+            new Vector3(
+              -cacheBody.localScale().x / 2 + 0.06,
+              -0.12,
+              -cacheBody.localScale().y / 2 + 0.02
+            )
+          ),
         cache
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(0.16, -0.1, -0.02)),
-        ram.localPosition().clone().add(new Vector3(-0.1, 0.05, -0.03)),
+          .add(new Vector3(0, -0.001, -0.15)),
+        ram.localPosition().clone().add(new Vector3(0, -0.05, -0.09)),
       ]}
       lineWidth={0}
       color="memory"
@@ -438,13 +462,19 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
         cache
           .localPosition()
           .clone()
-          .add(new Vector3(cacheBody.localScale().x / 2, -0.14, 0.02)),
+          .add(
+            new Vector3(
+              cacheBody.localScale().x / 2 - 0.02,
+              -0.12,
+              cacheBody.localScale().y / 2
+            )
+          ),
         cache
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(0.18, -0.1, 0.1)),
-        ram.localPosition().clone().add(new Vector3(-0.1, 0.05, 0.1)),
+          .add(new Vector3(0, -0.001, 0.1)),
+        ram.localPosition().clone().add(new Vector3(0, -0.05, -0.055)),
       ]}
       lineWidth={0}
       color="busAddr"
@@ -831,6 +861,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     wire_stack_mc,
     wire_stack_pc,
     wire_mc_cache_data,
+    wire_mc_cache_address,
     wire_cache_ram_data,
     wire_cache_ram_address,
   };
@@ -858,6 +889,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     [wire_stack_mc, 6],
     [wire_stack_pc, 5],
     [wire_mc_cache_data, 7],
+    [wire_mc_cache_address, 7],
     [wire_cache_ram_data, 9],
     [wire_cache_ram_address, 8],
   ]);
@@ -896,6 +928,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     wire_stack_mc,
     wire_stack_pc,
     wire_mc_cache_data,
+    wire_mc_cache_address,
     alu_flags,
   ].forEach((item) => cpu.add(item));
 
