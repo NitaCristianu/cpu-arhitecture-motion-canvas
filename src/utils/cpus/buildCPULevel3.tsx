@@ -438,7 +438,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
           .add(
             new Vector3(
               -cacheBody.localScale().x / 2 + 0.06,
-              -0.12,
+              -0.35,
               -cacheBody.localScale().y / 2 + 0.02
             )
           ),
@@ -446,7 +446,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(0, -0.001, -0.15)),
+          .add(new Vector3(0, -0.15, -0.15)),
         ram.localPosition().clone().add(new Vector3(0, -0.05, -0.09)),
       ]}
       lineWidth={0}
@@ -465,7 +465,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
           .add(
             new Vector3(
               cacheBody.localScale().x / 2 - 0.02,
-              -0.12,
+              -0.35,
               cacheBody.localScale().y / 2
             )
           ),
@@ -473,7 +473,7 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
           .localPosition()
           .clone()
           .lerp(ram.localPosition(), 0.5)
-          .add(new Vector3(0, -0.001, 0.1)),
+          .add(new Vector3(0, -0.15, 0.1)),
         ram.localPosition().clone().add(new Vector3(0, -0.05, -0.055)),
       ]}
       lineWidth={0}

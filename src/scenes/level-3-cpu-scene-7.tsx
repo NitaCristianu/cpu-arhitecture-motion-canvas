@@ -106,7 +106,9 @@ export default makeScene2D(function* (view) {
     <Label3D
       scene={scene}
       worldPosition={cpu.cache.getGlobalPosition()}
-      text={"I store now the number at X.\nI will return the value to the CPU.\nNext time the CPU will need X I will\nreturn it without fetching from RAM."}
+      text={
+        "I store now the number at X.\nI will return the value to the CPU.\nNext time the CPU will need X I will\nreturn it without fetching from RAM."
+      }
       offset2D={[-1000, -500]}
       height={350}
       width={900}
@@ -137,6 +139,32 @@ export default makeScene2D(function* (view) {
   yield* cpu.wire_cache_ram_data.reverseFlow(0.4, easeInSine, 100);
   yield* data_dialogue.popIn(0.5);
   yield* cpu.wire_mc_cache_data.reverseFlow(0.4, easeInSine, 100);
+
+  yield* waitUntil("post 3d scene");
+  yield* all(address_dialogue.popOut(), data_dialogue.popOut());
+
+  yield camera.zoomIn(2.3,3,easeInOutCubic);
+  yield camera.lookDown(0.35, 3, easeInOutCubic);
+  yield* camera.moveTo(
+    camera.localPosition().clone().add(new Vector3(-1, -3, -4)),
+    3,
+    easeInOutCubic
+  );
+
+  yield loop((i) =>
+    i % 2
+      ? cpu.wire_mc_cache_address.currentFlow(0.4, easeInSine, 100)
+      : i % 3 == 0
+      ? cpu.wire_mc_cache_data.currentFlow(0.4, easeInSine, 100)
+      : cpu.wire_mc_cache_data.reverseFlow(0.4, easeInSine, 100)
+  );
+
+  yield* waitUntil("mainmemory");
+  const cache_pos = camera.lookAt().clone();
+  yield* camera.lookTo(cpu.ram.getGlobalPosition());
+
+  yield* waitUntil('lookat cache');
+  yield* camera.lookTo(cache_pos)
 
   yield* waitUntil("next");
 });
