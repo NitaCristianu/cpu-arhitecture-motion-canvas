@@ -1,11 +1,15 @@
-import { makeScene2D } from "@motion-canvas/2d";
+import { Grid, makeScene2D, Txt } from "@motion-canvas/2d";
 import {
   all,
+  createRefArray,
   easeInOutCubic,
   easeInOutSine,
   easeInSine,
+  easeOutBack,
   easeOutSine,
   loop,
+  range,
+  sequence,
   useRandom,
   waitFor,
   waitUntil,
@@ -15,6 +19,7 @@ import { Vector3 } from "three";
 import { buildCPULevel3 } from "../utils/cpus/buildCPULevel3";
 import { RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import { Label3D } from "../components/Label3D";
+import { GlowBadge, GlowPanelTitle } from "../components/TextPresets";
 
 export default makeScene2D(function* (view) {
   const scene = createScene(new Vector3(-1.5, 0.5, -1.5));
@@ -143,7 +148,7 @@ export default makeScene2D(function* (view) {
   yield* waitUntil("post 3d scene");
   yield* all(address_dialogue.popOut(), data_dialogue.popOut());
 
-  yield camera.zoomIn(2.3,3,easeInOutCubic);
+  yield camera.zoomIn(2.3, 3, easeInOutCubic);
   yield camera.lookDown(0.35, 3, easeInOutCubic);
   yield* camera.moveTo(
     camera.localPosition().clone().add(new Vector3(-1, -3, -4)),
@@ -163,8 +168,87 @@ export default makeScene2D(function* (view) {
   const cache_pos = camera.lookAt().clone();
   yield* camera.lookTo(cpu.ram.getGlobalPosition());
 
-  yield* waitUntil('lookat cache');
-  yield* camera.lookTo(cache_pos)
+  const cache_data = createRefArray<Txt>();
+  const cache_contents = (
+    <Label3D
+      scene={scene}
+      worldPosition={cpu.cache.getGlobalPosition()}
+      text={""}
+      offset2D={[0, -500]}
+      height={600}
+      width={1200}
+      color="control"
+      clip
+    >
+      <Grid
+        lineWidth={2}
+        stroke={"#fff5"}
+        size="100%"
+        spacing={[100, 100]}
+        zIndex={1}
+      />
+      {...range(12).flatMap((x) =>
+        range(6).map((y) => (
+          <GlowPanelTitle
+            scale={0}
+            ref={cache_data}
+            text={
+              generator.nextInt(0, 2) == 0
+                ? "0x" + generator.nextInt(0, 256).toString(16)
+                : generator.nextInt(0, 16).toString(2)
+            }
+            fontWeight={300}
+            fontSize={30}
+            fontFamily={"Fira Code"}
+            x={x * 100 - 550}
+            y={y * 100 - 250}
+            fill={"white"}
+            zIndex={1}
+          />
+        ))
+      )}
+    </Label3D>
+  ) as Label3D;
+  const title = (
+    <GlowBadge
+      scale={0}
+      text={"CACHE CONTENTS"}
+      bottom={cache_contents.top}
+      padding={10}
+    />
+  );
+  view.add(title);
+
+  view.add(cache_contents);
+
+  yield* waitUntil("lookat cache");
+  yield* camera.lookTo(cache_pos, 1.5, easeInOutCubic);
+  yield* title.scale(1, 0.5, easeOutBack);
+  yield cache_contents.offset2D([-1200, -500], 1.5);
+  yield cache_contents.scale(1.5,.8,easeOutSine);
+  yield* sequence(
+    0.025,
+    ...cache_data.map((d) => d.scale(1, 0.5, easeOutBack))
+  );
+
+  yield loop((i) => {
+    const randompositions = generator.intArray(
+      generator.nextInt(0, 10),
+      0,
+      cache_data.length
+    );
+    return sequence(
+      0.01,
+      ...randompositions.map((pos) =>
+        cache_data[pos].text(
+          generator.nextInt(0, 2) == 0
+            ? "0x" + generator.nextInt(0, 256).toString(16)
+            : "",
+          0.4
+        )
+      )
+    );
+  });
 
   yield* waitUntil("next");
 });
