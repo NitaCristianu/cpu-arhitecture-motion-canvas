@@ -104,7 +104,7 @@ export default class Model extends Mesh {
       undefined,
       (error) => {
         // Log an error if the model fails to load
-        logger.error(`Failed to load GLB: ${props.src}` + error);
+        logger.warn(`Failed to load GLB: ${props.src}` + error);
       }
     );
   }

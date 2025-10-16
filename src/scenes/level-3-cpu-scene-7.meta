@@ -46,8 +46,48 @@
       "targetTime": 31.88173518654457
     },
     {
+      "name": "cache principles",
+      "targetTime": 37.512967184913464
+    },
+    {
+      "name": "spatial",
+      "targetTime": 42.787620906803966
+    },
+    {
+      "name": "temporal locality",
+      "targetTime": 45.987620906803954
+    },
+    {
+      "name": "show principles",
+      "targetTime": 51.18762090680394
+    },
+    {
+      "name": "split lines",
+      "targetTime": 53.93620542305488
+    },
+    {
+      "name": "128 bits",
+      "targetTime": 57.326471972680835
+    },
+    {
+      "name": "array",
+      "targetTime": 58.326471972680835
+    },
+    {
+      "name": "store first",
+      "targetTime": 59.326471972680835
+    },
+    {
+      "name": "finds line",
+      "targetTime": 62.66342594047398
+    },
+    {
+      "name": "direct mapping",
+      "targetTime": 66.55485571818804
+    },
+    {
       "name": "next",
-      "targetTime": 41.7660159060101
+      "targetTime": 74.5944486688957
     }
   ],
   "seed": 2457742075
