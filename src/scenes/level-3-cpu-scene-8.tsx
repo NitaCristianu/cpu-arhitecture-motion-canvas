@@ -124,10 +124,21 @@ export default    makeScene2D(function* (view) {
       x={cacheContents.x}
     />
   ) as GlowBadge;
+  const cacheHitLabel = (
+    <GlowBadge
+      initialVisibility={false}
+      text={"CACHE HIT (OK)"}
+      fill={"#f7c81f"}
+      shadowColor={"#f7c81f88"}
+      y={() => cacheContents.bottom().y + 140}
+      x={cacheContents.x}
+    />
+  ) as GlowBadge;
 
   view.add(cacheContents);
   view.add(cacheTitle);
   view.add(cacheMissLabel);
+  view.add(cacheHitLabel);
 
   yield* all(cacheContents.popIn(0.8), cacheTitle.popIn("CACHE", 0.6));
   yield* emptyHint.popIn("EMPTY", 0.4);
@@ -138,12 +149,17 @@ export default    makeScene2D(function* (view) {
   const randomHex = () =>
     "0x" + generator.nextInt(0, 4096).toString(16).padStart(3, "0").toUpperCase();
 
-  const runBurstFlow = () =>
+  const driveCacheQuery = (duration = 0.6, speed = 110) =>
+    cpu.wire_mc_cache_address.currentFlow(duration, easeInOutSine, speed);
+
+  const driveRamPath = (duration = 0.6, speed = 110) =>
     all(
-      cpu.wire_cache_ram_address.currentFlow(0.6, easeInOutSine, 110),
-      cpu.wire_cache_ram_data.currentFlow(0.6, easeOutSine, 110),
-      cpu.wire_mc_cache_data.currentFlow(0.6, easeOutSine, 110)
+      cpu.wire_cache_ram_address.currentFlow(duration, easeInOutSine, speed),
+      cpu.wire_cache_ram_data.currentFlow(duration, easeOutSine, speed),
+      cpu.wire_mc_cache_data.currentFlow(duration, easeOutSine, speed)
     );
+
+  const runBurstFlow = () => all(driveCacheQuery(), driveRamPath());
 
   const fillGroups = [
     [0, 1, 4, 5],
@@ -175,19 +191,14 @@ export default    makeScene2D(function* (view) {
         )
       )
     ),
-    cpu.wire_cache_ram_address.currentFlow(1.3, easeInOutSine, 80)
+    driveCacheQuery(1.3, 80)
   );
 
   yield* waitUntil("cache miss fetch");
   yield* cacheMissLabel.popIn("CACHE MISS (X)", 0.6);
   yield* waitFor(0.2);
 
-  const missBurst = () =>
-    all(
-      cpu.wire_cache_ram_address.currentFlow(0.9, easeInOutSine, 80),
-      cpu.wire_cache_ram_data.currentFlow(0.9, easeOutSine, 80),
-      cpu.wire_mc_cache_data.currentFlow(0.9, easeOutSine, 80)
-    );
+  const missBurst = () => all(driveCacheQuery(0.9, 80), driveRamPath(0.9, 80));
 
   const missGroup = [8, 9, 12, 13];
   const missValues = missGroup.map(() => randomHex());
@@ -208,5 +219,75 @@ export default    makeScene2D(function* (view) {
   );
 
   yield* waitFor(0.4);
+  yield* cacheMissLabel.popOut("", 0.3);
+
+  const hitIndex = fillGroups[0][0];
+  const hitSlot = cacheSlots[hitIndex];
+  const HIT_COLOR = "#f7c81f";
+  const HIT_SHADOW = "#f7c81fa0";
+
+  yield* waitUntil("cache hit");
+  yield* all(
+    driveCacheQuery(0.75, 120),
+    cpu.wire_mc_cache_data.currentFlow(0.75, easeOutSine, 120),
+    chain(
+      hitSlot.opacity(1, 0.001),
+      hitSlot.fill(HIT_COLOR, 0.3),
+      hitSlot.shadowColor(HIT_SHADOW, 0.3),
+      hitSlot.scale(1.25, 0.35, easeOutBack),
+      hitSlot.scale(1.15, 0.25, easeInOutSine)
+    )
+  );
+  yield* cacheHitLabel.popIn("CACHE HIT (OK)", 0.5);
+
+  const restSlots = searchOrder.filter((index) => index !== hitIndex);
+  if (restSlots.length) {
+    yield* all(...restSlots.map((index) => cacheSlots[index].opacity(0.7, 0.4)));
+  }
+
+  yield* waitFor(0.2);
+  yield* waitUntil("maximize hits");
+  yield* all(
+    cacheHitLabel.scale(1.3, 0.45, easeOutBack),
+    hitSlot.scale(1.35, 0.45, easeOutBack)
+  );
+  yield* all(
+    cacheHitLabel.scale(1, 0.35, easeInOutSine),
+    hitSlot.scale(1.15, 0.35, easeInOutSine)
+  );
+
+  const availableIndices = range(cacheSlots.length).filter(
+    (index) => index !== hitIndex
+  );
+
+  function* loadSlot(slot: GlowPanelTitle, value: string) {
+    yield* slot.scale(0.9, 0.2, easeInOutSine);
+    yield* all(slot.text(value, 0.25), slot.opacity(1, 0.25));
+    yield* slot.scale(1.15, 0.25, easeOutBack);
+    yield* slot.scale(1, 0.2, easeInOutSine);
+  }
+
+  function* unloadSlot(slot: GlowPanelTitle) {
+    yield* slot.scale(0.9, 0.2, easeInOutSine);
+    yield* all(slot.text("", 0.3), slot.opacity(0.25, 0.3));
+    yield* slot.scale(0.7, 0.2, easeInOutSine);
+  }
+
+  yield* waitUntil("random loads");
+  for (const _ of range(4)) {
+    const poolIndex = generator.nextInt(0, availableIndices.length);
+    const index = availableIndices[poolIndex];
+    const slot = cacheSlots[index];
+    const canUnload = slot.opacity() > 0.3;
+    const unload = canUnload && generator.nextInt(0, 3) === 0;
+
+    yield* all(
+      driveCacheQuery(0.7, 95),
+      driveRamPath(0.7, 95),
+      unload ? unloadSlot(slot) : loadSlot(slot, randomHex())
+    );
+    yield* waitFor(0.12);
+  }
+
   yield* waitUntil("next");
 });

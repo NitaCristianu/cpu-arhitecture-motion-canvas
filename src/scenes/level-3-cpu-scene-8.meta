@@ -22,8 +22,20 @@
       "targetTime": 17.049616764859984
     },
     {
+      "name": "cache hit",
+      "targetTime": 22.72803464181057
+    },
+    {
+      "name": "maximize hits",
+      "targetTime": 25.319701308477192
+    },
+    {
+      "name": "random loads",
+      "targetTime": 26.119701308477193
+    },
+    {
       "name": "next",
-      "targetTime": 28.38049242619122
+      "targetTime": 37.11591759206209
     }
   ],
   "seed": 1463742039
