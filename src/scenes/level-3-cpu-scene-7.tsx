@@ -5,8 +5,6 @@ import {
   lines,
   makeScene2D,
   Ray,
-  Ray,
-  Ray,
   Txt,
 } from "@motion-canvas/2d";
 import {
@@ -633,10 +631,10 @@ int first = arr[0];
       <GlassBodyText
         zIndex={1}
         text={
-          i == 3
+          i == 2
             ? "..."
-            : i > 3
-            ? i == 4
+            : i > 2
+            ? i == 3
               ? "Group n-1"
               : "Group n"
             : "Group " + i
@@ -649,27 +647,30 @@ int first = arr[0];
     const colors = [
       ["#ff8383ff", "#ff6a83ff"],
       ["#c3d5ffff", "#6ab2ffff"],
+      ["#ffe8a3ff", "#ffc26aff"],
+      ["#d3ffa8ff", "#7ddf73ff"],
+      ["#d8b3ffff", "#a079ffff"],
     ];
-    const positions = [i, 5 - i];
+    const positions = [[0, 4], [1, 3], [], [4, 2], [5, 1]][i];
 
     const rays = positions.map(
       (val, j) =>
         (
           <Ray
-            from={box.left().add(providerGlass.position()).addX(-650)}
+            from={box.left().add(providerGlass.position()).addX(-750)}
             to={(grid_lines[val] as Line)
               .getPointAtPercentage(1)
               .position.addY(-50)
               .add(grid_lines[val].position())}
             shadowBlur={40}
             lineWidth={10}
-            stroke={colors[j][0]}
-            shadowColor={colors[j][1]}
+            stroke={colors[i][0]}
+            shadowColor={colors[i][1]}
             endArrow
-            endOffset={50}
-            startOffset={50}
+            endOffset={0}
             end={0}
             lineDash={[30, 10]}
+            zIndex={2}
           />
         ) as Ray
     );
@@ -694,6 +695,39 @@ int first = arr[0];
     grid_lines[2].findFirst((t) => t instanceof Txt).text("...", 1)
   );
   yield* sequence(0.2, ...connection.map((c) => c.end(1, 0.7)));
+
+  const TITLE = (
+    <GlowPanelTitle fontSize={200} y={-1100} text={"DIRECT MAPPING"} />
+  );
+  view.add(TITLE);
+  yield* all(
+    ...view
+      .children() 
+      .filter((c) => c != shaderBgr)
+      .map((c) => c.y(c.y() + 500, 1))
+  );
+
+  yield* waitFor(1);
+  yield* all(
+    ...view
+      .children()
+      .filter((c) => c != shaderBgr)
+      .map((c) => c.y(c.y() - 500, 1))
+  );
+
+  yield* waitUntil("readdress");
+  yield loop(() =>
+    all(
+      ...connection.map((c) =>
+        c.to(
+          cache_contents
+            .topRight()
+            .lerp(cache_contents.bottomRight(), generator.nextInt(0, 6)/6).addY(100),
+          1
+        )
+      )
+    )
+  );
 
   yield* waitUntil("next");
 });

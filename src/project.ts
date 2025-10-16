@@ -26,6 +26,7 @@ import level3CpuScene4 from "./scenes/level-3-cpu-scene-4?scene";
 import level3CpuScene5 from "./scenes/level-3-cpu-scene-5?scene";
 import level3CpuScene6 from "./scenes/level-3-cpu-scene-6?scene";
 import level3CpuScene7 from "./scenes/level-3-cpu-scene-7?scene";
+import level3CpuScene8 from "./scenes/level-3-cpu-scene-8?scene";
 
 export default makeProject({
   scenes: [
@@ -52,7 +53,8 @@ export default makeProject({
     level3CpuScene4,
     level3CpuScene5,
     level3CpuScene6,
-    level3CpuScene7
+    level3CpuScene7,
+    level3CpuScene8,
     // devModelInspector,
   ],
   experimentalFeatures: true,
