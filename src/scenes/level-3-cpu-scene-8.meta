@@ -6,8 +6,24 @@
       "targetTime": 1.6696881803958963
     },
     {
+      "name": "empty cache",
+      "targetTime": 4.169688180395896
+    },
+    {
+      "name": "spatial fill",
+      "targetTime": 7.252706079174073
+    },
+    {
+      "name": "cache search",
+      "targetTime": 12.54882018981703
+    },
+    {
+      "name": "cache miss fetch",
+      "targetTime": 17.049616764859984
+    },
+    {
       "name": "next",
-      "targetTime": 7.603368318228927
+      "targetTime": 28.38049242619122
     }
   ],
   "seed": 1463742039
