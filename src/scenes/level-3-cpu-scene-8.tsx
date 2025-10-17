@@ -17,7 +17,6 @@ import {
   waitUntil,
   useRandom,
   easeInCubic,
-  easeOutCubic,
 } from "@motion-canvas/core";
 import { RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import { Label3D } from "../components/Label3D";
@@ -73,6 +72,12 @@ export default makeScene2D(function* (view) {
   const cacheSlots = createRefArray<GlowPanelTitle>();
   const policyTextRefs = createRefArray<GlassBodyText>();
   const policyIconRefs = createRefArray<Icon>();
+  const dataGridSpacing = createSignal<Vector2>(new Vector2(260, 170));
+  const instructionGridSpacing = createSignal<Vector2>(new Vector2(260, 170));
+  const dataCells = createRefArray<GlowPanelTitle>();
+  const instructionCells = createRefArray<GlowPanelTitle>();
+  let dataGrid: Glass | null = null;
+  let instructionGrid: Glass | null = null;
   const chunkIndices = range(4).map((row) =>
     range(4).map((column) => row * 4 + column)
   );
@@ -230,7 +235,6 @@ export default makeScene2D(function* (view) {
       ])}
     </Glass>
   ) as Glass;
-  view.add(policyGlass);
 
   yield* all(
     cacheContents.scale(1.5, 1, easeOutBack),
@@ -252,6 +256,21 @@ export default makeScene2D(function* (view) {
   };
   const randomQuarter = () => randomQuarterRaw();
   const randomLine = () => range(4).map(() => randomQuarterRaw());
+  const randomDataValue = () => {
+    const digits = generator.nextInt(1, 6);
+    const min = digits === 1 ? 0 : Math.pow(10, digits - 1);
+    const max = Math.pow(10, digits) - 1;
+    let value = generator.nextInt(min, max + 1);
+    if (generator.nextInt(0, 4) === 0 && value !== 0) value *= -1;
+    return value.toString();
+  };
+  const randomInstructionValue = () =>
+    "0x" +
+    generator
+      .nextInt(0, 0xfff)
+      .toString(16)
+      .padStart(3, "0")
+      .toUpperCase();
 
   const driveCacheQuery = (duration = 0.6, speed = 110) =>
     cpu.wire_mc_cache_address.currentFlow(duration, easeInOutSine, speed);
@@ -491,6 +510,7 @@ export default makeScene2D(function* (view) {
   }
 
   yield* waitUntil("policy list");
+  view.add(policyGlass);
   yield* policyGlass.scale(1, 0.35, easeOutBack);
 
   const POLICY_ICON_DEFAULT = "#fffd";
@@ -558,8 +578,78 @@ export default makeScene2D(function* (view) {
     cacheTitle.popOut(),
     policyGlass.scale(0, 0.5, easeInCubic)
   );
+  cacheContents.remove();
+  cacheTitle.remove();
+  cacheHitLabel.remove();
+  cacheMissLabel.remove();
+  policyGlass.remove();
 
   yield* waitUntil("data");
+  if (!dataGrid) {
+    dataGrid = (
+      <Glass
+        scale={0}
+        size={[1200, 780]}
+        x={-1350}
+        y={520}
+        radius={72}
+        shadowColor={"#ff9ad688"}
+        fill={"#ff9ad628"}
+        translucency={0.75}
+        lightness={0.14}
+      >
+        {...range(4).flatMap((row) =>
+          range(4).map((column) => (
+            <GlowPanelTitle
+              ref={dataCells}
+              initialVisibility={false}
+              zIndex={2}
+              text={""}
+              fontSize={66}
+              fontWeight={700}
+              textAlign={"center"}
+              lineHeight={58}
+              x={() => (column - 1.5) * dataGridSpacing().x}
+              y={() => (row - 1.5) * dataGridSpacing().y}
+            />
+          ))
+        )}
+      </Glass>
+    ) as Glass;
+    instructionGrid = (
+      <Glass
+        scale={0}
+        size={[1200, 780]}
+        x={1350}
+        y={520}
+        radius={72}
+        shadowColor={"#9ec4ff88"}
+        fill={"#9ec4ff26"}
+        translucency={0.75}
+        lightness={0.1}
+      >
+        {...range(4).flatMap((row) =>
+          range(4).map((column) => (
+            <GlowPanelTitle
+              ref={instructionCells}
+              zIndex={2}
+              initialVisibility={false}
+              text={""}
+              fontSize={66}
+              fontWeight={700}
+              textAlign={"center"}
+              lineHeight={58}
+              x={() => (column - 1.5) * instructionGridSpacing().x}
+              y={() => (row - 1.5) * instructionGridSpacing().y}
+            />
+          ))
+        )}
+      </Glass>
+    ) as Glass;
+    view.add(dataGrid);
+    view.add(instructionGrid);
+  }
+
   const data_label = (
     <Label3D
       scene={scene}
@@ -572,7 +662,6 @@ export default makeScene2D(function* (view) {
       color="memory"
     />
   ) as Label3D;
-  view.add(data_label);
   const address_label = (
     <Label3D
       scene={scene}
@@ -585,29 +674,59 @@ export default makeScene2D(function* (view) {
       color="cache"
     />
   ) as Label3D;
+  view.add(data_label);
   view.add(address_label);
   yield* all(
-    camera.moveDOWN(1.5, 1),
-    camera.lookTo(new Vector3(0.6, -0.25, -0.15))
+    camera.moveTo(
+      cpu.cache
+        .getGlobalPosition()
+        .add(new Vector3(-0.25, 0.45, -0.3).multiplyScalar(2)),
+      1,
+      easeInOutCubic
+    ),
+    camera.lookTo(
+      cpu.cache.getGlobalPosition().add(new Vector3(0.12, -0.08, -0.04)),
+      1,
+      easeInOutCubic
+    ),
+    dataGrid!.scale(1, 0.35, easeOutBack),
+    data_label.popIn(0.35)
   );
-  yield* data_label.popIn();
+  const dataValues = dataCells.map(() => randomDataValue());
+  yield* sequence(
+    0.02,
+    ...dataCells.map((cell, index) => cell.popIn(dataValues[index], 0.28))
+  );
 
   yield* waitUntil("address");
+  const instructionValues = instructionCells.map(() =>
+    randomInstructionValue()
+  );
   yield* all(
     camera.moveForward(-1, 1),
-    camera.lookTo(new Vector3(0.6, -0.22, 0.25), 1)
+    camera.lookTo(new Vector3(0.6, -0.15, 0.25), 1, easeInOutCubic),
+    instructionGrid!.scale(1, 0.35, easeOutBack),
+    address_label.popIn(0.35)
   );
-  yield* address_label.popIn();
+  yield* sequence(
+    0.02,
+    ...instructionCells.map((cell, index) =>
+      cell.popIn(instructionValues[index], 0.28)
+    )
+  );
 
   yield* waitUntil("restore");
   yield* all(
     camera.lookTo(new Vector3(0.6, -0.42, 0), 1, easeInOutCubic),
-    camera.moveTo(new Vector3(-.5, .1, 0), 1, easeInOutCubic),
+    camera.moveTo(new Vector3(-0.5, 0.1, 0), 1, easeInOutCubic),
+    dataGrid!.x(-1050, 1, easeInOutCubic),
+    dataGrid!.scale(0.92, 1, easeInOutCubic),
+    instructionGrid!.x(1050, 1, easeInOutCubic),
+    instructionGrid!.scale(0.92, 1, easeInOutCubic),
+    data_label.offset2D([250, -250], 1),
     address_label.offset2D([-600, -200], 1),
-    data_label.offset2D([250,-250], 1),
-    address_label.scale(0.5,1),
-    data_label.scale(0.5,1),
+    data_label.scale(0.5, 1),
+    address_label.scale(0.5, 1)
   );
-
   yield* waitUntil("next");
 });
