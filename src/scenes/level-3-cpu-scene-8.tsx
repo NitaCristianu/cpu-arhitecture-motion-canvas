@@ -1,4 +1,4 @@
-import { Grid, makeScene2D } from "@motion-canvas/2d";
+import { Grid, Icon, makeScene2D } from "@motion-canvas/2d";
 import { createScene } from "../components/presets";
 import { Vector2, Vector3 } from "three";
 import { buildCPULevel3 } from "../utils/cpus/buildCPULevel3";
@@ -19,6 +19,7 @@ import {
 } from "@motion-canvas/core";
 import { RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import { Label3D } from "../components/Label3D";
+import { Glass } from "../components/GlassRect";
 import { GlassBodyText, GlowBadge, GlowPanelTitle } from "../components/TextPresets";
 
 export default    makeScene2D(function* (view) {
@@ -30,7 +31,7 @@ export default    makeScene2D(function* (view) {
 
   view.add(scene);
   scene.init();
-
+ 
   yield* waitUntil("begin");
   yield* camera.moveTo(
     cpu.fpu
@@ -66,6 +67,8 @@ export default    makeScene2D(function* (view) {
 
   const spacing = createSignal<Vector2>(new Vector2(220, 160));
   const cacheSlots = createRefArray<GlowPanelTitle>();
+  const policyTextRefs = createRefArray<GlassBodyText>();
+  const policyIconRefs = createRefArray<Icon>();
   const emptyHint = (
     <GlassBodyText
       initialVisibility={false}
@@ -83,10 +86,12 @@ export default    makeScene2D(function* (view) {
       offset2D={[-1200, -420]}
       size={[1100, 860]}
       clip
+      translucency={1}
       text={""}
     >
       <Grid
         lineWidth={3}
+        zIndex={1}
         stroke={"#ffffff30"}
         spacing={spacing}
         size="100%"
@@ -98,10 +103,13 @@ export default    makeScene2D(function* (view) {
             ref={cacheSlots}
             initialVisibility={false}
             text={""}
-            fontSize={56}
+            zIndex={2}
+            fontSize={48}
             fontWeight={500}
             x={() => (column - 1.5) * spacing().x}
             y={() => (row - 1.5) * spacing().y}
+            textAlign={"center"}
+            lineHeight={52}
           />
         ))
       )}
@@ -139,15 +147,87 @@ export default    makeScene2D(function* (view) {
   view.add(cacheTitle);
   view.add(cacheMissLabel);
   view.add(cacheHitLabel);
+  const policyEntries = [
+    { icon: "mdi:clock-outline", label: "Most Recently Used (MRU)", cue: "policy mru" },
+    { icon: "mdi:pulse", label: "Least Frequently Used (LFU)", cue: "policy lfu" },
+    { icon: "mdi:history", label: "Least Recently Used (LRU)", cue: "policy lru" },
+    { icon: "mdi:chart-bar", label: "Most Frequently Used (MFU)", cue: "policy mfu" },
+    {
+      icon: "mdi:dice-6",
+      label: "Pseudorandom",
+      cue: "policy random",
+    },
+    {
+      icon: "mdi:vector-combine",
+      label: "Hybrid strategies",
+      cue: "policy hybrid",
+    },
+    { icon: "mdi:dots-horizontal", label: "etc", cue: "policy etc" },
+  ];
+  const policyGlass = (
+    <Glass
+      scale={0}
+      size={[1500, 900]}
+      x={() => cacheContents.x() + 2300}
+      y={() => cacheContents.y()}
+      radius={64}
+      translucency={1}
+      lightness={0.05}
+    >
+      <GlowPanelTitle
+        text={"REPLACEMENT POLICIES"}
+        fontSize={72}
+        y={-280}
+        zIndex={2}
+      />
+      {...policyEntries.flatMap((entry, index) => [
+        (
+          <Icon
+            ref={policyIconRefs}
+            icon={entry.icon}
+            color={"#fffd"}
+            width={64}
+            x={-340}
+            y={-150 + index * 90}
+            scale={1}
+            zIndex={2}
+          />
+        ),
+        (
+          <GlassBodyText
+            ref={policyTextRefs}
+            text={`${index + 1}. ${entry.label}`}
+            zIndex={2}
+            fontSize={46}
+            fontWeight={600}
+            textAlign={"left"}
+            width={500}
+            x={-20}
+            y={-150 + index * 90}
+          />
+        ),
+      ])}
+    </Glass>
+  ) as Glass;
+  view.add(policyGlass);
 
-  yield* all(cacheContents.popIn(0.8), cacheTitle.popIn("CACHE", 0.6));
+  yield* all(cacheContents.scale(1.5,1,easeOutBack), cacheTitle.popIn("CACHE", 0.6));
   yield* emptyHint.popIn("EMPTY", 0.4);
 
   yield* waitUntil("spatial fill");
   yield* emptyHint.popOut("", 0.4);
 
-  const randomHex = () =>
-    "0x" + generator.nextInt(0, 4096).toString(16).padStart(3, "0").toUpperCase();
+  const randomQuarterRaw = () => {
+    const digitCount = generator.nextInt(1, 6);
+    const min = digitCount === 1 ? 0 : Math.pow(10, digitCount - 1);
+    const max = Math.pow(10, digitCount) - 1;
+    const magnitude = generator.nextInt(min, max + 1);
+    const negative = magnitude > 0 && generator.nextInt(0, 2) === 0;
+    const value = negative ? -magnitude : magnitude;
+    return value.toString();
+  };
+  const randomQuarter = () => randomQuarterRaw();
+  const randomLine = () => range(4).map(() => randomQuarterRaw());
 
   const driveCacheQuery = (duration = 0.6, speed = 110) =>
     cpu.wire_mc_cache_address.currentFlow(duration, easeInOutSine, speed);
@@ -167,10 +247,10 @@ export default    makeScene2D(function* (view) {
   ];
 
   for (const group of fillGroups) {
-    const values = group.map(() => randomHex());
+    const line = randomLine();
     yield* all(
       runBurstFlow(),
-      ...group.map((index, i) => cacheSlots[index].popIn(values[i], 0.45))
+      ...group.map((index, i) => cacheSlots[index].popIn(line[i], 0.45))
     );
     yield* waitFor(0.12);
   }
@@ -201,11 +281,11 @@ export default    makeScene2D(function* (view) {
   const missBurst = () => all(driveCacheQuery(0.9, 80), driveRamPath(0.9, 80));
 
   const missGroup = [8, 9, 12, 13];
-  const missValues = missGroup.map(() => randomHex());
+  const missLine = randomLine();
 
   yield* all(
     missBurst(),
-    ...missGroup.map((index, i) => cacheSlots[index].popIn(missValues[i], 0.55))
+    ...missGroup.map((index, i) => cacheSlots[index].popIn(missLine[i], 0.55))
   );
 
   yield* sequence(
@@ -273,6 +353,55 @@ export default    makeScene2D(function* (view) {
     yield* slot.scale(0.7, 0.2, easeInOutSine);
   }
 
+  yield* waitUntil("eviction");
+  const allIndices = cacheSlots.map((_, index) => index);
+  const filledIndices = allIndices.filter((index) => cacheSlots[index].opacity() > 0.35);
+  const removalIndices = (filledIndices.length ? filledIndices : allIndices).slice(0, 3);
+
+  yield* sequence(
+    0.25,
+    ...removalIndices.map((index) =>
+      all(driveCacheQuery(0.5, 90), unloadSlot(cacheSlots[index]))
+    )
+  );
+
+  yield* waitUntil("sequential refill");
+  const refillValues = removalIndices.map(() => randomQuarter());
+  yield* sequence(
+    0.25,
+    ...removalIndices.map((index, i) =>
+      all(
+        driveCacheQuery(0.65, 95),
+        driveRamPath(0.65, 95),
+        loadSlot(cacheSlots[index], refillValues[i])
+      )
+    )
+  );
+
+  yield* waitUntil("policy list");
+  yield* policyGlass.scale(1, 0.7, easeOutBack);
+
+  const POLICY_ICON_DEFAULT = "#fffd";
+  const POLICY_TEXT_DEFAULT = "#ededed";
+  const POLICY_HIGHLIGHT = "#f7c81f";
+
+  for (const [index, entry] of policyEntries.entries()) {
+    yield* waitUntil(entry.cue);
+    yield* all(
+      policyTextRefs[index].fill(POLICY_HIGHLIGHT, 0.3),
+      policyTextRefs[index].scale(1.08, 0.3, easeOutBack),
+      policyIconRefs[index].color(POLICY_HIGHLIGHT, 0.3),
+      policyIconRefs[index].scale(1.2, 0.3, easeOutBack)
+    );
+    yield* waitFor(0.15);
+    yield* all(
+      policyTextRefs[index].fill(POLICY_TEXT_DEFAULT, 0.3),
+      policyTextRefs[index].scale(1, 0.25, easeInOutSine),
+      policyIconRefs[index].color(POLICY_ICON_DEFAULT, 0.3),
+      policyIconRefs[index].scale(1, 0.25, easeInOutSine)
+    );
+  }
+
   yield* waitUntil("random loads");
   for (const _ of range(4)) {
     const poolIndex = generator.nextInt(0, availableIndices.length);
@@ -284,7 +413,7 @@ export default    makeScene2D(function* (view) {
     yield* all(
       driveCacheQuery(0.7, 95),
       driveRamPath(0.7, 95),
-      unload ? unloadSlot(slot) : loadSlot(slot, randomHex())
+      unload ? unloadSlot(slot) : loadSlot(slot, randomQuarter())
     );
     yield* waitFor(0.12);
   }

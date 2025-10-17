@@ -30,12 +30,52 @@
       "targetTime": 25.319701308477192
     },
     {
+      "name": "eviction",
+      "targetTime": 36.26402199312474
+    },
+    {
+      "name": "sequential refill",
+      "targetTime": 40.20927308451086
+    },
+    {
+      "name": "policy list",
+      "targetTime": 45.61034358921269
+    },
+    {
+      "name": "policy mru",
+      "targetTime": 46.31034358921269
+    },
+    {
+      "name": "policy lfu",
+      "targetTime": 47.060343589212685
+    },
+    {
+      "name": "policy lru",
+      "targetTime": 47.81034358921268
+    },
+    {
+      "name": "policy mfu",
+      "targetTime": 48.56034358921267
+    },
+    {
+      "name": "policy random",
+      "targetTime": 49.310343589212664
+    },
+    {
+      "name": "policy hybrid",
+      "targetTime": 50.06034358921266
+    },
+    {
+      "name": "policy etc",
+      "targetTime": 50.81034358921265
+    },
+    {
       "name": "random loads",
-      "targetTime": 26.119701308477193
+      "targetTime": 48.13614410425412
     },
     {
       "name": "next",
-      "targetTime": 37.11591759206209
+      "targetTime": 54.17371986182922
     }
   ],
   "seed": 1463742039
