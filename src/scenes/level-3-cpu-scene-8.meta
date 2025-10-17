@@ -47,35 +47,47 @@
     },
     {
       "name": "policy lfu",
-      "targetTime": 47.060343589212685
+      "targetTime": 47.397843589212705
     },
     {
       "name": "policy lru",
-      "targetTime": 47.81034358921268
+      "targetTime": 48.48534358921272
     },
     {
       "name": "policy mfu",
-      "targetTime": 48.56034358921267
+      "targetTime": 49.57284358921273
     },
     {
       "name": "policy random",
-      "targetTime": 49.310343589212664
+      "targetTime": 50.660343589212744
     },
     {
       "name": "policy hybrid",
-      "targetTime": 50.06034358921266
+      "targetTime": 51.747843589212756
     },
     {
       "name": "policy etc",
-      "targetTime": 50.81034358921265
+      "targetTime": 52.83534358921277
     },
     {
-      "name": "random loads",
-      "targetTime": 48.13614410425412
+      "name": "data instruction",
+      "targetTime": 54.69518130275231
+    },
+    {
+      "name": "data",
+      "targetTime": 55.973901972602086
+    },
+    {
+      "name": "address",
+      "targetTime": 57.373901972602084
+    },
+    {
+      "name": "restore",
+      "targetTime": 58.77390197260208
     },
     {
       "name": "next",
-      "targetTime": 54.17371986182922
+      "targetTime": 63.35658126581939
     }
   ],
   "seed": 1463742039

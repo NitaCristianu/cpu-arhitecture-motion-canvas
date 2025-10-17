@@ -16,13 +16,19 @@ import {
   waitFor,
   waitUntil,
   useRandom,
+  easeInCubic,
+  easeOutCubic,
 } from "@motion-canvas/core";
 import { RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import { Label3D } from "../components/Label3D";
 import { Glass } from "../components/GlassRect";
-import { GlassBodyText, GlowBadge, GlowPanelTitle } from "../components/TextPresets";
+import {
+  GlassBodyText,
+  GlowBadge,
+  GlowPanelTitle,
+} from "../components/TextPresets";
 
-export default    makeScene2D(function* (view) {
+export default makeScene2D(function* (view) {
   const scene = createScene(new Vector3(-1.5, 0.5, -1.5));
   const cpu = buildCPULevel3(scene);
   const generator = useRandom(8);
@@ -31,7 +37,7 @@ export default    makeScene2D(function* (view) {
 
   view.add(scene);
   scene.init();
- 
+
   yield* waitUntil("begin");
   yield* camera.moveTo(
     cpu.fpu
@@ -46,13 +52,11 @@ export default    makeScene2D(function* (view) {
 
   yield* all(cpu.group.popIn(1), cpu.ram.popIn(1, RAM_SCALE));
   yield camera.moveTo(
-    cpu.fpu
-      .getGlobalPosition()
-      .add(new Vector3(0, 1, -0.2).multiplyScalar(2)),
+    cpu.fpu.getGlobalPosition().add(new Vector3(0, 1, -0.2).multiplyScalar(2)),
     1.5
   );
   yield* camera.lookTo(
-    cpu.fpu.getGlobalPosition().add(new Vector3(.5, -0.1, 0.05)),
+    cpu.fpu.getGlobalPosition().add(new Vector3(0.5, -0.1, 0.05)),
     1.5
   );
 
@@ -62,13 +66,18 @@ export default    makeScene2D(function* (view) {
     cpu.wire_cache_ram_address,
     cpu.wire_cache_ram_data,
     cpu.wire_mc_cache_data,
-    cpu.wire_mc_cache_address
+    cpu.wire_mc_cache_address,
   ]);
 
   const spacing = createSignal<Vector2>(new Vector2(220, 160));
   const cacheSlots = createRefArray<GlowPanelTitle>();
   const policyTextRefs = createRefArray<GlassBodyText>();
   const policyIconRefs = createRefArray<Icon>();
+  const chunkIndices = range(4).map((row) =>
+    range(4).map((column) => row * 4 + column)
+  );
+  const allSlotIndices = chunkIndices.flat();
+  let lastAddedChunk = chunkIndices.length - 1;
   const emptyHint = (
     <GlassBodyText
       initialVisibility={false}
@@ -148,18 +157,34 @@ export default    makeScene2D(function* (view) {
   view.add(cacheMissLabel);
   view.add(cacheHitLabel);
   const policyEntries = [
-    { icon: "mdi:clock-outline", label: "Most Recently Used (MRU)", cue: "policy mru" },
-    { icon: "mdi:pulse", label: "Least Frequently Used (LFU)", cue: "policy lfu" },
-    { icon: "mdi:history", label: "Least Recently Used (LRU)", cue: "policy lru" },
-    { icon: "mdi:chart-bar", label: "Most Frequently Used (MFU)", cue: "policy mfu" },
+    {
+      icon: "mdi:clock-outline",
+      label: "Most Recently Used (MRU)",
+      cue: "policy mru",
+    },
+    {
+      icon: "mdi:pulse",
+      label: "Least Frequently Used (LFU)",
+      cue: "policy lfu",
+    },
+    {
+      icon: "mdi:history",
+      label: "Least Recently Used (LRU)",
+      cue: "policy lru",
+    },
+    {
+      icon: "mdi:chart-bar",
+      label: "Most Frequently Used (MFU)",
+      cue: "policy mfu",
+    },
     {
       icon: "mdi:dice-6",
-      label: "Pseudorandom",
+      label: "Pseudorandom (removes a random line)",
       cue: "policy random",
     },
     {
       icon: "mdi:vector-combine",
-      label: "Hybrid strategies",
+      label: "Hybrid strategies (combining several techniques)",
       cue: "policy hybrid",
     },
     { icon: "mdi:dots-horizontal", label: "etc", cue: "policy etc" },
@@ -181,37 +206,36 @@ export default    makeScene2D(function* (view) {
         zIndex={2}
       />
       {...policyEntries.flatMap((entry, index) => [
-        (
-          <Icon
-            ref={policyIconRefs}
-            icon={entry.icon}
-            color={"#fffd"}
-            width={64}
-            x={-340}
-            y={-200 + index * 90}
-            scale={1}
-            zIndex={2}
-          />
-        ),
-        (
-          <GlassBodyText
-            ref={policyTextRefs}
-            text={`${index + 1}. ${entry.label}`}
-            zIndex={2}
-            fontSize={46}
-            fontWeight={600}
-            textAlign={"left"}
-            width={500}
-            x={-20}
-            y={-200 + index * 90}
-          />
-        ),
+        <Icon
+          ref={policyIconRefs}
+          icon={entry.icon}
+          color={"#fffd"}
+          width={64}
+          x={-340}
+          y={-200 + index * 90}
+          scale={1}
+          zIndex={2}
+        />,
+        <GlassBodyText
+          ref={policyTextRefs}
+          text={`${index + 1}. ${entry.label}`}
+          zIndex={2}
+          fontSize={46}
+          fontWeight={600}
+          textAlign={"left"}
+          width={500}
+          x={-20}
+          y={-200 + index * 90}
+        />,
       ])}
     </Glass>
   ) as Glass;
   view.add(policyGlass);
 
-  yield* all(cacheContents.scale(1.5,1,easeOutBack), cacheTitle.popIn("CACHE", 0.6));
+  yield* all(
+    cacheContents.scale(1.5, 1, easeOutBack),
+    cacheTitle.popIn("CACHE", 0.6)
+  );
   yield* emptyHint.popIn("EMPTY", 0.4);
 
   yield* waitUntil("spatial fill");
@@ -322,7 +346,9 @@ export default    makeScene2D(function* (view) {
 
   const restSlots = searchOrder.filter((index) => index !== hitIndex);
   if (restSlots.length) {
-    yield* all(...restSlots.map((index) => cacheSlots[index].opacity(0.7, 0.4)));
+    yield* all(
+      ...restSlots.map((index) => cacheSlots[index].opacity(0.7, 0.4))
+    );
   }
 
   yield* waitFor(0.2);
@@ -336,87 +362,252 @@ export default    makeScene2D(function* (view) {
     hitSlot.scale(1.15, 0.35, easeInOutSine)
   );
 
-  const availableIndices = range(cacheSlots.length).filter(
-    (index) => index !== hitIndex
-  );
+  const SLOT_DEFAULT_COLOR = "#fff";
+  const SLOT_DIM_OPACITY = 0.08;
 
-  function* loadSlot(slot: GlowPanelTitle, value: string) {
-    yield* slot.scale(0.9, 0.2, easeInOutSine);
-    yield* all(slot.text(value, 0.25), slot.opacity(1, 0.25));
-    yield* slot.scale(1.15, 0.25, easeOutBack);
-    yield* slot.scale(1, 0.2, easeInOutSine);
+  function* loadSlot(index: number, value: string, withBounce = true) {
+    const slot = cacheSlots[index];
+    if (!slot) return;
+    if (withBounce) {
+      yield* slot.scale(0.9, 0.09, easeInOutSine);
+    }
+    yield* all(
+      slot.fill(SLOT_DEFAULT_COLOR, 0.1),
+      slot.text(value, 0.125),
+      slot.opacity(1, 0.125)
+    );
+    if (withBounce) {
+      yield* slot.scale(1.15, 0.125, easeOutBack);
+      yield* slot.scale(1, 0.1, easeInOutSine);
+    } else {
+      slot.scale(1);
+    }
+    lastAddedChunk = Math.floor(index / 4);
   }
 
-  function* unloadSlot(slot: GlowPanelTitle) {
-    yield* slot.scale(0.9, 0.2, easeInOutSine);
-    yield* all(slot.text("", 0.3), slot.opacity(0.25, 0.3));
-    yield* slot.scale(0.7, 0.2, easeInOutSine);
+  function* unloadSlot(index: number, withBounce = true) {
+    const slot = cacheSlots[index];
+    if (!slot) return;
+    if (withBounce) {
+      yield* slot.scale(0.9, 0.09, easeInOutSine);
+    }
+    yield* all(slot.text("", 0.125), slot.opacity(SLOT_DIM_OPACITY, 0.125));
+    if (withBounce) {
+      yield* slot.scale(0.7, 0.1, easeInOutSine);
+    } else {
+      slot.scale(0.9);
+    }
+    slot.fill(SLOT_DEFAULT_COLOR, 0.025);
+  }
+
+  function* highlightChunk(chunkIndex: number) {
+    const chunk = chunkIndices[chunkIndex] ?? [];
+    if (!chunk.length) return;
+    yield* sequence(
+      0.02,
+      ...chunk.map((index) =>
+        chain(
+          cacheSlots[index].fill(HIT_COLOR, 0.1),
+          cacheSlots[index].scale(1.2, 0.11, easeOutBack)
+        )
+      )
+    );
+  }
+
+  function* removeChunk(chunkIndex: number) {
+    const chunk = chunkIndices[chunkIndex] ?? [];
+    if (!chunk.length) return;
+    yield* sequence(0.025, ...chunk.map((index) => unloadSlot(index)));
+  }
+
+  function* stealthRefill() {
+    const values = allSlotIndices.map(() => randomQuarter());
+    for (let i = 0; i < allSlotIndices.length; i++) {
+      const slotIndex = allSlotIndices[i];
+      const slot = cacheSlots[slotIndex];
+      if (!slot) continue;
+      slot.fill(SLOT_DEFAULT_COLOR);
+      slot.text(values[i], 0);
+      slot.opacity(SLOT_DIM_OPACITY);
+      slot.scale(0.9);
+    }
+    yield* sequence(
+      0.0075,
+      ...allSlotIndices.map((index) =>
+        all(
+          cacheSlots[index].opacity(1, 0.06),
+          cacheSlots[index].scale(1, 0.06)
+        )
+      )
+    );
+    lastAddedChunk = chunkIndices.length - 1;
+  }
+
+  function* stealthRefillChunk(chunkIndex: number) {
+    const chunk = chunkIndices[chunkIndex] ?? [];
+    if (!chunk.length) return;
+    const values = chunk.map(() => randomQuarter());
+    chunk.forEach((slotIndex, i) => {
+      const slot = cacheSlots[slotIndex];
+      if (!slot) return;
+      slot.fill(SLOT_DEFAULT_COLOR);
+      slot.text("", 0);
+      slot.opacity(SLOT_DIM_OPACITY);
+      slot.scale(0.9);
+    });
+    yield* sequence(
+      0.0075,
+      ...chunk.map((slotIndex, i) =>
+        all(
+          cacheSlots[slotIndex].text(values[i], 0.06),
+          cacheSlots[slotIndex].opacity(1, 0.06),
+          cacheSlots[slotIndex].scale(1, 0.06)
+        )
+      )
+    );
+    lastAddedChunk = chunkIndex;
   }
 
   yield* waitUntil("eviction");
-  const allIndices = cacheSlots.map((_, index) => index);
-  const filledIndices = allIndices.filter((index) => cacheSlots[index].opacity() > 0.35);
-  const removalIndices = (filledIndices.length ? filledIndices : allIndices).slice(0, 3);
-
-  yield* sequence(
-    0.25,
-    ...removalIndices.map((index) =>
-      all(driveCacheQuery(0.5, 90), unloadSlot(cacheSlots[index]))
-    )
+  const prefillChunk = chunkIndices[chunkIndices.length - 1];
+  yield* all(
+    driveCacheQuery(0.275, 90),
+    driveRamPath(0.275, 90),
+    sequence(0.025, ...prefillChunk.map((index) => unloadSlot(index)))
   );
 
   yield* waitUntil("sequential refill");
-  const refillValues = removalIndices.map(() => randomQuarter());
-  yield* sequence(
-    0.25,
-    ...removalIndices.map((index, i) =>
-      all(
-        driveCacheQuery(0.65, 95),
-        driveRamPath(0.65, 95),
-        loadSlot(cacheSlots[index], refillValues[i])
+  for (const [chunkIndex, chunk] of chunkIndices.entries()) {
+    const values = chunk.map(() => randomQuarter());
+    yield* all(
+      driveCacheQuery(0.325, 95),
+      driveRamPath(0.325, 95),
+      sequence(
+        0.02,
+        ...chunk.map((slotIndex, i) => loadSlot(slotIndex, values[i]))
       )
-    )
-  );
+    );
+    yield* waitFor(0.04);
+  }
 
   yield* waitUntil("policy list");
-  yield* policyGlass.scale(1, 0.7, easeOutBack);
+  yield* policyGlass.scale(1, 0.35, easeOutBack);
 
   const POLICY_ICON_DEFAULT = "#fffd";
   const POLICY_TEXT_DEFAULT = "#ededed";
   const POLICY_HIGHLIGHT = "#f7c81f";
+  const policyChunkSelector = [
+    () => lastAddedChunk,
+    () => generator.nextInt(0, chunkIndices.length),
+    () => 0,
+    () => Math.min(1, chunkIndices.length - 1),
+    () => generator.nextInt(0, chunkIndices.length),
+    () => Math.min(2, chunkIndices.length - 1),
+    () => Math.max(0, chunkIndices.length - 1),
+  ];
 
   for (const [index, entry] of policyEntries.entries()) {
     yield* waitUntil(entry.cue);
     yield* all(
-      policyTextRefs[index].fill(POLICY_HIGHLIGHT, 0.3),
-      policyTextRefs[index].scale(1.08, 0.3, easeOutBack),
-      policyIconRefs[index].color(POLICY_HIGHLIGHT, 0.3),
-      policyIconRefs[index].scale(1.2, 0.3, easeOutBack)
+      policyTextRefs[index].fill(POLICY_HIGHLIGHT, 0.15),
+      policyTextRefs[index].scale(1.08, 0.15, easeOutBack),
+      policyIconRefs[index].color(POLICY_HIGHLIGHT, 0.15),
+      policyIconRefs[index].scale(1.2, 0.15, easeOutBack)
     );
-    yield* waitFor(0.15);
+    const selector =
+      policyChunkSelector[index] ??
+      (() => generator.nextInt(0, chunkIndices.length));
+    const chunkIndex =
+      ((selector() % chunkIndices.length) + chunkIndices.length) %
+      chunkIndices.length;
+    const chunk = chunkIndices[chunkIndex] ?? [];
+    yield* highlightChunk(chunkIndex);
+    yield* waitFor(0.025);
+    yield* removeChunk(chunkIndex);
+    yield* waitFor(0.02);
+    yield* stealthRefillChunk(chunkIndex);
     yield* all(
-      policyTextRefs[index].fill(POLICY_TEXT_DEFAULT, 0.3),
-      policyTextRefs[index].scale(1, 0.25, easeInOutSine),
-      policyIconRefs[index].color(POLICY_ICON_DEFAULT, 0.3),
-      policyIconRefs[index].scale(1, 0.25, easeInOutSine)
+      policyTextRefs[index].fill(POLICY_TEXT_DEFAULT, 0.15),
+      policyTextRefs[index].scale(1, 0.125, easeInOutSine),
+      policyIconRefs[index].color(POLICY_ICON_DEFAULT, 0.15),
+      policyIconRefs[index].scale(1, 0.125, easeInOutSine)
     );
   }
 
-  yield* waitUntil("random loads");
-  for (const _ of range(4)) {
-    const poolIndex = generator.nextInt(0, availableIndices.length);
-    const index = availableIndices[poolIndex];
-    const slot = cacheSlots[index];
-    const canUnload = slot.opacity() > 0.3;
-    const unload = canUnload && generator.nextInt(0, 3) === 0;
+  // yield* waitUntil("random loads");
+  // for (const _ of range(4)) {
+  //   const poolIndex = generator.nextInt(0, allSlotIndices.length);
+  //   const index = allSlotIndices[poolIndex];
+  //   const slot = cacheSlots[index];
+  //   const canUnload = slot.opacity() > 0.3;
+  //   const unload = canUnload && generator.nextInt(0, 3) === 0;
 
-    yield* all(
-      driveCacheQuery(0.7, 95),
-      driveRamPath(0.7, 95),
-      unload ? unloadSlot(slot) : loadSlot(slot, randomQuarter())
-    );
-    yield* waitFor(0.12);
-  }
+  //   yield* all(
+  //     driveCacheQuery(0.35, 95),
+  //     driveRamPath(0.35, 95),
+  //     unload ? unloadSlot(index) : loadSlot(index, randomQuarter())
+  //   );
+  //   yield* waitFor(0.06);
+  // }
+
+  yield* waitUntil("data instruction");
+
+  yield* all(
+    cacheContents.scale(0, 0.5, easeInCubic),
+    cacheHitLabel.popOut(),
+    cacheTitle.popOut(),
+    policyGlass.scale(0, 0.5, easeInCubic)
+  );
+
+  yield* waitUntil("data");
+  const data_label = (
+    <Label3D
+      scene={scene}
+      text={"DATA"}
+      worldPosition={new Vector3(0.6, -0.25, -0.15)}
+      offset2D={[0, -700]}
+      width={800}
+      height={250}
+      fontSize={120}
+      color="memory"
+    />
+  ) as Label3D;
+  view.add(data_label);
+  const address_label = (
+    <Label3D
+      scene={scene}
+      text={"ADDRESSES"}
+      worldPosition={new Vector3(0.6, -0.22, 0.25)}
+      offset2D={[0, -1000]}
+      width={800}
+      height={250}
+      fontSize={120}
+      color="cache"
+    />
+  ) as Label3D;
+  view.add(address_label);
+  yield* all(
+    camera.moveDOWN(1.5, 1),
+    camera.lookTo(new Vector3(0.6, -0.25, -0.15))
+  );
+  yield* data_label.popIn();
+
+  yield* waitUntil("address");
+  yield* all(
+    camera.moveForward(-1, 1),
+    camera.lookTo(new Vector3(0.6, -0.22, 0.25), 1)
+  );
+  yield* address_label.popIn();
+
+  yield* waitUntil("restore");
+  yield* all(
+    camera.lookTo(new Vector3(0.6, -0.42, 0), 1, easeInOutCubic),
+    camera.moveTo(new Vector3(-.5, .1, 0), 1, easeInOutCubic),
+    address_label.offset2D([-600, -200], 1),
+    data_label.offset2D([250,-250], 1),
+    address_label.scale(0.5,1),
+    data_label.scale(0.5,1),
+  );
 
   yield* waitUntil("next");
 });
