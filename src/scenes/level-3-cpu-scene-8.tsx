@@ -17,6 +17,7 @@ import {
   waitUntil,
   useRandom,
   easeInCubic,
+  loop,
 } from "@motion-canvas/core";
 import { RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import { Label3D } from "../components/Label3D";
@@ -103,13 +104,6 @@ export default makeScene2D(function* (view) {
       translucency={1}
       text={""}
     >
-      <Grid
-        lineWidth={3}
-        zIndex={1}
-        stroke={"#ffffff30"}
-        spacing={spacing}
-        size="100%"
-      />
       {emptyHint}
       {...range(4).flatMap((row) =>
         range(4).map((column) => (
@@ -117,7 +111,7 @@ export default makeScene2D(function* (view) {
             ref={cacheSlots}
             initialVisibility={false}
             text={""}
-            zIndex={2}
+            zIndex={3}
             fontSize={48}
             fontWeight={500}
             x={() => (column - 1.5) * spacing().x}
@@ -603,7 +597,7 @@ export default makeScene2D(function* (view) {
             <GlowPanelTitle
               ref={dataCells}
               initialVisibility={false}
-              zIndex={2}
+              zIndex={3}
               text={""}
               fontSize={66}
               fontWeight={700}
@@ -632,7 +626,7 @@ export default makeScene2D(function* (view) {
           range(4).map((column) => (
             <GlowPanelTitle
               ref={instructionCells}
-              zIndex={2}
+              zIndex={3}
               initialVisibility={false}
               text={""}
               fontSize={66}
@@ -704,7 +698,7 @@ export default makeScene2D(function* (view) {
   );
   yield* all(
     camera.moveForward(-1, 1),
-    camera.lookTo(new Vector3(0.6, -0.15, 0.25), 1, easeInOutCubic),
+    camera.lookTo(new Vector3(0.6, -0.22, 0.25), 1, easeInOutCubic),
     instructionGrid!.scale(1, 0.35, easeOutBack),
     address_label.popIn(0.35)
   );
@@ -728,5 +722,72 @@ export default makeScene2D(function* (view) {
     data_label.scale(0.5, 1),
     address_label.scale(0.5, 1)
   );
+  yield* waitUntil("overlap warning");
+  yield* all(
+    data_label.scale(0, 0.25),
+    address_label.scale(0, 0.25)
+  );
+  const mixedGrid = (
+    <Glass
+      scale={0}
+      size={[1700, 900]}
+      x={0}
+      radius={90}
+      shadowColor={"#ffd06aaa"}
+      fill={"#ffff8928"}
+      translucency={0.68}
+      lightness={0.06}
+    >
+      {...range(4).flatMap((row) =>
+        range(5).map((column) => (
+          <GlowPanelTitle
+            initialVisibility={false}
+            zIndex={3}
+            text={""}
+            fontSize={70}
+            fontWeight={700}
+            textAlign={"center"}
+            lineHeight={62}
+            x={() => (column - 2) * 320}
+            y={() => (row - 1.5) * 180}
+          />
+        ))
+      )}
+    </Glass>
+  ) as Glass;
+  view.add(mixedGrid);
+
+  yield* all(
+    dataGrid!.position(0, 0.45, easeInOutCubic),
+    dataGrid!.scale(0, 0.7, easeInOutCubic),
+    instructionGrid!.position(0, 0.45, easeInOutCubic),
+    instructionGrid!.scale(0, 0.7, easeInOutCubic),
+    mixedGrid.scale(1, 0.45, easeOutBack)
+  );
+  const mixedCells = mixedGrid.children().filter(
+    (child): child is GlowPanelTitle => child instanceof GlowPanelTitle
+  );
+  yield* sequence(
+    0.04,
+    ...mixedCells.map((cell, index) => {
+      const value =
+        index % 2 === 0
+          ? generator.nextInt(-999, 999).toString()
+          : "0x" + generator.nextInt(0, 0xfff).toString(16).toUpperCase();
+      return cell.popIn(value, 0.2);
+    })
+  );
+  yield* waitFor(0.2);
+  yield loop(()=> sequence(
+    0.035,
+    ...mixedCells.map((cell, index) =>
+      cell.text(
+        index % 2 === 0
+          ? "0x" + generator.nextInt(0, 0xfff).toString(16).toUpperCase()
+          : generator.nextInt(-999, 999).toString(),
+        0.25
+      )
+    )
+  ));
   yield* waitUntil("next");
 });
