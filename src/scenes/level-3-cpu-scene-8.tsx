@@ -167,8 +167,8 @@ export default    makeScene2D(function* (view) {
   const policyGlass = (
     <Glass
       scale={0}
-      size={[1500, 900]}
-      x={() => cacheContents.x() + 2300}
+      size={[1000, 900]}
+      x={() => cacheContents.x() + 2550}
       y={() => cacheContents.y()}
       radius={64}
       translucency={1}
@@ -177,7 +177,7 @@ export default    makeScene2D(function* (view) {
       <GlowPanelTitle
         text={"REPLACEMENT POLICIES"}
         fontSize={72}
-        y={-280}
+        y={-320}
         zIndex={2}
       />
       {...policyEntries.flatMap((entry, index) => [
@@ -188,7 +188,7 @@ export default    makeScene2D(function* (view) {
             color={"#fffd"}
             width={64}
             x={-340}
-            y={-150 + index * 90}
+            y={-200 + index * 90}
             scale={1}
             zIndex={2}
           />
@@ -203,7 +203,7 @@ export default    makeScene2D(function* (view) {
             textAlign={"left"}
             width={500}
             x={-20}
-            y={-150 + index * 90}
+            y={-200 + index * 90}
           />
         ),
       ])}
