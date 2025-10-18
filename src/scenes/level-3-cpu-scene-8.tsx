@@ -18,6 +18,7 @@ import {
   useRandom,
   easeInCubic,
   loop,
+  delay,
 } from "@motion-canvas/core";
 import { RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import { Label3D } from "../components/Label3D";
@@ -730,14 +731,19 @@ export default makeScene2D(function* (view) {
   const mixedGrid = (
     <Glass
       scale={0}
-      size={[1700, 900]}
-      x={0}
+      size={[1700, 950]}
       radius={90}
       shadowColor={"#ffd06aaa"}
       fill={"#ffff8928"}
       translucency={0.68}
       lightness={0.06}
     >
+      <GlowPanelTitle
+        text={"UNORGANIZED CACHE"}
+        fontSize={124}
+        y={-360}
+        zIndex={3}
+      />
       {...range(4).flatMap((row) =>
         range(5).map((column) => (
           <GlowPanelTitle
@@ -749,7 +755,7 @@ export default makeScene2D(function* (view) {
             textAlign={"center"}
             lineHeight={62}
             x={() => (column - 2) * 320}
-            y={() => (row - 1.5) * 180}
+            y={() => (row - 1.5) * 180 + 50}
           />
         ))
       )}
@@ -765,7 +771,7 @@ export default makeScene2D(function* (view) {
     mixedGrid.scale(1, 0.45, easeOutBack)
   );
   const mixedCells = mixedGrid.children().filter(
-    (child): child is GlowPanelTitle => child instanceof GlowPanelTitle
+    (child): child is GlowPanelTitle => child instanceof GlowPanelTitle && child.text()[0] != "U"
   );
   yield* sequence(
     0.04,
@@ -789,5 +795,29 @@ export default makeScene2D(function* (view) {
       )
     )
   ));
+
+  yield* waitUntil("end rant");
+  yield* all(
+    camera.zoomOut(.5,1),
+    camera.moveTo(new Vector3(-2, 2, 1), 2),
+    delay(0.25, mixedGrid.scale(0, 1)),
+    cpu.wire_cache_ram_address.popOutDraw(0), 
+    cpu.wire_mc_cache_address.popOutDraw(0), 
+    cpu.wire_cache_ram_data.popOutDraw(0), 
+    cpu.wire_mc_cache_data.popOutDraw(0), 
+  );
+  
+  yield* waitUntil("implement"); 
+  yield* all(
+    camera.moveTo(new Vector3(1, 2, 1), 2),
+    camera.lookTo(new Vector3(.75, -.5, 0), 2),
+    camera.zoomIn(2,1),
+  );
+  yield* cpu.cache.expand();
+  yield* cpu.cache.moveForward(-.2);
+  yield* waitFor(0.5);
+  yield* cpu.cache.moveBack(-.2);
+  yield* cpu.cache.shrink();
+
   yield* waitUntil("next");
 });
