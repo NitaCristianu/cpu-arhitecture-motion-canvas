@@ -819,5 +819,193 @@ export default makeScene2D(function* (view) {
   yield* cpu.cache.moveBack(-.2);
   yield* cpu.cache.shrink();
 
+  yield* waitUntil('outro');
+  yield* cpu.initWires(cpu.wires);
+  scene.scene.updateMatrixWorld(true);
+
+  const outroFeatureData = [
+    {
+      key: "floating-point",
+      title: "Floating-Point Power",
+      subtitle: "Dedicated FPU keeps heavy math precise.",
+      icon: "mdi:function-variant",
+    },
+    {
+      key: "stack-handling",
+      title: "Stack Discipline",
+      subtitle: "BP & SP coordinate reliable call frames.",
+      icon: "mdi:layers-triple-outline",
+    },
+    {
+      key: "cache-memory",
+      title: "Cache Memory",
+      subtitle: "Smart cache feeds data at top speed.",
+      icon: "mdi:chip",
+    },
+  ] as const;
+
+  const outroFeatureIconRefs = createRefArray<Icon>();
+
+  const outroFeatureFills = ["#ff6bd950", "#7f0f0f58", "#1d6bff5c"];
+
+  const outroTitleLeft = (
+    <GlowPanelTitle
+      initialVisibility={false}
+      text={"LEVEL 3"}
+      fontSize={160}
+      fontWeight={800}
+      x={0}
+      y={-120}
+      zIndex={4}
+    />
+  ) as GlowPanelTitle;
+  const outroTitleRight = (
+    <GlowPanelTitle
+      initialVisibility={false}
+      text={"CPU"}
+      fontSize={160}
+      fontWeight={800}
+      x={0}
+      y={-120}
+      zIndex={4}
+    />
+  ) as GlowPanelTitle;
+  view.add(outroTitleLeft);
+  view.add(outroTitleRight);
+
+  const outroFeatureCards = outroFeatureData.map((feature, index) => (
+    <Glass
+      key={`outro-feature-${feature.key}`}
+      scale={0}
+      size={[1050, 380]}
+      radius={66}
+      translucency={1}
+      lightness={0.08}
+      shadowColor={"#0c1018aa"}
+      fill={outroFeatureFills[index] ?? "#ffffff10"}
+      x={0}
+      y={-460 + index * 460}
+      zIndex={4}
+    >
+      <Icon
+        ref={outroFeatureIconRefs}
+        icon={feature.icon}
+        color={"#fffd"}
+        width={140}
+        y={-240}
+        zIndex={5}
+      />
+      <GlowPanelTitle
+        text={feature.title}
+        fontSize={78}
+        fontWeight={700}
+        y={30}
+        zIndex={5}
+      />
+      <GlassBodyText
+        text={feature.subtitle}
+        fontSize={46}
+        opacity={0.85}
+        y={120}
+        textAlign={"center"}
+        zIndex={5}
+      />
+    </Glass>
+  )) as Glass[];
+  outroFeatureCards.forEach((card) => view.add(card));
+
+  const outroCenter = cpu.group.getGlobalPosition();
+  const outroFocus = outroCenter.clone().add(new Vector3(0, 0.1, 0));
+  const outroRadius = 2.4;
+  const outroHeight = 1.35;
+  const outroAngles = [0, (3 * Math.PI) / 2, Math.PI, Math.PI / 2];
+  const outroWaypoints = outroAngles.map(
+    (angle) =>
+      new Vector3(
+        outroCenter.x + Math.cos(angle) * outroRadius,
+        outroCenter.y + outroHeight ,
+        outroCenter.z + Math.sin(angle) * outroRadius
+      )
+  );
+
+  yield* all(
+    camera.moveTo(outroWaypoints[0], 1.4, easeInOutSine),
+    camera.lookTo(outroFocus, 1.4, easeInOutSine),
+    camera.zoomOut(1.2, 1.4, easeInOutSine)
+  );
+
+  const randomFlow = (
+    wire: any,
+    baseDuration: number,
+    baseDensity: number,
+    easeFn = easeInOutSine
+  ) => {
+    const duration = Math.max(
+      0.35,
+      baseDuration * generator.nextFloat(0.45, 0.82)
+    );
+    const density = Math.max(
+      30,
+      Math.round(baseDensity * generator.nextFloat(1.35, 1.9))
+    );
+    return wire.currentFlow(duration, easeFn, density);
+  };
+
+  const outroFlowShowcase = chain(
+    all(
+      randomFlow(cpu.wire_cu_fpu, 1.35, 180),
+      randomFlow(cpu.wire_fpr_fpu, 1.35, 180),
+      randomFlow(cpu.wire_fpu_mc, 1.35, 210)
+    ),
+    waitFor(0.25),
+    all(
+      randomFlow(cpu.wire_stack_mc, 1.1, 170),
+      randomFlow(cpu.wire_stack_pc, 1.1, 170),
+      randomFlow(cpu.wire_cu_pc, 1.1, 150)
+    ),
+    waitFor(0.25),
+    all(
+      randomFlow(cpu.wire_mc_cache_address, 1.25, 200),
+      randomFlow(cpu.wire_cache_ram_address, 1.25, 220),
+      randomFlow(cpu.wire_mc_cache_data, 1.25, 220, easeOutSine),
+      randomFlow(cpu.wire_cache_ram_data, 1.25, 240, easeOutSine)
+    )
+  );
+
+  yield* all(
+    camera.followWaypoints(outroWaypoints, 4.6, {
+      includeCurrentPosition: true,
+      tension: 0.36,
+    }),
+    camera.lookTo(outroFocus, 4.6, easeInOutSine),
+    camera.zoomOut(1.05, 4.6, easeInOutSine),
+    outroFlowShowcase
+  );
+
+  yield* waitFor(0.2);
+  yield* chain(
+    all(
+      outroTitleLeft.popIn("LEVEL 3", 0.55),
+      outroTitleRight.popIn("CPU", 0.55)
+    ),
+    all(
+      outroTitleLeft.x(-1200, 0.7, easeInOutSine),
+      outroTitleRight.x(1200, 0.7, easeInOutSine)
+    ),
+    sequence(
+      0.24,
+      ...outroFeatureCards.map((card, index) =>
+        chain(
+          card.scale(1.05, 0.6, easeOutBack),
+          all(
+            card.scale(1, 0.3, easeInOutSine),
+            outroFeatureIconRefs[index].y(-90, 0.5, easeOutBack)
+          )
+        )
+      )
+    )
+  );
+  yield* waitFor(0.5);
+
   yield* waitUntil("next");
 });
