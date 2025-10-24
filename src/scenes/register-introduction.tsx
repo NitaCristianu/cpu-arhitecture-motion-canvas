@@ -188,7 +188,7 @@ export default makeScene2D(function* (view) {
   const tag_mc_text = createSignal("Memory Controller");
   const dataBusText = createSignal("Data Bus");
   const addressBusText = createSignal("Address Bus");
-  const tag_ramText = createSignal("VALUE : 27\n( 0001 1011 )");
+  const tag_ramText = createSignal("VALUE : 27 ( 0001 1011 )");
   const tags = {
     cu: new Label3D({
       text: tag_cu_text,
@@ -196,7 +196,7 @@ export default makeScene2D(function* (view) {
       scene,
       worldPosition: cpu.cu.getGlobalPosition().clone(),
       fontSize: 70,
-      offset2D: [150, 400],
+      offset2D: [0, 200],
       width: 500,
       key: "cu-text",
     }),
@@ -219,7 +219,7 @@ export default makeScene2D(function* (view) {
       scene,
       worldPosition: cpu.mc.getGlobalPosition().clone(),
       fontSize: 50,
-      offset2D: [200, 430],
+      offset2D: [0, 100],
       width: 500,
       height: 90,
     }),
@@ -263,9 +263,10 @@ export default makeScene2D(function* (view) {
       scene,
       fontSize: 60,
       color: "control",
-      offset2D: [400, -600],
-      width: 400,
-      height: 400,
+      offset2D: [200, -600],
+      width: 700,
+      height: 100,
+      textAlign: 'center'
     }),
   };
   const tag_container = <Node y={-800} />;
@@ -939,7 +940,7 @@ export default makeScene2D(function* (view) {
         delay(
           1,
           all(
-            tag_ramText("VALUE : 28\n(0001 0100)", 1),
+            tag_ramText("VALUE : 28 (0001 0100)", 1),
             tags.ram.fill("#eb24e140", 1)
           )
         )

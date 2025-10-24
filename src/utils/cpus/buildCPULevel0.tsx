@@ -1,5 +1,4 @@
-import { MeshPhysicalMaterial, Vector3 } from "three";
-import Box from "../../libs/Thrash/objects/Box";
+import { Vector3 } from "three";
 import Line from "../../libs/Thrash/objects/Line";
 import Scene3D from "../../libs/Thrash/Scene";
 import { all } from "@motion-canvas/core";
@@ -42,11 +41,13 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
   });
 
   /* child blocks — positions are inside cpu-space (XY because we rotated) */
-  const cu = new Box({
+  const cu = new Model({
     key: "CU",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x4caf50 }),
-    localScale: new Vector3(L / 2, H, T),
-    localPosition: new Vector3(-0.18, -0.05, 0),
+    src: "/models/Chips/CU.glb",
+    localScale: new Vector3(L / 2, L/2, L/2),
+    localPosition: new Vector3(-0.18, 0.02, 0),
+    sceneRotation: CHIP_ROTATION,
+    meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
 
   const iu = new Model({
@@ -57,11 +58,13 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
     sceneRotation: CHIP_ROTATION,
   });
 
-  const mc = new Box({
+  const mc = new Model({
     key: "MC",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xbe22e8 }),
-    localScale: new Vector3(L * 0.5, H * 0.8, T),
-    localPosition: new Vector3(0.22, 0, 0),
+    src: "/models/Chips/MC.glb",
+    localScale: new Vector3(L * 0.5, L * 0.5, T*1.5),
+    localPosition: new Vector3(0.22, 0.01, 0),
+    sceneRotation: CHIP_ROTATION,
+    meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
 
   const gpr = new Model({
@@ -104,7 +107,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         cu
           .localPosition()
           .clone()
-          .add(new Vector3(cu.localScale().x / 2, 0, 0)),
+          .add(new Vector3(0,-cu.localScale().y / 4, 0)),
         cu
           .localPosition()
           .clone()
@@ -132,7 +135,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         iu
           .localPosition()
           .clone()
-          .add(new Vector3(iu.localScale().x / 2, 0, 0)),
+          .add(new Vector3(iu.localScale().x / 3, 0, 0)),
         iu
           .localPosition()
           .clone()
@@ -160,7 +163,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.35, 0)),
+          .add(new Vector3(mc.localScale().x / 3, -0.35, 0)),
         mc
           .localPosition()
           .clone()
@@ -181,7 +184,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.35, 0)),
+          .add(new Vector3(mc.localScale().x / 3, -0.35, 0.03)),
         mc
           .localPosition()
           .clone()
@@ -223,7 +226,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         cu
           .localPosition()
           .clone()
-          .add(new Vector3(0, cu.localScale().y / 2, 0.01)),
+          .add(new Vector3(0, 0, 0.01)),
         cu
           .localPosition()
           .clone()
@@ -294,26 +297,26 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(-mc.localScale().x / 2, 0, 0)),
+          .add(new Vector3(0, -mc.localScale().x / 2, 0)),
 
         // 2. Dip down left of IU
-        mc.localPosition().clone().add(new Vector3(-0.01, -0.1, 0.01)),
+        mc.localPosition().clone().add(new Vector3(-0.01, -0.2, 0.01)),
 
         // 3. Drop below IU
         mc
           .localPosition()
           .clone()
           .lerp(cu.localPosition(), 0.5)
-          .add(new Vector3(0, -0.24, 0.01)),
+          .add(new Vector3(0, -0.28, 0.01)),
 
         // 4. Rise up right of IU
-        cu.localPosition().clone().add(new Vector3(-0.01, -0.1, 0.01)),
+        cu.localPosition().clone().add(new Vector3(-0.01, -0.2, 0.01)),
 
         // 5. End at right side of CU
         cu
           .localPosition()
           .clone()
-          .add(new Vector3(cu.localScale().x / 2, 0, 0)),
+          .add(new Vector3(0,-cu.localScale().x / 2, 0)),
       ]}
       lineWidth={0}
       color="alu"

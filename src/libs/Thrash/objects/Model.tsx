@@ -9,6 +9,20 @@ import {
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import Mesh, { MeshProps } from "./Mesh";
 
+interface MeshOverrideBase {
+  /**
+   * Multiplier applied to the model's overall opacity.
+   * For example, 0.3 yields 30% opacity when the model is fully visible.
+   */
+  opacity?: number;
+  /** Optional override for material transparency */
+  transparent?: boolean;
+}
+
+type MeshOverride =
+  | ({ index: number; name?: never } & MeshOverrideBase)
+  | ({ name: string; index?: never } & MeshOverrideBase);
+
 export interface ModelProps extends MeshProps {
   /** Path or URL to the GLB/GLTF model file */
   src: string;
@@ -22,10 +36,14 @@ export interface ModelProps extends MeshProps {
    * localScale) behaving as before the switch from primitive boxes.
    */
   normalize?: boolean;
+  /** Per-mesh material overrides applied after the model loads */
+  meshOverrides?: MeshOverride[];
 }
 
 export default class Model extends Mesh {
   private materials: Material[] = [];
+  private meshOverrides: MeshOverride[] = [];
+  private meshInfos: { mesh: ThreeMesh; materials: Material[] }[] = [];
   private scaleCompensation = new Vector3(1, 1, 1);
   private static readonly DEFAULT_SCENE_ROTATION = new Vector3(0, 0, 0);
 
@@ -33,6 +51,7 @@ export default class Model extends Mesh {
     super(props);
     const logger = useLogger();
     const loader = new GLTFLoader();
+    this.meshOverrides = props.meshOverrides ?? [];
 
     // Ensure core matches initial transforms before the asset loads
     this.core.position.copy(this.localPosition());
@@ -110,25 +129,46 @@ export default class Model extends Mesh {
   }
 
   private collectMaterials(root: Object3D) {
+    this.materials = [];
+    this.meshInfos = [];
     root.traverse((child) => {
       if ((child as ThreeMesh).isMesh) {
         const mesh = child as ThreeMesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         const material = mesh.material;
-        if (Array.isArray(material)) {
-          this.materials.push(...material);
-        } else if (material) {
-          this.materials.push(material);
-        }
+        const materials = Array.isArray(material)
+          ? material
+          : material
+          ? [material]
+          : [];
+        this.meshInfos.push({ mesh, materials });
+        this.materials.push(...materials);
       }
     });
   }
 
   private syncOpacity(opacity: number) {
-    this.materials.forEach((material) => {
-      material.transparent = true;
-      material.opacity = opacity;
+    this.meshInfos.forEach((info, index) => {
+      const override = this.meshOverrides.find((candidate) => {
+        if ("index" in candidate && candidate.index === index) return true;
+        if ("name" in candidate && candidate.name === info.mesh.name) {
+          return true;
+        }
+        return false;
+      });
+      const multiplier =
+        override && override.opacity !== undefined ? override.opacity : 1;
+      const transparent =
+        override && override.transparent !== undefined
+          ? override.transparent
+          : true;
+      const finalOpacity = opacity * multiplier;
+
+      info.materials.forEach((material) => {
+        material.transparent = transparent;
+        material.opacity = finalOpacity;
+      });
     });
   }
 

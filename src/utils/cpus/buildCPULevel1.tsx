@@ -38,11 +38,13 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
     localRotation: new Vector3(Math.PI / 2, 0, 0),
   });
 
-  const cu = new Box({
+  const cu = new Model({
     key: "level_1 CU",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x4caf50 }),
+    src: "/models/Chips/CU.glb",
     localScale: new Vector3(L / 2, H, T),
     localPosition: new Vector3(-0.18, -0.05, 0),
+    sceneRotation: CHIP_ROTATION,
+    meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
 
   const alu = new Model({
@@ -63,11 +65,13 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
     localPosition: new Vector3(-0.2, 0.14, 0),
   });
 
-  const mc = new Box({
+  const mc = new Model({
     key: "level_1 MC",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xbe22e8 }),
+    src: "/models/Chips/MC.glb",
     localScale: new Vector3(L * 0.5, H * 0.8, T),
     localPosition: new Vector3(0.22, 0, 0),
+    sceneRotation: CHIP_ROTATION,
+    meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
 
   const gpr = new Model({

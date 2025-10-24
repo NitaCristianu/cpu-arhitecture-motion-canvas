@@ -48,11 +48,13 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     sceneRotation: CHIP_ROTATION,
   });
 
-  const cu = new Box({
+  const cu = new Model({
     key: "level_3 CU",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0x4caf50 }),
+    src: "/models/Chips/CU.glb",
     localScale: new Vector3(L / 2, H, T),
     localPosition: new Vector3(-0.24, -0.1, 0),
+    sceneRotation: CHIP_ROTATION,
+    meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
 
   const alu = new Model({
@@ -92,11 +94,13 @@ export function buildCPULevel3(scene: Scene3D, addToScene: boolean = true) {
     sceneRotation: CHIP_ROTATION,
   });
 
-  const mc = new Box({
+  const mc = new Model({
     key: "level_3 MC",
-    material: new MeshPhysicalMaterial({ metalness: 0.5, color: 0xbe22e8 }),
+    src: "/models/Chips/MC.glb",
     localScale: new Vector3(L * 0.55, H * 0.85, T),
     localPosition: new Vector3(0.42, -0.12, 0),
+    sceneRotation: CHIP_ROTATION,
+    meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
 
   const cache = new Group({
