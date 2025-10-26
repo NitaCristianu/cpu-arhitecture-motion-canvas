@@ -390,6 +390,8 @@ export default makeScene2D(function* (view) {
     )
   );
 
+  
+  yield* waitUntil("select bit 2");
   startbyte(42);
   length(7);
   const wrapper1 = getwrapper();
@@ -524,7 +526,7 @@ export default makeScene2D(function* (view) {
               opacity={0}
               ref={memoryarray}
             >
-              {(j * 10 + i).toString(16) + "000"}
+              {+(j * 10 + i) + "00"}
             </Txt>
           ))
         )}
@@ -538,23 +540,32 @@ export default makeScene2D(function* (view) {
       />
     </Glass>
   );
-  const cursorref = createRef<Cursor>();
-  view.add(<Cursor ref={cursorref} position={[1000, 800]}></Cursor>);
   yield* all(containerMemoryAddresses().scale(1, 1));
-  yield delay(1, cursorref().pop());
   yield* sequence(
     0.02,
     ...memoryarray.map((memory) => memory.opacity(1, 0.3, easeOutCubic))
   );
+  yield* waitUntil('number');
+  yield* containerMemoryAddresses().scale(2,1);
+  
+  yield* waitUntil('hex');
+  yield* sequence(
+    0.02,
+    ...memoryarray.map((memory, i) => all(
+      memory.fill("#FF0", 1, easeOutCubic).back(1),
+      memory.scale(1.2,1).back(1),
+      memory.text('0x'+i.toString(16)+ '00', 1),
+    ))
+  );
+  yield* waitUntil('move cursor');
+  yield containerMemoryAddresses().scale(1,  1);
   yield* loop(7, function* () {
     const pos =
       memoryarray[generator.nextInt(0, memoryarray.length)].position();
-    yield* cursorref().to(pos, 0.4);
   });
   const overlay = createRef<Rect>();
   view.add(<Rect fill={"#ccc"} opacity={0} ref={overlay} size={"100%"}></Rect>);
   yield* all(
-    cursorref().pop(),
     ...memoryarray.map((memory) => memory.opacity(0, .5, easeInCubic)),
     delay(3, overlay().opacity(0.5, 1, easeOutCubic)),
     holderMemoryAddresses().scale(0, 2, easeOutCubic),

@@ -3,63 +3,83 @@
   "timeEvents": [
     {
       "name": "introduce cpu",
-      "targetTime": 2
+      "targetTime": 5.4191770686460945
     },
     {
       "name": "contents",
-      "targetTime": 7.9
+      "targetTime": 14.649883784213571
     },
     {
       "name": "ar",
-      "targetTime": 9.511366971742618
+      "targetTime": 16.371363056296403
     },
     {
       "name": "vr",
-      "targetTime": 10.370019588484764
+      "targetTime": 21.05139506989863
     },
     {
       "name": "hardcode vr",
-      "targetTime": 11.433659954575905
+      "targetTime": 25.583938358914658
     },
     {
       "name": "focus",
-      "targetTime": 11.733659954575906
+      "targetTime": 27.946264099704155
+    },
+    {
+      "name": "next step",
+      "targetTime": 35.48675239680252
     },
     {
       "name": "cleanup",
-      "targetTime": 23.27920484893288
+      "targetTime": 44.08008573013596
     },
     {
       "name": "clock",
-      "targetTime": 26.67920484893288
+      "targetTime": 57.485410935997095
     },
     {
       "name": "press",
-      "targetTime": 30.67920484893288
+      "targetTime": 64.19770137473807
     },
     {
       "name": "resume",
-      "targetTime": 32.67920484893288
+      "targetTime": 68.04451288017502
+    },
+    {
+      "name": "step 0",
+      "targetTime": 73.26943178361539
+    },
+    {
+      "name": "step 1",
+      "targetTime": 76.58258336092766
     },
     {
       "name": "tap",
-      "targetTime": 40.66253818226613
+      "targetTime": 80.41618926781231
+    },
+    {
+      "name": "step 3",
+      "targetTime": 84.97021258131315
+    },
+    {
+      "name": "step 5",
+      "targetTime": 91.06103797066301
     },
     {
       "name": "clean",
-      "targetTime": 60.58253818226641
+      "targetTime": 102.59152682554054
     },
     {
       "name": "others",
-      "targetTime": 61.58253818226641
+      "targetTime": 106.04623252116332
     },
     {
       "name": "second",
-      "targetTime": 68.38253818226642
+      "targetTime": 114.70287621966632
     },
     {
       "name": "next",
-      "targetTime": 76.30540048099186
+      "targetTime": 130.07902136754635
     }
   ],
   "seed": 4213255170

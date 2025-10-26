@@ -18,6 +18,9 @@ import {
   delay,
   easeInCubic,
   easeInOutCirc,
+  easeInOutCubic,
+  easeInOutSine,
+  sequence,
 } from "@motion-canvas/core";
 import { Label3D } from "../components/Label3D";
 
@@ -85,6 +88,7 @@ export default makeScene2D(function* (view) {
   view.add(tag_container);
 
   // === Match camera state at end of previous scene ===
+
   yield* all(
     camera.moveTo(new Vector3(0.3, 3.5, 1.46).divideScalar(2), 0),
     camera.lookTo(new Vector3(0.3, -0.7, 0.2).divideScalar(2), 0),
@@ -105,10 +109,12 @@ export default makeScene2D(function* (view) {
     inner_cpu.wire_mc_cu,
   ]);
 
+  yield* waitUntil("start");
+
   yield* all(
-    camera.lookTo(new Vector3(0.35, 0, 0.15)),
-    camera.moveTo(new Vector3(0.35, 1, 0.5)),
-    camera.zoomIn(1.6)
+    camera.lookTo(new Vector3(0.35, 0, 0.15), 1, easeInOutCubic),
+    camera.moveTo(new Vector3(0.35, 1, 0.58), 1),
+    camera.zoomIn(1.6, 1, easeInOutCubic)
   );
 
   const datapoint = () => inner_cpu.wire_mc_ram_data.getMiddlePoint();
@@ -134,7 +140,6 @@ export default makeScene2D(function* (view) {
       fontFamily={"Poppins"}
       fontWeight={200}
       scale={0}
-      
     />
   );
   dataLabel.add(info_data_buss);
@@ -186,9 +191,42 @@ export default makeScene2D(function* (view) {
     info_data_buss.scale(0, 0.5, easeInCubic),
     addressLabel.height(100, 1),
     dataLabel.height(100, 1),
-    dataLabel.scale(.75, 1),
-    addressLabel.scale(.75, 1),
+    dataLabel.scale(0.75, 1),
+    addressLabel.scale(0.75, 1)
   );
+  yield delay(
+    1.4,
+    all(
+      camera.lookTo(
+        inner_cpu.cu.getGlobalPosition().add(new Vector3(-0.01, 0, 0)),
+        1.5
+      ),
+      camera.zoomIn(2, 1.5)
+    )
+  );
+  const clone_address_info = (
+    <Label3D
+      ignorePosition
+      scene={scene}
+      worldPosition={null}
+      text={"ADDRESS"}
+      fontFamily={"Poppins"}
+      fontWeight={200}
+      fill={"white"}
+    />
+  );
+  view.add(clone_address_info);
+  yield all(
+    clone_address_info.position(new Vector3(-659, 1124), 0),
+    info_data_buss.position(new Vector3(-659, 1124), 0)
+  );
+  yield sequence(
+    0.7,
+    clone_address_info.position(new Vector3(-90, 327), 1),
+    info_data_buss.position(new Vector3(-90, 327), 1)
+  );
+  yield* waitFor(0.5);
+  yield* inner_cpu.wire_mc_cu.currentFlow(2, easeInOutSine, 100);
 
   yield* waitUntil("next");
 });

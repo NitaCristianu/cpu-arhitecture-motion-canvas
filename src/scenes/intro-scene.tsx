@@ -12,6 +12,7 @@ import {
   easeInQuad,
   easeOutSine,
   easeInSine,
+  waitUntil,
 } from "@motion-canvas/core";
 import { createScene } from "../components/presets";
 import Box from "../libs/Thrash/objects/Box";
@@ -163,6 +164,7 @@ export function* SubScene1(scene: Scene3D, camera: Camera, view: View2D) {
 }
 // cpu current flow and instructino logic
 export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
+  yield* waitUntil('start');
   const level0cpu = buildCPULevel0(scene);
   cpu = level0cpu.group;
   ram = level0cpu.ram;
@@ -182,17 +184,18 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
   yield* waitFor(0.15);
   yield* all(
     ram.popIn(0.5, RAM_SCALE, easeOutBack),
-    camera.lookTo(ram.localPosition(), 0.5, easeInOutCubic)
+    // camera.lookTo(ram.localPosition(), 0.5, easeInOutCubic)
   );
-  yield* all(camera.lookTo(cpu.localPosition(), 0.6, easeOutSine));
+  yield* waitUntil('continue');
+  yield* all(camera.lookTo(cpu.localPosition(), 2, easeOutSine));
   yield* level0cpu.initWires();
   yield* all(
     camera.moveTo(
       cpu.localPosition().add(new Vector3(0.5, 5, 1.2)),
-      0.6,
+      2,
       easeOutSine
     ),
-    camera.zoomIn(2.2)
+    camera.zoomIn(2.2, 2)
   );
 
   // === LEVEL 0  CPU EXECUTION PATH CAMERA TOUR ===

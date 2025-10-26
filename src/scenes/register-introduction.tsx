@@ -17,6 +17,7 @@ import {
   easeOutBack,
   easeOutCubic,
   easeOutSine,
+  loop,
   range,
   sequence,
   tween,
@@ -81,17 +82,15 @@ export default makeScene2D(function* (view) {
     key: "GPR Presentation",
     localScale: new Vector3(),
     localPosition: new Vector3(0, -2, 0.05),
-    sceneRotation: new Vector3(Math.PI / 2, 0, 0),
+    sceneRotation: new Vector3(Math.PI / 2, 0),
+    localRotation: new Vector3(-Math.PI / 2 - 0.4, -0.3, -1.5),
     src: "/models/Chips/gpr.glb",
   }) as Model;
   const cpu = buildCPULevel0(scene);
   scene.add(cpu);
   yield* cpu.gpr.opacityTo(0.2, 0);
   yield* cpu.clock.scaleTo(new Vector3(), 0);
-  yield* cpu.gpr.scaleTo(
-    new Vector3(0.1, 0.1, 0.1 / 1.5).divideScalar(1.2),
-    0
-  );
+  yield* cpu.gpr.scaleTo(new Vector3(0.1, 0.1, 0.1 / 1.5).divideScalar(1.2), 0);
   yield* all(
     ...[cpu.group, cpu.ram].map((item) =>
       item.reposition(
@@ -108,7 +107,7 @@ export default makeScene2D(function* (view) {
       key="cursor"
       src="/models/cursor.glb"
       localRotation={new Vector3(-0.4, 0.3, 0.7)}
-      localScale={new Vector3(1, 1, .2).multiplyScalar(0.15)}
+      localScale={new Vector3(1, 1, 0.2).multiplyScalar(0.15)}
       localPosition={cpu.clock
         .getGlobalPosition()
         .clone()
@@ -130,7 +129,7 @@ export default makeScene2D(function* (view) {
   yield* waitFor(1);
   yield* all(
     lights_api.fadeIn(),
-    camera.lookTo(new Vector3(0, -0.3, 0), 0.5),
+    camera.lookTo(new Vector3(-0.05, -0.33, 0), 0.5),
     gpr.reposition(new Vector3(0, -0.3, 0.05), 0.5, easeOutCubic),
     gpr.popIn(0.5, new Vector3(0.1, 0.1, 0.1 / 1.5)),
     context_title.node.y(context_title.node.y() + 350, 1)
@@ -140,11 +139,11 @@ export default makeScene2D(function* (view) {
 
   yield* all(
     gpr.reposition(new Vector3(0, 0.069, 0.05), 0.5, easeOutCubic),
-    camera.lookTo(new Vector3(0, 0, 0), 0.5, easeOutCubic),
+    camera.lookTo(new Vector3(0, 0, 0), 0.5, easeOutCubic)
   );
   yield* any(
-    gpr.rotateTo(new Vector3(Math.PI / 2,  Math.PI, 0), 1),
-    delay(1, gpr.rotateTo(new Vector3(Math.PI / 2, Math.PI, 0), 81)),
+    gpr.rotateTo(new Vector3(Math.PI / 2, Math.PI, 0), 1),
+    delay(1, gpr.rotateTo(new Vector3(Math.PI / 2, Math.PI, 0), 181)),
     ...[cpu.group, cpu.ram].map((item) =>
       item.reposition(
         item.localPosition().clone().add(new Vector3(0, 1.233, 0.21)),
@@ -156,11 +155,7 @@ export default makeScene2D(function* (view) {
   );
   yield delay(0.6, lights_api.fadeOut(1.2));
   yield* any(
-    cpu.gpr.scaleTo(
-      new Vector3(0).divideScalar(1.1),
-      0.6,
-      easeOutCubic
-    ),
+    cpu.gpr.scaleTo(new Vector3(0).divideScalar(1.1), 0.6, easeOutCubic),
     ...[cpu.group, cpu.ram].map((item) =>
       item.reposition(
         item.localPosition().clone().add(new Vector3(0, 0.395, 0)),
@@ -208,7 +203,7 @@ export default makeScene2D(function* (view) {
       scene,
       worldPosition: cpu.iu.getGlobalPosition().clone(),
       fontSize: 70,
-      offset2D: [200, 400],
+      offset2D: [-100, 100],
       width: 600,
     }),
 
@@ -231,7 +226,7 @@ export default makeScene2D(function* (view) {
       scene,
       worldPosition: cpu.gpr.getGlobalPosition().clone(),
       fontSize: 70,
-      offset2D: [0, 330],
+      offset2D: [0, 130],
       width: 1000,
     }),
 
@@ -266,7 +261,7 @@ export default makeScene2D(function* (view) {
       offset2D: [200, -600],
       width: 700,
       height: 100,
-      textAlign: 'center'
+      textAlign: "center",
     }),
   };
   const tag_container = <Node y={-800} />;
@@ -409,7 +404,7 @@ export default makeScene2D(function* (view) {
     (
       <Label3D
         worldPosition={cpu.mc.getGlobalPosition().clone()}
-        offset2D={[400, -700]}
+        offset2D={[600, -550]}
         text={"2. The MC loads the value from memory."}
         scene={scene}
         fontSize={50}
@@ -441,7 +436,7 @@ export default makeScene2D(function* (view) {
     (
       <Label3D
         worldPosition={cpu.wire_cu_gpr.getMiddlePoint().clone()}
-        offset2D={[100, -250]}
+        offset2D={[-800, -250]}
         text={"4. The CU tells the register to load the data."}
         scene={scene}
         fontSize={50}
@@ -472,7 +467,7 @@ export default makeScene2D(function* (view) {
     (
       <Label3D
         worldPosition={cpu.iu.getGlobalPosition().clone()}
-        offset2D={[350, -500]}
+        offset2D={[-400, -1000]}
         text={"6. The Incremental Unit outputs the incremented result."}
         scene={scene}
         fontSize={50}
@@ -488,7 +483,7 @@ export default makeScene2D(function* (view) {
     (
       <Label3D
         worldPosition={cpu.mc.getGlobalPosition().clone()}
-        offset2D={[400, -700]}
+        offset2D={[-800, 300]}
         text={"7. The CU orders the MC to write the new value back to memory."}
         scene={scene}
         fontSize={50}
@@ -526,7 +521,7 @@ export default makeScene2D(function* (view) {
       2
     ),
     camera.lookTo(gpr.localPosition().clone().add(new Vector3(0, 0, 0.15)), 2),
-    cpu.ram.popIn(0.4,RAM_SCALE),
+    cpu.ram.popIn(0.4, RAM_SCALE),
     context_title.node.y(context_title.node.y() - 350, 1)
   );
   yield all(
@@ -550,12 +545,11 @@ export default makeScene2D(function* (view) {
   );
   yield* waitUntil("contents");
   yield* any(
-    register_contents.scale(0.8, 1, easeOutCubic),
+    register_contents.scale(1.4, 1, easeOutCubic),
     register_contents.rotation(0, 1, easeOutCubic),
     register_contents.skew([0, 0], 1, easeOutCubic),
     register_contents.position(
-      () =>
-        scene.projectToScreen(cpu.gpr.getGlobalPosition()).add([1000, -570]),
+      () => scene.projectToScreen(cpu.gpr.getGlobalPosition()).add([500, -270]),
       2,
       easeOutBack
     )
@@ -572,6 +566,15 @@ export default makeScene2D(function* (view) {
     .scale(1, 0.3, easeOutBack);
 
   yield* waitUntil("focus");
+  yield* any(
+    register_contents.scale(0.8, 1, easeOutCubic),
+    register_contents.position(
+      () =>
+        scene.projectToScreen(cpu.gpr.getGlobalPosition()).add([1100, -570]),
+      2,
+      easeOutBack
+    )
+  );
   yield* all(
     ...tag_container
       .childrenAs<Label3D>()
@@ -593,23 +596,27 @@ export default makeScene2D(function* (view) {
       all(
         cpu.cu.expand(),
         tag_container.childrenAs<Label3D>()[0].scale(1.2, 0.33),
-        cpu.wire_mc_cu.reverseFlow(1.5, easeInSine, 60),
+        cpu.wire_mc_cu.reverseFlow(2.5, easeInSine, 60),
         camera.lookToWeighted(cpu.cu.getGlobalPosition().clone())
       ),
       all(
         anchor_notes[0].popIn(),
         camera.lookToWeighted(cpu.mc.getGlobalPosition().clone())
-      ),
+      )
+    ),
+    waitUntil("next step"),
+    sequence(
+      0.7,
       all(
         cpu.mc.expand(),
         tag_container.childrenAs<Label3D>()[2].scale(1.2, 0.33)
+      ),
+      all(
+        tag_container.childrenAs<Label3D>()[0].scale(1, 0.33),
+        tag_container.childrenAs<Label3D>()[2].scale(1, 0.33),
+        cpu.mc.shrink(),
+        cpu.cu.shrink()
       )
-    ),
-    all(
-      tag_container.childrenAs<Label3D>()[0].scale(1, 0.33),
-      tag_container.childrenAs<Label3D>()[2].scale(1, 0.33),
-      cpu.mc.shrink(),
-      cpu.cu.shrink()
     )
   );
   yield* sequence(
@@ -661,7 +668,9 @@ export default makeScene2D(function* (view) {
     ),
     camera.zoomIn(2, 3)
   );
-
+  yield* loop(2, (i) =>
+    [cpu.wire_cu_gpr, cpu.wire_cu_iu][i % 3].currentFlow(1)
+  );
   yield* waitUntil("clock");
   const clock_oldposition = cpu.clock.getGlobalPosition();
   yield* cpu.clock.moveBack(3, 0);
@@ -744,6 +753,7 @@ export default makeScene2D(function* (view) {
       )
   );
 
+  yield* waitUntil("step 0");
   yield* chain(
     any(
       waitFor(1),
@@ -753,17 +763,18 @@ export default makeScene2D(function* (view) {
           cursor.moveDOWN(0.01, 0.3)
         ),
         all(
-          cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
+          cpu.wire_clock_cu.currentFlow(1, easeInOutCubic, 50),
           cursor.moveUP(0.01, 0.3),
-          cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
+          cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5),
+          tag_container.childrenAs<Label3D>()[0].scale(1.2, 0.33)
         )
       )
     ),
+    waitUntil("step 1"),
     sequence(
       0.7,
       all(
         cpu.cu.expand(),
-        tag_container.childrenAs<Label3D>()[0].scale(1.2, 0.33),
         cpu.wire_mc_cu.reverseFlow(1.5, easeInSine, 60),
         camera.lookToWeighted(cpu.cu.getGlobalPosition().clone())
       ),
@@ -804,149 +815,157 @@ export default makeScene2D(function* (view) {
     cpu.wire_mc_ram_data.currentFlow(1),
     all(cpu.wire_mc_ram_data.reverseFlow(1), anchor_notes[1].popIn())
   );
-  yield* chain(
-    any(
-      waitFor(0.5),
-      chain(
-        all(
-          cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
-          cursor.moveDOWN(0.01, 0.3)
+  yield* waitUntil("step 3"),
+    yield* chain(
+      sequence(
+        0.2,
+        any(
+          chain(
+            all(
+              cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
+              cursor.moveDOWN(0.01, 0.3)
+            ),
+            all(
+              cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
+              cursor.moveUP(0.01, 0.3),
+              cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
+            )
+          )
         ),
-        all(
-          cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
-          cursor.moveUP(0.01, 0.3),
-          cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
-        )
-      )
-    ),
-    sequence(
-      // 1. value travels MC → GPR
-      0.6,
-      all(
-        cpu.wire_gpr_mc.reverseFlow(1.2, easeInSine, 60), // cyan dots forward
-        cpu.gpr.expand(), // registers flare
-        tag_container.childrenAs<Label3D>()[3].scale(1.1, 0.33), // “VR” label pops
-        camera.lookToWeighted(cpu.gpr.getGlobalPosition().clone())
-      ),
-      all(gpr.expand(), anchor_notes[2].popIn(), anchor_notes[0].popOut())
-    ),
-    gpr.shrink(),
-    any(
-      waitFor(0.5),
-      chain(
-        all(
-          cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
-          cursor.moveDOWN(0.01, 0.3)
-        ),
-        all(
-          cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
-          cursor.moveUP(0.01, 0.3),
-          cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
-        )
-      )
-    ),
-    sequence(
-      0.6,
-      all(
-        cpu.wire_cu_gpr.currentFlow(1, easeInSine, 50),
-        cpu.gpr.shrink(),
-        tag_container.childrenAs<Label3D>()[3].scale(1, 0.33),
-        anchor_notes[3].popIn(),
-        anchor_notes[1].popOut(),
-        anchor_notes[2].popOut()
-      ),
-
-      all(
-        vr_ref().childAs<Txt>(0).text("VR: 0001 1011", 1),
-        vr_ref().fill("#bbc0f150", 1)
-      )
-    ),
-
-    any(
-      waitFor(0.5),
-      chain(
-        all(
-          cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
-          cursor.moveDOWN(0.01, 0.3)
-        ),
-        all(
-          cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
-          cursor.moveUP(0.01, 0.3),
-          cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
-        )
-      )
-    ),
-    sequence(
-      // 5. CU tells IU to increment
-      0.6,
-      all(
-        cpu.iu.expand(),
-        cpu.wire_cu_iu.currentFlow(1, easeInSine, 50),
-        tag_container.childrenAs<Label3D>()[5].scale(1.1, 0.33),
-        camera.lookToWeighted(cpu.iu.getGlobalPosition().clone())
-      ),
-      anchor_notes[4].popIn(),
-      anchor_notes[3].popOut()
-    ),
-    waitFor(0.5),
-    sequence(
-      // 6. IU outputs the incremented result
-      0.6,
-      all(
-        cpu.iu.shrink(),
-        cpu.wire_gpr_iu.reverseFlow(1.2, easeInSine, 60),
-        vr_ref().childAs<Txt>(0).text("VR: 0001 1100", 1), // incremented value
-        vr_ref().fill("#f8686850", 1),
-        anchor_notes[5].popIn(),
-        anchor_notes[4].popOut()
-      )
-    ),
-    any(
-      waitFor(0.5),
-      chain(
-        all(
-          cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
-          cursor.moveDOWN(0.01, 0.3)
-        ),
-        all(
-          cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
-          cursor.moveUP(0.01, 0.3),
-          cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
-        )
-      )
-    ),
-    sequence(
-      // 7. CU orders MC to write back
-      0.6,
-      all(
-        cpu.mc.expand(),
-        cpu.wire_mc_cu.reverseFlow(1, easeInSine, 50),
-        // tag_container.childrenAs<Label3D>()[6].scale(1.1, 0.33),
-        camera.lookToWeighted(cpu.mc.getGlobalPosition().clone())
-      ),
-      anchor_notes[6].popIn(),
-      anchor_notes[5].popOut()
-    ),
-    waitFor(0.5),
-    sequence(
-      // 8. MC stores the value in RAM
-      0.6,
-      all(
-        cpu.wire_mc_ram_data.currentFlow(1.2, easeInSine, 60),
-        cpu.wire_mc_ram_address.currentFlow(1.2, easeInSine, 60),
-        anchor_notes[7].popIn(),
-        anchor_notes[6].popOut(),
-        cpu.mc.shrink(),
-        delay(
-          1,
+        sequence(
+          // 1. value travels MC → GPR
+          0.3,
           all(
-            tag_ramText("VALUE : 28 (0001 0100)", 1),
-            tags.ram.fill("#eb24e140", 1)
+            cpu.wire_gpr_mc.reverseFlow(0.5, easeInSine, 60), // cyan dots forward
+            cpu.gpr.expand(), // registers flare
+            tag_container.childrenAs<Label3D>()[3].scale(1.1, 0.33), // “VR” label pops
+            camera.lookToWeighted(cpu.gpr.getGlobalPosition().clone())
+          ),
+          all(gpr.expand(), anchor_notes[2].popIn(), anchor_notes[0].popOut())
+        ),
+        any(
+          waitFor(0.5),
+          chain(
+            all(
+              cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
+              cursor.moveDOWN(0.01, 0.3)
+            ),
+            all(
+              cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
+              cursor.moveUP(0.01, 0.3),
+              cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
+            )
+          )
+        ),
+        sequence(
+          0.6,
+          all(
+            cpu.wire_cu_gpr.currentFlow(1, easeInSine, 50),
+            cpu.gpr.shrink(),
+            tag_container.childrenAs<Label3D>()[3].scale(1, 0.33),
+            anchor_notes[3].popIn(),
+            anchor_notes[1].popOut()
+            // anchor_notes[2].popOut()
+          ),
+
+          all(
+            vr_ref().childAs<Txt>(0).text("VR: 0001 1011", 1),
+            vr_ref().fill("#bbc0f150", 1)
+          )
+        )
+      ),
+      gpr.shrink(),
+      waitUntil("step 5"),
+
+      any(
+        waitFor(0.5),
+        chain(
+          all(
+            cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
+            cursor.moveDOWN(0.01, 0.3),
+            anchor_notes[2].popOut()
+          ),
+          all(
+            cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
+            cursor.moveUP(0.01, 0.3),
+            cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
+          )
+        )
+      ),
+      sequence(
+        1,
+        sequence(
+          // 5. CU tells IU to increment
+          0.6,
+          all(
+            cpu.iu.expand(),
+            cpu.wire_cu_iu.currentFlow(1, easeInSine, 50),
+            // tag_container.childrenAs<Label3D>()[5].scale(1.1, 0.33),
+            camera.lookToWeighted(cpu.iu.getGlobalPosition().clone())
+          ),
+          anchor_notes[4].popIn(),
+          anchor_notes[3].popOut()
+        ),
+        sequence(
+          // 6. IU outputs the incremented result
+          0.6,
+          all(
+            cpu.iu.shrink(),
+            cpu.wire_gpr_iu.reverseFlow(1.2, easeInSine, 60),
+            vr_ref().childAs<Txt>(0).text("VR: 0001 1100", 1), // incremented value
+            vr_ref().fill("#f8686850", 1),
+            anchor_notes[5].popIn(),
+            // anchor_notes[4].popOut()
+          )
+        )
+      ),
+      anchor_notes[4].popOut(),
+      any(
+        waitFor(0.5),
+        chain(
+          all(
+            cpu.clock.childAs<Box>(0).moveForward(0.3, 0.5),
+            cursor.moveDOWN(0.01, 0.3)
+          ),
+          all(
+            cpu.wire_clock_cu.currentFlow(0.5, easeInOutCubic, 50),
+            cursor.moveUP(0.01, 0.3),
+            cpu.clock.childAs<Box>(0).moveBack(0.3, 0.5)
+          )
+        )
+      ),
+      sequence(
+        // 7. CU orders MC to write back
+        0.6,
+        all(
+          cpu.mc.expand(),
+          cpu.wire_mc_cu.reverseFlow(1, easeInSine, 50),
+          // tag_container.childrenAs<Label3D>()[6].scale(1.1, 0.33),
+          camera.lookToWeighted(cpu.mc.getGlobalPosition().clone())
+        ),
+        anchor_notes[6].popIn(),
+        anchor_notes[5].popOut()
+      ),
+      waitFor(0.5),
+      sequence(
+        // 8. MC stores the value in RAM
+        0.6,
+        all(
+          cpu.wire_mc_ram_data.currentFlow(1.2, easeInSine, 60),
+          cpu.wire_mc_ram_address.currentFlow(1.2, easeInSine, 60),
+          anchor_notes[7].popIn(),
+          anchor_notes[6].popOut(),
+          cpu.mc.shrink(),
+          delay(
+            1,
+            all(
+              tag_ramText("VALUE : 28 (0001 0100)", 1),
+              tags.ram.fill("#eb24e140", 1)
+            )
           )
         )
       )
-    )
-  );
+    );
 
   yield* waitUntil("clean");
   yield* all(
@@ -1002,7 +1021,6 @@ export default makeScene2D(function* (view) {
     ),
     delay(1.4, other_cpus[0].expand(1.5))
   );
-
 
   yield* waitUntil("next");
 });

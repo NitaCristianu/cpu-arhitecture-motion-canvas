@@ -27,12 +27,12 @@ export default class Floor extends ObjectBase {
 
     /* 1️⃣ – tint plane (semi-gloss) */
     const tintMat = new MeshPhysicalMaterial({
-      color: 0x000,
-      metalness: 1,
-      roughness: 0.6,
+      color: 0xf00,
+      metalness: -1,
+      roughness: .6,
       clearcoat: 1,
-      clearcoatRoughness: 0.6,
-      envMapIntensity: 0.1,
+      clearcoatRoughness: .6,
+      envMapIntensity: 2,
     });
     this.tint = new ThreeMesh(geo, tintMat);
     this.tint.receiveShadow = true;

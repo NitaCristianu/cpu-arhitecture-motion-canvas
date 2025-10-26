@@ -34,7 +34,7 @@ export default makeScene2D(function* (view) {
   const inner_cpu = buildCPULevel0(scene);
   const outer_cpu = (
     <Box
-      material={new MeshPhongMaterial({ color: '#130235' })}
+      material={new MeshPhongMaterial({ color: "#130235" })}
       localScale={new Vector3(0, 0, 0)}
       localPosition={new Vector3(-0.02, -0.4, 0)}
     />
@@ -123,7 +123,7 @@ export default makeScene2D(function* (view) {
     outer_cpu.popIn(1, new Vector3(0.66, 0.02 * 5 + 0.04, 0.61)),
     inner_cpu.ram.popIn(0.5, RAM_SCALE)
   );
-  yield* all(
+  yield all(
     inner_cpu.wire_mc_ram_address.widthTo(11, 1),
     inner_cpu.wire_mc_ram_data.widthTo(10, 1)
   );
@@ -133,7 +133,7 @@ export default makeScene2D(function* (view) {
   );
   yield* all(
     ramData.popIn(),
-    inner_cpu.wire_mc_ram_address.reverseFlow(0.6, easeInSine, 50)
+    inner_cpu.wire_mc_ram_address.reverseFlow(0.3, easeInSine, 50)
   );
 
   yield* all(
@@ -143,9 +143,13 @@ export default makeScene2D(function* (view) {
     camera.zoomTo(1.5, 0.9)
   );
 
-  yield* waitFor(0.5);
   yield* all(cpuData2.popIn());
-  yield* loop(9, (i) => cpustring2("Computing" + ".".repeat((i % 3) + 1), 0.2));
+  yield* loop(7, (i) =>
+    cpustring2(
+      i == 6 ? "Incremented 5" : "Computing" + ".".repeat((i % 3) + 1),
+      i == 6 ? 0.5 : 0.2
+    )
+  );
   yield* cpuData3.popIn();
   yield* any(
     camera.lookTo(inner_cpu.ram.localPosition()),
@@ -164,27 +168,28 @@ export default makeScene2D(function* (view) {
     camera.zoomTo(1, 2),
     ...[cpuData, cpuData2, cpuData3, ramData].map((item) => item.popOut()),
     context_title.node.position(context_title.node.position().add([0, 500]), 1)
-  ),
-    yield* all(
-      outer_cpu.reposition(new Vector3(0.25, -0.4, 0)),
-      inner_cpu.ram.popOut(),
-      inner_cpu.wire_mc_ram_address.updatePoints(
-        [
-          inner_cpu.wire_mc_ram_address.getPointAt(0),
-          inner_cpu.wire_mc_ram_address.getPointAt(0),
-          inner_cpu.wire_mc_ram_address.getPointAt(0),
-        ],
-        1
-      ),
-      inner_cpu.wire_mc_ram_data.updatePoints(
-        [
-          inner_cpu.wire_mc_ram_data.getPointAt(0),
-          inner_cpu.wire_mc_ram_data.getPointAt(0),
-          inner_cpu.wire_mc_ram_data.getPointAt(0),
-        ],
-        1
-      )
-    );
+  );
+  yield* waitUntil("inside");
+  yield* all(
+    outer_cpu.reposition(new Vector3(0.25, -0.4, 0)),
+    inner_cpu.ram.popOut(),
+    inner_cpu.wire_mc_ram_address.updatePoints(
+      [
+        inner_cpu.wire_mc_ram_address.getPointAt(0),
+        inner_cpu.wire_mc_ram_address.getPointAt(0),
+        inner_cpu.wire_mc_ram_address.getPointAt(0),
+      ],
+      1
+    ),
+    inner_cpu.wire_mc_ram_data.updatePoints(
+      [
+        inner_cpu.wire_mc_ram_data.getPointAt(0),
+        inner_cpu.wire_mc_ram_data.getPointAt(0),
+        inner_cpu.wire_mc_ram_data.getPointAt(0),
+      ],
+      1
+    )
+  );
   yield* inner_cpu.group.reposition(
     outer_cpu.localPosition().add(new Vector3(0, 0.1, 0)),
     0
@@ -232,7 +237,7 @@ export default makeScene2D(function* (view) {
       scene,
       worldPosition: inner_cpu.mc.getGlobalPosition().clone(),
       fontSize: 70,
-      offset2D: [0, 330],
+      offset2D: [0, 30],
       width: 700,
     }),
   };
@@ -364,9 +369,9 @@ export default makeScene2D(function* (view) {
           (child as Label3D).translucency(1, 1)
         )
       ),
-    camera.moveTo(new Vector3(0.5, 5, 1).divideScalar(2), 2),
-    camera.lookTo(new Vector3(0.5, -0.7, 0.2).divideScalar(2), 2),
-    camera.zoomTo(1.8, 2)
+    camera.moveTo(new Vector3(0.5, 5, 1).divideScalar(2), .5),
+    camera.lookTo(new Vector3(0.5, -0.7, 0.2).divideScalar(2), .5),
+    camera.zoomTo(1.8, .5)
   );
   yield* inner_cpu.wire_mc_ram_address.widthTo(0, 0);
   yield* inner_cpu.wire_mc_ram_data.widthTo(0, 0);

@@ -10,7 +10,7 @@ import Scene3D from "../Scene";
 export function addTowerSpotlight(
   scene3D: Scene3D,
   position: Vector3 = new Vector3(0, 1, 0),
-  radius: number = .7
+  radius: number = .4
 ) {
   const spotlight = new SpotLight(
     0xFFD700, // color

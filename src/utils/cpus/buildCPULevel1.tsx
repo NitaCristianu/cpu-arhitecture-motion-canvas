@@ -41,8 +41,8 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
   const cu = new Model({
     key: "level_1 CU",
     src: "/models/Chips/CU.glb",
-    localScale: new Vector3(L / 2, H, T),
-    localPosition: new Vector3(-0.18, -0.05, 0),
+    localScale: new Vector3(L / 2, L / 2, L / 2),
+    localPosition: new Vector3(-0.18, 0.02, 0),
     sceneRotation: CHIP_ROTATION,
     meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
@@ -68,8 +68,8 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
   const mc = new Model({
     key: "level_1 MC",
     src: "/models/Chips/MC.glb",
-    localScale: new Vector3(L * 0.5, H * 0.8, T),
-    localPosition: new Vector3(0.22, 0, 0),
+    localScale: new Vector3(L * 0.5, L * 0.5, T * 1.5),
+    localPosition: new Vector3(0.22, 0.01, 0),
     sceneRotation: CHIP_ROTATION,
     meshOverrides: [{ name: "Sphere", opacity: 0.3 }],
   });
@@ -111,7 +111,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
         cu
           .localPosition()
           .clone()
-          .add(new Vector3(cu.localScale().x / 2, 0, 0)),
+          .add(new Vector3(0, -cu.localScale().y / 4, 0)),
         cu
           .localPosition()
           .clone()
@@ -147,10 +147,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
           .clone()
           .lerp(alu.localPosition(), 0.4)
           .add(new Vector3(-0.015, 0.01, 0.005)),
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(-mc.localScale().x / 2, 0, 0)),
+        mc.localPosition().clone(),
       ]}
       lineWidth={0}
       color="control"
@@ -165,7 +162,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.35, 0)),
+          .add(new Vector3(mc.localScale().x / 3, -0.35, 0)),
         mc
           .localPosition()
           .clone()
@@ -186,7 +183,7 @@ export function buildCPULevel1(scene: Scene3D, addToScene: boolean = true) {
         mc
           .localPosition()
           .clone()
-          .add(new Vector3(mc.localScale().x / 2, -0.35, 0)),
+          .add(new Vector3(mc.localScale().x / 3, -0.35, 0)),
         mc
           .localPosition()
           .clone()
