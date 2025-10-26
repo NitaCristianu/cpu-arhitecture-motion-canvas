@@ -25,6 +25,8 @@ import { Label3D } from "../components/Label3D";
 import { buildCPULevel0, RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import Mesh from "../libs/Thrash/objects/Mesh";
 
+const CONTINUE_TIMING_SCALE = .6;
+
 // GLOBAL USED ELEMENTS
 var ram: Box;
 var cpu: Mesh;
@@ -169,6 +171,25 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
   cpu = level0cpu.group;
   ram = level0cpu.ram;
 
+  const cpuLabel = new Label3D({
+    text: "CPU",
+    scene,
+    worldPosition: () => level0cpu.base.getGlobalPosition(),
+    color: "control",
+    fontSize: 80,
+    offset2D: [0, -260],
+  });
+  const ramLabel = new Label3D({
+    text: "RAM",
+    scene,
+    worldPosition: () => level0cpu.ram.getGlobalPosition(),
+    color: "memory",
+    fontSize: 80,
+    offset2D: [-350, -1060],
+  });
+  // view.add(cpuLabel);
+  view.add(ramLabel);
+
   // 1) CPU enters → camera snaps to it
   //
   yield* all(
@@ -187,29 +208,38 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
     // camera.lookTo(ram.localPosition(), 0.5, easeInOutCubic)
   );
   yield* waitUntil('continue');
-  yield* all(camera.lookTo(cpu.localPosition(), 2, easeOutSine));
+  yield* all(
+    cpuLabel.popIn(0.5 * CONTINUE_TIMING_SCALE),
+    camera.lookTo(
+      cpu.localPosition(),
+      2 * CONTINUE_TIMING_SCALE,
+      easeOutSine
+    )
+  );
   yield* level0cpu.initWires();
   yield* all(
     camera.moveTo(
       cpu.localPosition().add(new Vector3(0.5, 5, 1.2)),
-      2,
+      2 * CONTINUE_TIMING_SCALE,
       easeOutSine
     ),
-    camera.zoomIn(2.2, 2)
+    camera.zoomIn(2.2, 2 * CONTINUE_TIMING_SCALE)
   );
+  
+  yield* waitUntil('exectue');
 
   // === LEVEL 0  CPU EXECUTION PATH CAMERA TOUR ===
-  yield* waitFor(0.4);
+  yield* waitFor(0.4 * CONTINUE_TIMING_SCALE);
 
   const offset = new Vector3(0, -0.35, 0);
 
-  const delay_offset = 1.2;
+  const delay_offset = 1.2 * CONTINUE_TIMING_SCALE;
 
   camera.anchor(cpu.localPosition().clone().add(new Vector3(0, -0.2, 0.8)));
-  camera.anchorWeight(0.7);
+  camera.anchorWeight(.9);
 
   // RAM ➝ MC
-  yield level0cpu.wire_mc_ram_data.reverseFlow(1);
+  yield level0cpu.wire_mc_ram_data.reverseFlow(CONTINUE_TIMING_SCALE);
   yield* all(
     camera.moveToWeighted(
       ram.localPosition().clone().add(new Vector3(-0.3, 1.3, 0.8)),
@@ -224,7 +254,11 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
   );
 
   // MC ➝ CU
-  yield level0cpu.wire_mc_cu.currentFlow(1, easeInSine, 50);
+  yield level0cpu.wire_mc_cu.currentFlow(
+    1 * CONTINUE_TIMING_SCALE,
+    easeInSine,
+    50
+  );
   yield* all(
     camera.moveToWeighted(
       level0cpu.iu
@@ -248,7 +282,9 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
   );
 
   // CU ➝ GPR
-  yield level0cpu.wire_cu_gpr.currentFlow(1); // assuming VR is part of GPR here
+  yield level0cpu.wire_cu_gpr.currentFlow(
+    1 * CONTINUE_TIMING_SCALE
+  ); // assuming VR is part of GPR here
   yield* all(
     camera.moveToWeighted(
       level0cpu.cu
@@ -268,7 +304,7 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
   );
 
   // CU ➝ IU
-  yield level0cpu.wire_cu_iu.currentFlow(1);
+  yield level0cpu.wire_cu_iu.currentFlow(1 * CONTINUE_TIMING_SCALE);
   yield* all(
     camera.moveTo(
       level0cpu.cu
@@ -286,11 +322,11 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
       easeOutSine
     )
   );
-  yield level0cpu.wire_iu_mc.currentFlow(1);
+  yield level0cpu.wire_iu_mc.currentFlow(1 * CONTINUE_TIMING_SCALE);
 
   // CU ➝ MC
-  yield level0cpu.wire_mc_cu.reverseFlow(1);
-  yield* waitFor(0.2);
+  yield level0cpu.wire_mc_cu.reverseFlow(1 * CONTINUE_TIMING_SCALE);
+  yield* waitFor(0.2 * CONTINUE_TIMING_SCALE);
   yield* all(
     camera.moveTo(
       level0cpu.cu
@@ -310,32 +346,33 @@ export function* SubScene2(scene: Scene3D, camera: Camera, view: View2D) {
   );
 
   // MC ➝ RAM
-  yield level0cpu.wire_mc_ram_data.currentFlow(1.4);
+  yield level0cpu.wire_mc_ram_data.currentFlow(1.4 * CONTINUE_TIMING_SCALE);
   yield* all(
     camera.moveTo(
       ram.localPosition().clone().add(new Vector3(-3, 2, 0)),
-      2,
+      2 * CONTINUE_TIMING_SCALE,
       easeInOutCubic
     ),
     camera.lookTo(
       ram.localPosition().add(new Vector3(0.25, 0, 0)),
-      2,
+      2 * CONTINUE_TIMING_SCALE,
       easeOutSine
     )
   );
+  yield*  ramLabel.popIn(0.5 * CONTINUE_TIMING_SCALE);
 
   yield all(
     camera.moveTo(
-      ram.localPosition().clone().add(new Vector3(0, 2, 0)),
-      2,
+      ram.localPosition().clone().add(new Vector3(-0.1, 2, -0.01)),
+      2 * CONTINUE_TIMING_SCALE,
       easeInOutCubic
     ),
     camera.lookTo(
       ram.localPosition().add(new Vector3(-0.1, 0, 0)),
-      2,
+      2 * CONTINUE_TIMING_SCALE,
       easeOutSine
     ),
-    camera.zoomIn(2, 2)
+    camera.zoomIn(16, 3 * CONTINUE_TIMING_SCALE, easeInCubic)
   );
 }
 

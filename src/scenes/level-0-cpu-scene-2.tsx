@@ -1,4 +1,4 @@
-import { makeScene2D, Node, Txt } from "@motion-canvas/2d";
+import { Icon, makeScene2D, Node, Rect, Txt } from "@motion-canvas/2d";
 import { createScene } from "../components/presets";
 import { createInfoCard } from "../utils/infocard";
 import { buildCPULevel0, RAM_SCALE } from "../utils/cpus/buildCPULevel0";
@@ -23,8 +23,12 @@ import {
   sequence,
   loop,
   useRandom,
+  Color,
+  createRef,
 } from "@motion-canvas/core";
 import { Label3D } from "../components/Label3D";
+import { Glass } from "../components/GlassRect";
+import COLORS from "../utils/colors";
 
 export default makeScene2D(function* (view) {
   const scene = createScene(new Vector3(3, 4, 4).divideScalar(3));
@@ -43,8 +47,14 @@ export default makeScene2D(function* (view) {
       localPosition={inner_cpu.iu
         .getGlobalPosition()
         .add(new Vector3(0, 1, -0.1))}
-      material={new MeshStandardMaterial({ color: "#ff0000", transparent: true, opacity: 0 })}
-      localScale={new Vector3(2,1,1).multiplyScalar(0.06)}
+      material={
+        new MeshStandardMaterial({
+          color: "#ff0000",
+          transparent: true,
+          opacity: 0,
+        })
+      }
+      localScale={new Vector3(2, 1, 1).multiplyScalar(0.06)}
     />
   ) as Box;
   yield* phantom_memory.opacityTo(0.2, 0);
@@ -114,7 +124,8 @@ export default makeScene2D(function* (view) {
 
   // === Animate CPU coming back from below ===
   yield* all(inner_cpu.group.scaleTo(new Vector3(1, 1, 1), 0, easeOutBack));
-  yield* inner_cpu.ram.scaleTo(RAM_SCALE, 0.5);
+  yield* inner_cpu.ram.scaleTo(RAM_SCALE, 0);
+  yield* waitFor(0.5);
   yield* inner_cpu.initWires([
     inner_cpu.wire_cu_iu,
     inner_cpu.wire_iu_mc,
@@ -285,12 +296,12 @@ export default makeScene2D(function* (view) {
       1.5
     )
   );
-  yield* waitUntil('memory');
-  yield* phantom_memory.moveDOWN(1,1)
- 
+  yield* waitUntil("memory");
+  yield* phantom_memory.moveDOWN(1, 1);
+
   const memory = new Label3D({
     text: "Memory",
-    color: 'alu',
+    color: "alu",
     scene,
     worldPosition: phantom_memory.getGlobalPosition(),
     fontSize: 60,
@@ -298,35 +309,155 @@ export default makeScene2D(function* (view) {
     width: 500,
   });
   view.add(memory);
-  
-  yield* camera.lookTo(phantom_memory.getGlobalPosition(),1);
+
+  yield* camera.lookTo(phantom_memory.getGlobalPosition(), 1);
   yield* memory.popIn();
   yield* waitUntil("guess");
-  yield* camera.zoomIn(1.5,1);
-  yield* waitUntil('reveal');
+  yield* camera.zoomIn(1.5, 1);
+  yield* waitUntil("reveal");
   yield* all(
-    memory.scale(2,1),
-    memory.findFirst(t=>t instanceof Txt).text("a number", 1)
+    memory.scale(2, 1),
+    memory.findFirst((t) => t instanceof Txt).text("a number", 1)
   );
   yield* waitFor(0.5);
   yield* all(
-    memory.findFirst(t=>t instanceof Txt).text("a number + an address", 1),
-    memory.width(900, 1),
- );
- 
-  yield* waitUntil('store');
-  yield camera.moveLeft(.4, 15);
-  yield* all(
-    memory.popOut(),
-    camera.zoomIn(1.1,1),
+    memory.findFirst((t) => t instanceof Txt).text("a number + an address", 1),
+    memory.width(900, 1)
   );
-  yield* waitUntil('area');
-  yield* all(
-    phantom_memory.pulse(1.5, 1.5),
-  );
-  yield* waitUntil("register space");
-  yield* memory.findFirst(t=>t instanceof Txt).text("register space / GPR", 0),
-  yield* memory.popIn();
 
+  yield* waitUntil("store");
+  yield camera.moveLeft(0.4, 15);
+  yield* all(memory.popOut(), camera.zoomIn(1.1, 1));
+  yield* waitUntil("area");
+  yield* all(phantom_memory.pulse(1.5, 1.5));
+  // yield* waitUntil("register space");
+  // yield* memory
+  //   .findFirst((t) => t instanceof Txt)
+  //   .text("register space / GPR", 0),
+  //   yield* memory.popIn();
+  // const vr_ref = createRef<Glass>();
+  // const ar_ref = createRef<Glass>();
+  // const register_contents = (
+  //   <Glass
+  //     size={[1100, 600]}
+  //     fill={new Color(COLORS["alu"]).alpha(0.2)}
+  //     position={[-15, 37]}
+  //     scale={0}
+  //     lightness={-0.2}
+  //   >
+  //     <Txt
+  //       zIndex={1}
+  //       fontSize={120}
+  //       fontWeight={400}
+  //       fill={new Color(COLORS["alu"]).brighten(4)}
+  //       shadowBlur={10}
+  //       shadowColor={"#000a"}
+  //       text={"GPR CONTENT"}
+  //       fontFamily={"Poppins"}
+  //       y={-180}
+  //     />
+  //     <Rect
+  //       width={800}
+  //       height={5}
+  //       fill={new Color(COLORS["alu"]).brighten(4)}
+  //       zIndex={1}
+  //       y={-100}
+  //       radius={100}
+  //     />
+  //     <Glass
+  //       width={900}
+  //       height={130}
+  //       zIndex={1}
+  //       y={30}
+  //       lightness={-0.3}
+  //       blurstrength={10}
+  //       ref={ar_ref}
+  //       scale={0}
+  //     >
+  //       <Txt
+  //         zIndex={1}
+  //         fontSize={70}
+  //         fontWeight={300}
+  //         shadowBlur={10}
+  //         fill={new Color(COLORS["alu"]).brighten(5)}
+  //         fontFamily={"Poppins"}
+  //         shadowColor={"#000a"}
+  //         text={"AR: 0x001"}
+  //         width={800}
+  //       />
+  //       <Txt
+  //         zIndex={1}
+  //         fontSize={70}
+  //         fontWeight={200}
+  //         fill={"999"}
+  //         shadowBlur={10}
+  //         fontFamily={"Poppins"}
+  //         shadowColor={"#000a"}
+  //         text={"8bit"}
+  //         width={800}
+  //         textAlign={"right"}
+  //       />
+  //       <Icon
+  //         icon={"tabler:lock-filled"}
+  //         color={"999"}
+  //         scale={0}
+  //         size={60}
+  //         zIndex={1}
+  //         x={230}
+  //       />
+  //     </Glass>
+  //     <Glass
+  //       width={900}
+  //       height={130}
+  //       zIndex={1}
+  //       y={200}
+  //       lightness={-0.3}
+  //       blurstrength={10}
+  //       scale={0}
+  //       ref={vr_ref}
+  //     >
+  //       <Txt
+  //         zIndex={1}
+  //         fontSize={70}
+  //         fontWeight={300}
+  //         shadowBlur={10}
+  //         fontFamily={"Poppins"}
+  //         fill={new Color(COLORS["alu"]).brighten(5)}
+  //         shadowColor={"#000a"}
+  //         text={"VR: 0001 1110"}
+  //         width={800}
+  //       />
+  //       <Txt
+  //         zIndex={1}
+  //         fontSize={70}
+  //         fontWeight={200}
+  //         fill={"999"}
+  //         shadowBlur={10}
+  //         fontFamily={"Poppins"}
+  //         shadowColor={"#000a"}
+  //         text={"8bit"}
+  //         width={800}
+  //         textAlign={"right"}
+  //       />
+  //     </Glass>
+  //   </Glass>
+  // );
+  // view.add(register_contents);
+
+  // yield* waitUntil('contents');
+  // yield* all(
+  //   register_contents.scale(2,1,easeOutBack),
+  //   memory.popOut()
+  // )
+  // yield* waitUntil('add reg');
+  // yield* all(ar_ref().scale(1, 0.33, easeOutBack));
+  // yield* waitUntil('val reg');
+  // yield* all(vr_ref().scale(1, 0.33, easeOutBack));
+  // yield* waitUntil('hardcode');
+  // yield* waitFor(0.5);
+  // yield* ar_ref()
+  //   .findFirst((child) => child instanceof Icon)
+  //   .scale(1, 0.3, easeOutBack);
+  
   yield* waitUntil("next");
 });

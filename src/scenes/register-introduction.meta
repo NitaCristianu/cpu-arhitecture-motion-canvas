@@ -7,79 +7,79 @@
     },
     {
       "name": "contents",
-      "targetTime": 14.649883784213571
+      "targetTime": 13.148242818911779
     },
     {
       "name": "ar",
-      "targetTime": 16.371363056296403
+      "targetTime": 14.86972209099461
     },
     {
       "name": "vr",
-      "targetTime": 21.05139506989863
+      "targetTime": 19.549754104596836
     },
     {
       "name": "hardcode vr",
-      "targetTime": 25.583938358914658
+      "targetTime": 24.082297393612865
     },
     {
       "name": "focus",
-      "targetTime": 27.946264099704155
+      "targetTime": 26.444623134402363
     },
     {
       "name": "next step",
-      "targetTime": 35.48675239680252
+      "targetTime": 33.98511143150073
     },
     {
       "name": "cleanup",
-      "targetTime": 44.08008573013596
+      "targetTime": 42.57844476483417
     },
     {
       "name": "clock",
-      "targetTime": 57.485410935997095
+      "targetTime": 55.9837699706953
     },
     {
       "name": "press",
-      "targetTime": 64.19770137473807
+      "targetTime": 62.69606040943628
     },
     {
       "name": "resume",
-      "targetTime": 68.04451288017502
+      "targetTime": 66.54287191487323
     },
     {
       "name": "step 0",
-      "targetTime": 73.26943178361539
+      "targetTime": 71.7677908183136
     },
     {
       "name": "step 1",
-      "targetTime": 76.58258336092766
+      "targetTime": 75.08094239562587
     },
     {
       "name": "tap",
-      "targetTime": 80.41618926781231
+      "targetTime": 78.91454830251052
     },
     {
       "name": "step 3",
-      "targetTime": 84.97021258131315
+      "targetTime": 83.46857161601136
     },
     {
       "name": "step 5",
-      "targetTime": 91.06103797066301
+      "targetTime": 89.55939700536122
     },
     {
       "name": "clean",
-      "targetTime": 102.59152682554054
+      "targetTime": 101.08988586023875
     },
     {
       "name": "others",
-      "targetTime": 106.04623252116332
+      "targetTime": 104.54459155586153
     },
     {
       "name": "second",
-      "targetTime": 114.70287621966632
+      "targetTime": 113.20123525436453
     },
     {
       "name": "next",
-      "targetTime": 130.07902136754635
+      "targetTime": 128.57738040224456
     }
   ],
   "seed": 4213255170

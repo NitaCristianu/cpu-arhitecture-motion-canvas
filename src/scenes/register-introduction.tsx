@@ -56,6 +56,12 @@ export default makeScene2D(function* (view) {
   const camera: Camera = scene.findFirst(
     (child) => (child as any) instanceof Camera
   ) as any;
+ 
+  const ct = createInfoCard("LEVEL 0 CPU", {
+    width: 700,
+    props: { top: [1600, 750] },
+  });
+  view.add(ct.node);
 
   const getCPUScale = (level: number) =>
     new Vector3(3 + level * 0.1, 1, 3 + level * 0.1).multiplyScalar(0.15); // level 0-4
@@ -310,6 +316,7 @@ export default makeScene2D(function* (view) {
         zIndex={1}
         y={30}
         lightness={-0.3}
+        translucency={.2}
         blurstrength={10}
         ref={ar_ref}
         scale={0}
@@ -351,6 +358,7 @@ export default makeScene2D(function* (view) {
         height={130}
         zIndex={1}
         y={200}
+        translucency={.2}
         lightness={-0.3}
         blurstrength={10}
         scale={0}

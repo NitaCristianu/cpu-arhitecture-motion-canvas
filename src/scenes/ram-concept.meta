@@ -3,39 +3,39 @@
   "timeEvents": [
     {
       "name": "zoom in",
-      "targetTime": 1.3331966942190925
+      "targetTime": 4.566012055450862
     },
     {
       "name": "select bit",
-      "targetTime": 8.662554322425017
+      "targetTime": 13.736649675678269
     },
     {
       "name": "select bit 2",
-      "targetTime": 14.00892841166101
+      "targetTime": 18.051435155977483
     },
     {
       "name": "modify",
-      "targetTime": 18.710886897686933
+      "targetTime": 22.753393642003406
     },
     {
       "name": "address",
-      "targetTime": 27.548554385098335
+      "targetTime": 31.591061129414808
     },
     {
       "name": "number",
-      "targetTime": 31.187877536521988
+      "targetTime": 34.740080026571796
     },
     {
       "name": "hex",
-      "targetTime": 34.86602259184885
+      "targetTime": 37.69238250940555
     },
     {
       "name": "move cursor",
-      "targetTime": 39.23107892224766
+      "targetTime": 41.62074548353274
     },
     {
       "name": "end",
-      "targetTime": 43.23107892224766
+      "targetTime": 45.62074548353274
     }
   ],
   "seed": 1349546265

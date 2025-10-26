@@ -369,9 +369,9 @@ export default makeScene2D(function* (view) {
           (child as Label3D).translucency(1, 1)
         )
       ),
-    camera.moveTo(new Vector3(0.5, 5, 1).divideScalar(2), .5),
-    camera.lookTo(new Vector3(0.5, -0.7, 0.2).divideScalar(2), .5),
-    camera.zoomTo(1.8, .5)
+    camera.moveTo(new Vector3(0.75, 3.5, 1.46).divideScalar(2), .5),
+    camera.lookTo(new Vector3(0.75, -0.7, 0.2).divideScalar(2), .5),
+    camera.zoomTo(1.5, .5)
   );
   yield* inner_cpu.wire_mc_ram_address.widthTo(0, 0);
   yield* inner_cpu.wire_mc_ram_data.widthTo(0, 0);

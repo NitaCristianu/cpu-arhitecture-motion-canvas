@@ -211,7 +211,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
         cu
           .localPosition()
           .clone()
-          .add(new Vector3(0, 0, -cu.localScale().z / 2)),
+          .add(new Vector3(0,  -cu.localScale().z / 2, .01)),
       ]}
       lineWidth={0}
       color="control"
