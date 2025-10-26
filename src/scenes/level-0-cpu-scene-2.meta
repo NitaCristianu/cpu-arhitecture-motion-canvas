@@ -22,8 +22,40 @@
       "targetTime": 29.84288128989973
     },
     {
+      "name": "theory",
+      "targetTime": 38.7266222293668
+    },
+    {
+      "name": "missing",
+      "targetTime": 39.7266222293668
+    },
+    {
+      "name": "memory",
+      "targetTime": 47.42108328581473
+    },
+    {
+      "name": "guess",
+      "targetTime": 57.399822410839946
+    },
+    {
+      "name": "reveal",
+      "targetTime": 58.610472973302045
+    },
+    {
+      "name": "store",
+      "targetTime": 62.34964098819572
+    },
+    {
+      "name": "area",
+      "targetTime": 65.32104464825385
+    },
+    {
+      "name": "register space",
+      "targetTime": 71.83657929581977
+    },
+    {
       "name": "next",
-      "targetTime": 70.20382062717673
+      "targetTime": 88.78457107726547
     }
   ],
   "seed": 1066491154

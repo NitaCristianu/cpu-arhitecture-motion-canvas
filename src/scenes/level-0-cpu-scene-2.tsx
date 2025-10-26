@@ -3,7 +3,7 @@ import { createScene } from "../components/presets";
 import { createInfoCard } from "../utils/infocard";
 import { buildCPULevel0, RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import Camera from "../libs/Thrash/Camera";
-import { Vector3, MeshPhongMaterial } from "three";
+import { Vector3, MeshPhongMaterial, MeshStandardMaterial } from "three";
 import Box from "../libs/Thrash/objects/Box";
 import {
   all,
@@ -21,6 +21,8 @@ import {
   easeInOutCubic,
   easeInOutSine,
   sequence,
+  loop,
+  useRandom,
 } from "@motion-canvas/core";
 import { Label3D } from "../components/Label3D";
 
@@ -35,6 +37,18 @@ export default makeScene2D(function* (view) {
   yield* inner_cpu.group.rotateTo(new Vector3(-Math.PI / 2, 0, 0), 0);
   yield* inner_cpu.clock.scaleTo(new Vector3(0, 0, 0), 0);
   yield* inner_cpu.gpr.scaleTo(new Vector3(0, 0, 0), 0);
+
+  const phantom_memory = (
+    <Box
+      localPosition={inner_cpu.iu
+        .getGlobalPosition()
+        .add(new Vector3(0, 1, -0.1))}
+      material={new MeshStandardMaterial({ color: "#ff0000", transparent: true, opacity: 0 })}
+      localScale={new Vector3(2,1,1).multiplyScalar(0.06)}
+    />
+  ) as Box;
+  yield* phantom_memory.opacityTo(0.2, 0);
+  scene.add(phantom_memory);
 
   scene.init();
   view.add(scene);
@@ -198,7 +212,7 @@ export default makeScene2D(function* (view) {
     1.4,
     all(
       camera.lookTo(
-        inner_cpu.cu.getGlobalPosition().add(new Vector3(-0.01, 0, 0)),
+        inner_cpu.cu.getGlobalPosition().add(new Vector3(0.01, 0, 0.05)),
         1.5
       ),
       camera.zoomIn(2, 1.5)
@@ -209,24 +223,110 @@ export default makeScene2D(function* (view) {
       ignorePosition
       scene={scene}
       worldPosition={null}
-      text={"ADDRESS"}
-      fontFamily={"Poppins"}
-      fontWeight={200}
-      fill={"white"}
+      text={"Address info"}
+      color={"bus"}
+      fontSize={60}
+      width={500}
+    />
+  );
+  const clone_data_info = (
+    <Label3D
+      ignorePosition
+      scene={scene}
+      worldPosition={null}
+      text={"Data info"}
+      color={"memory"}
+      fontSize={60}
+      width={500}
     />
   );
   view.add(clone_address_info);
+  view.add(clone_data_info);
   yield all(
     clone_address_info.position(new Vector3(-659, 1124), 0),
-    info_data_buss.position(new Vector3(-659, 1124), 0)
-  );
-  yield sequence(
-    0.7,
-    clone_address_info.position(new Vector3(-90, 327), 1),
-    info_data_buss.position(new Vector3(-90, 327), 1)
+    clone_data_info.position(new Vector3(-659, 1124), 0)
   );
   yield* waitFor(0.5);
-  yield* inner_cpu.wire_mc_cu.currentFlow(2, easeInOutSine, 100);
+  yield* inner_cpu.wire_mc_cu.currentFlow(1.5, easeInOutSine, 100);
+  yield* all(
+    clone_address_info.position(new Vector3(-90, 227), 1),
+    clone_address_info.scale(1.3, 1)
+  );
+  yield* all(
+    clone_address_info.position(new Vector3(-90 - 300, 227), 1),
+    clone_data_info.position(new Vector3(350, 227), 1),
+    clone_data_info.scale(1.3, 1)
+  );
+  yield* waitUntil("theory");
+  yield* all(
+    clone_address_info.scale(0, 1),
+    clone_data_info.scale(0, 1),
+    clone_data_info.position(new Vector3(-9, -164), 1),
+    clone_address_info.position(new Vector3(-9, -164), 1),
+    camera.zoomOut(1 / 2, 1, easeInOutCubic)
+  );
+  yield* waitUntil("missing");
+  camera.anchor(inner_cpu.base.getGlobalPosition());
+  camera.anchorWeight(0.5);
+  const r = 0.2;
+  const randomgenerator = useRandom(0);
+  yield* loop(4, () =>
+    camera.lookTo(
+      camera
+        .anchor()
+        .clone()
+        .add(
+          new Vector3(
+            randomgenerator.nextFloat(-r, r),
+            0,
+            randomgenerator.nextFloat(-r, r)
+          )
+        ),
+      1.5
+    )
+  );
+  yield* waitUntil('memory');
+  yield* phantom_memory.moveDOWN(1,1)
+ 
+  const memory = new Label3D({
+    text: "Memory",
+    color: 'alu',
+    scene,
+    worldPosition: phantom_memory.getGlobalPosition(),
+    fontSize: 60,
+    offset2D: [0, -800],
+    width: 500,
+  });
+  view.add(memory);
+  
+  yield* camera.lookTo(phantom_memory.getGlobalPosition(),1);
+  yield* memory.popIn();
+  yield* waitUntil("guess");
+  yield* camera.zoomIn(1.5,1);
+  yield* waitUntil('reveal');
+  yield* all(
+    memory.scale(2,1),
+    memory.findFirst(t=>t instanceof Txt).text("a number", 1)
+  );
+  yield* waitFor(0.5);
+  yield* all(
+    memory.findFirst(t=>t instanceof Txt).text("a number + an address", 1),
+    memory.width(900, 1),
+ );
+ 
+  yield* waitUntil('store');
+  yield camera.moveLeft(.4, 15);
+  yield* all(
+    memory.popOut(),
+    camera.zoomIn(1.1,1),
+  );
+  yield* waitUntil('area');
+  yield* all(
+    phantom_memory.pulse(1.5, 1.5),
+  );
+  yield* waitUntil("register space");
+  yield* memory.findFirst(t=>t instanceof Txt).text("register space / GPR", 0),
+  yield* memory.popIn();
 
   yield* waitUntil("next");
 });
