@@ -4,6 +4,7 @@ import "./global.css";
 import example from "./scenes/example?scene";
 import devModelInspector from "./scenes/dev-model-inspector?scene";
 import introScene from "./scenes/intro-scene?scene";
+import level0Postintro from "./scenes/level-0-postintro?scene";
 import ramConcept from "./scenes/ram-concept?scene";
 import level0CpuScene1 from "./scenes/level-0-cpu-scene-1?scene";
 import level0CpuScene2 from "./scenes/level-0-cpu-scene-2?scene";
@@ -34,11 +35,12 @@ export default makeProject({
   audio : level0CpuAudio,
   scenes: [
     // example,
-    introScene,
+    // introScene,
+    // level0Postintro,
     ramConcept,
-    level0CpuScene1,
-    level0CpuScene2,
-    registerIntroduction,
+    // level0CpuScene1,
+    // level0CpuScene2,
+    // registerIntroduction,
     // level1CpuScene1,
     // level1CpuScene2,
     // level1CpuScene3,

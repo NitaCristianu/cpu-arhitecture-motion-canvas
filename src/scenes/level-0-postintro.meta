@@ -1,0 +1,18 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "show code",
+      "targetTime": 14.507533080846644
+    },
+    {
+      "name": "never look at coding",
+      "targetTime": 18.4023202171677
+    },
+    {
+      "name": "next",
+      "targetTime": 23.050272875211963
+    }
+  ],
+  "seed": 337386703
+}
