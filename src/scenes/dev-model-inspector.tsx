@@ -133,6 +133,23 @@ export default makeScene2D(function* (view) {
   yield* showCpu(level);
   yield* moveCamera(cpu as any, "iso");
 
+  yield* camera.zoomIn(3,1);
+  yield* cpu.ram.scaleTo(new Vector3(0,0,0),0);
+  yield* cpu.initWires(
+    cpu.wires.filter(w => !(w == cpu.wire_mc_ram_address || w == cpu.wire_mc_ram_data))
+  );
+  yield* all(
+    camera.moveTo(
+     new Vector3(2, 1, 2),
+      2
+    ),
+    camera.lookTo(
+      cpu.gpr.localPosition().clone().add(new Vector3(0, -.45, 0)),
+      2
+    )
+  );
+  yield* waitFor(2);
+
   for (const angle of ["front", "right", "back", "top"] as const) {
     yield* waitFor(1);
     yield* waitUntil(`${short}-${angle}`);

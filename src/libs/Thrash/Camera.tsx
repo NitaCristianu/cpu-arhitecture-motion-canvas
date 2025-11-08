@@ -27,7 +27,7 @@ export interface CameraProps extends ObjectProps {
 /*───────────────────────────────────────────────*/
 export default class Camera extends Object {
   /* ── Signals ───────────────────────────────── */
-  @initial(new PerspectiveCamera(20, 2, 0.05, 2000))
+  @initial(new PerspectiveCamera(20, 2, 0.1, 1000))
   @signal()
   public declare readonly camera: SimpleSignal<ThreeCamera | null, this>;
 

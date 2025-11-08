@@ -3,15 +3,15 @@
   "timeEvents": [
     {
       "name": "show code",
-      "targetTime": 14.507533080846644
+      "targetTime": 13.255269696468803
     },
     {
       "name": "never look at coding",
-      "targetTime": 18.4023202171677
+      "targetTime": 17.150056832789858
     },
     {
       "name": "next",
-      "targetTime": 23.050272875211963
+      "targetTime": 21.798009490834122
     }
   ],
   "seed": 337386703

@@ -10,7 +10,7 @@ const T = 0.02; // thin Z-depth for all logic blocks
 const S = 0.1; // base XY size of small units
 const L = 0.18; // large unit width
 const H = 0.13; // large unit height
-const wire_sizes = [4, 4, 16, 16, 6, 6, 10, 6, 5];
+const wire_sizes = [4, 4, 6, 6, 6, 6, 4, 6, 5];
 const CHIP_ROTATION = new Vector3(Math.PI / 2, 0, 0);
 
 export const RAM_SCALE = new Vector3(.65,.1,1).multiplyScalar(.35);

@@ -29,19 +29,19 @@ import level3CpuScene6 from "./scenes/level-3-cpu-scene-6?scene";
 import level3CpuScene7 from "./scenes/level-3-cpu-scene-7?scene";
 import level3CpuScene8 from "./scenes/level-3-cpu-scene-8?scene";
 
-import level0CpuAudio from './assets/audio/Level 0 CPU audio raw.mp3';
+import level0CpuAudio from './assets/audio/level-0-take-3.wav';
 
 export default makeProject({
   audio : level0CpuAudio,
   scenes: [
     // example,
-    // introScene,
     // level0Postintro,
-    ramConcept,
-    // level0CpuScene1,
-    // level0CpuScene2,
-    // registerIntroduction,
-    // level1CpuScene1,
+    // introScene,
+    // ramConcept,
+    level0CpuScene1,
+    level0CpuScene2,
+    registerIntroduction,
+    // // level1CpuScene1,
     // level1CpuScene2,
     // level1CpuScene3,
     // level1CpuScene4,

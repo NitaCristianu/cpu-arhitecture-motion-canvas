@@ -3,7 +3,16 @@ import { createScene } from "../components/presets";
 import { createInfoCard } from "../utils/infocard";
 import { buildCPULevel0, RAM_SCALE } from "../utils/cpus/buildCPULevel0";
 import Camera from "../libs/Thrash/Camera";
-import { Vector3, MeshPhongMaterial, MeshStandardMaterial } from "three";
+import {
+  Vector3,
+  MeshPhongMaterial,
+  MeshStandardMaterial,
+  ShaderMaterial,
+  DoubleSide,
+  AdditiveBlending,
+  Uniform,
+  Color,
+} from "three";
 import Box from "../libs/Thrash/objects/Box";
 import {
   all,
@@ -23,12 +32,77 @@ import {
   sequence,
   loop,
   useRandom,
-  Color,
   createRef,
 } from "@motion-canvas/core";
 import { Label3D } from "../components/Label3D";
 import { Glass } from "../components/GlassRect";
 import COLORS from "../utils/colors";
+
+const fragment = `
+uniform vec3 uColor;
+uniform float uTime;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+void main()
+{
+    // Normal
+    vec3 normal = normalize(vNormal);
+    if(!gl_FrontFacing)
+        normal *= - 1.0;
+
+    // Stripes
+    float stripes = mod((vPosition.y - uTime * 0.02) *80.0, 2.0);
+    stripes = pow(stripes, 3.0);
+
+    // Fresnel
+    vec3 viewDirection = normalize(vPosition - cameraPosition);
+    float fresnel = dot(viewDirection, normal) ;
+    fresnel = pow(fresnel, 1.0);
+
+    // Falloff
+    float falloff = smoothstep(0.8, 0.2, fresnel);
+
+    // Holographic
+    float holographic = stripes * fresnel;
+    holographic += fresnel * 0.25;
+    holographic *= falloff;
+
+    // Final color
+    gl_FragColor = vec4(uColor, min(holographic,12.));
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+}
+`;
+
+const vertex = `
+uniform float uTime;
+
+varying vec3 vPosition;
+varying vec3 vNormal;
+
+float random2D(vec2 value)
+{
+    return fract(sin(dot(value.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
+
+void main()
+{
+    // Position
+    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    // Final position
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+
+    // Model normal
+    vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+
+    // Varyings
+    vPosition = modelPosition.xyz;
+    vNormal = modelNormal.xyz;
+}
+`;
 
 export default makeScene2D(function* (view) {
   const scene = createScene(new Vector3(3, 4, 4).divideScalar(3));
@@ -44,20 +118,25 @@ export default makeScene2D(function* (view) {
 
   const phantom_memory = (
     <Box
-      localPosition={inner_cpu.iu
+      localPosition={inner_cpu.gpr
         .getGlobalPosition()
-        .add(new Vector3(0, 1, -0.1))}
+        .add(new Vector3(0,1.1, -.1))}
       material={
-        new MeshStandardMaterial({
-          color: "#ff0000",
+        new ShaderMaterial({
+          vertexShader: vertex,
+          fragmentShader: fragment,
+          uniforms: {
+            uTime: new Uniform(0),
+            uColor: new Uniform(new Color('gold')),
+          },
           transparent: true,
-          opacity: 0,
+          depthWrite: false,
+          blending: AdditiveBlending,
         })
       }
       localScale={new Vector3(2, 1, 1).multiplyScalar(0.06)}
     />
   ) as Box;
-  yield* phantom_memory.opacityTo(0.2, 0);
   scene.add(phantom_memory);
 
   scene.init();
@@ -195,6 +274,11 @@ export default makeScene2D(function* (view) {
 
   yield* waitUntil("busses");
   yield* chain(dataLabel.popIn(0.5), addressLabel.popIn(0.5));
+  yield* waitUntil("a");
+  yield* addressLabel.scale(1.2, 0.7).back(0.7);
+  yield* waitUntil("d");
+  yield* dataLabel.scale(1.2, 0.7).back(0.7);
+
   yield* waitUntil("address");
   yield* all(
     inner_cpu.wire_mc_ram_address.currentFlow(),
@@ -252,13 +336,14 @@ export default makeScene2D(function* (view) {
     />
   );
   view.add(clone_address_info);
-  view.add(clone_data_info);
   yield all(
     clone_address_info.position(new Vector3(-659, 1124), 0),
     clone_data_info.position(new Vector3(-659, 1124), 0)
   );
-  yield* waitFor(0.5);
-  yield* inner_cpu.wire_mc_cu.currentFlow(1.5, easeInOutSine, 100);
+  view.add(clone_data_info);
+  yield* waitFor(0.25);
+  yield inner_cpu.wire_mc_cu.currentFlow(1.5, easeInOutSine, 100);
+  yield* waitFor(1.5);
   yield* all(
     clone_address_info.position(new Vector3(-90, 227), 1),
     clone_address_info.scale(1.3, 1)
@@ -280,8 +365,8 @@ export default makeScene2D(function* (view) {
   camera.anchor(inner_cpu.base.getGlobalPosition());
   camera.anchorWeight(0.5);
   const r = 0.2;
-  const randomgenerator = useRandom(0);
-  yield* loop(4, () =>
+  const randomgenerator = useRandom(2);
+  yield* loop(2, () =>
     camera.lookTo(
       camera
         .anchor()
@@ -319,7 +404,6 @@ export default makeScene2D(function* (view) {
     memory.scale(2, 1),
     memory.findFirst((t) => t instanceof Txt).text("a number", 1)
   );
-  yield* waitFor(0.5);
   yield* all(
     memory.findFirst((t) => t instanceof Txt).text("a number + an address", 1),
     memory.width(900, 1)
@@ -458,6 +542,6 @@ export default makeScene2D(function* (view) {
   // yield* ar_ref()
   //   .findFirst((child) => child instanceof Icon)
   //   .scale(1, 0.3, easeOutBack);
-  
+
   yield* waitUntil("next");
 });

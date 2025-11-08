@@ -42,6 +42,7 @@ import { Glass } from "../components/GlassRect";
 import { addTowerSpotlight } from "../libs/Thrash/components/showlight";
 import COLORS from "../utils/colors";
 import Model from "../libs/Thrash/objects/Model";
+import Mesh from "../libs/Thrash/objects/Mesh";
 
 /**
  *
@@ -56,7 +57,7 @@ export default makeScene2D(function* (view) {
   const camera: Camera = scene.findFirst(
     (child) => (child as any) instanceof Camera
   ) as any;
- 
+
   const ct = createInfoCard("LEVEL 0 CPU", {
     width: 700,
     props: { top: [1600, 750] },
@@ -66,9 +67,11 @@ export default makeScene2D(function* (view) {
   const getCPUScale = (level: number) =>
     new Vector3(3 + level * 0.1, 1, 3 + level * 0.1).multiplyScalar(0.15); // level 0-4
   const other_cpus = range(5).map((level) => (
-    <Box
+    <Model
+      src={"/models/cpu.glb"}
       localScale={new Vector3(0, 0, 0)}
-      localPosition={new Vector3((level + 1) * 1.5, 0, 0.16)}
+      localRotation={new Vector3(0, Math.PI / 2, 0)}
+      localPosition={new Vector3((level + 1) * 1.5, -0.4, 0.16)}
       material={
         new MeshPhysicalMaterial({
           transmission: 0.9, // glassy transparency
@@ -316,7 +319,7 @@ export default makeScene2D(function* (view) {
         zIndex={1}
         y={30}
         lightness={-0.3}
-        translucency={.2}
+        translucency={0.2}
         blurstrength={10}
         ref={ar_ref}
         scale={0}
@@ -358,7 +361,7 @@ export default makeScene2D(function* (view) {
         height={130}
         zIndex={1}
         y={200}
-        translucency={.2}
+        translucency={0.2}
         lightness={-0.3}
         blurstrength={10}
         scale={0}
@@ -604,7 +607,7 @@ export default makeScene2D(function* (view) {
       all(
         cpu.cu.expand(),
         tag_container.childrenAs<Label3D>()[0].scale(1.2, 0.33),
-        cpu.wire_mc_cu.reverseFlow(2.5, easeInSine, 60),
+        cpu.wire_mc_cu.reverseFlow(1.3, easeInSine, 60),
         camera.lookToWeighted(cpu.cu.getGlobalPosition().clone())
       ),
       all(
@@ -632,6 +635,7 @@ export default makeScene2D(function* (view) {
     cpu.wire_mc_ram_data.currentFlow(1),
     all(cpu.wire_mc_ram_data.reverseFlow(1), anchor_notes[1].popIn())
   );
+  yield* waitUntil("mc places");
   yield* chain(
     sequence(
       // 1. value travels MC → GPR
@@ -679,6 +683,8 @@ export default makeScene2D(function* (view) {
   yield* loop(2, (i) =>
     [cpu.wire_cu_gpr, cpu.wire_cu_iu][i % 3].currentFlow(1)
   );
+  yield* waitUntil("done");
+  yield* camera.zoomOut(0.8, 1);
   yield* waitUntil("clock");
   const clock_oldposition = cpu.clock.getGlobalPosition();
   yield* cpu.clock.moveBack(3, 0);
@@ -783,7 +789,7 @@ export default makeScene2D(function* (view) {
       0.7,
       all(
         cpu.cu.expand(),
-        cpu.wire_mc_cu.reverseFlow(1.5, easeInSine, 60),
+        cpu.wire_mc_cu.reverseFlow(1.5, easeInSine, 90),
         camera.lookToWeighted(cpu.cu.getGlobalPosition().clone())
       ),
       all(
@@ -922,7 +928,7 @@ export default makeScene2D(function* (view) {
             cpu.wire_gpr_iu.reverseFlow(1.2, easeInSine, 60),
             vr_ref().childAs<Txt>(0).text("VR: 0001 1100", 1), // incremented value
             vr_ref().fill("#f8686850", 1),
-            anchor_notes[5].popIn(),
+            anchor_notes[5].popIn()
             // anchor_notes[4].popOut()
           )
         )
@@ -994,7 +1000,7 @@ export default makeScene2D(function* (view) {
       height={0}
       fontSize={80 + (i + 1) * 20}
       scene={scene}
-      offset2D={[150, -650]}
+      offset2D={[0, -850]}
       shadowBlur={20}
       shadowColor={"#fff5"}
       worldPosition={cpu.localPosition()}
@@ -1024,10 +1030,14 @@ export default makeScene2D(function* (view) {
     camera.moveLeft(9, 2),
     camera.lookTo(other_cpus[0].localPosition(), 2),
     cpus_tags[0].offset2D(
-      [150, ((cpus_tags[0].offset2D() as any)[1] as any) - 120],
+      [0, ((cpus_tags[0].offset2D() as any)[1] as any) - 320],
       2
     ),
     delay(1.4, other_cpus[0].expand(1.5))
+  );
+  yield* all(
+    other_cpus[0].rotateTo(new Vector3(Math.PI, 0, 0), 1),
+    other_cpus[0].moveUP(0.6, 1)
   );
 
   yield* waitUntil("next");

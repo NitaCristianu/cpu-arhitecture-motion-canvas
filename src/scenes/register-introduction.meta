@@ -7,79 +7,87 @@
     },
     {
       "name": "contents",
-      "targetTime": 13.148242818911779
+      "targetTime": 11.395428408941912
     },
     {
       "name": "ar",
-      "targetTime": 14.86972209099461
+      "targetTime": 12.695280675917962
     },
     {
       "name": "vr",
-      "targetTime": 19.549754104596836
+      "targetTime": 17.375312689520186
     },
     {
       "name": "hardcode vr",
-      "targetTime": 24.082297393612865
+      "targetTime": 20.91606088641997
     },
     {
       "name": "focus",
-      "targetTime": 26.444623134402363
+      "targetTime": 25.82406691366341
     },
     {
       "name": "next step",
-      "targetTime": 33.98511143150073
+      "targetTime": 30.40740024699667
+    },
+    {
+      "name": "mc places",
+      "targetTime": 34.73140250015934
     },
     {
       "name": "cleanup",
-      "targetTime": 42.57844476483417
+      "targetTime": 40.88681256853643
+    },
+    {
+      "name": "done",
+      "targetTime": 49.95488099649876
     },
     {
       "name": "clock",
-      "targetTime": 55.9837699706953
+      "targetTime": 56.47573633652691
     },
     {
       "name": "press",
-      "targetTime": 62.69606040943628
+      "targetTime": 63.188026775267886
     },
     {
       "name": "resume",
-      "targetTime": 66.54287191487323
+      "targetTime": 68.49892060797765
     },
     {
       "name": "step 0",
-      "targetTime": 71.7677908183136
+      "targetTime": 72.49892060797765
     },
     {
       "name": "step 1",
-      "targetTime": 75.08094239562587
+      "targetTime": 74.15450788468763
     },
     {
       "name": "tap",
-      "targetTime": 78.91454830251052
+      "targetTime": 77.1433967735758
     },
     {
       "name": "step 3",
-      "targetTime": 83.46857161601136
+      "targetTime": 81.75948436324194
     },
     {
       "name": "step 5",
-      "targetTime": 89.55939700536122
+      "targetTime": 86.12008809783339
     },
     {
       "name": "clean",
-      "targetTime": 101.08988586023875
+      "targetTime": 97.67941568393378
     },
     {
       "name": "others",
-      "targetTime": 104.54459155586153
+      "targetTime": 99.03418060823638
     },
     {
       "name": "second",
-      "targetTime": 113.20123525436453
+      "targetTime": 107.69082430673939
     },
     {
       "name": "next",
-      "targetTime": 128.57738040224456
+      "targetTime": 114.12935311006501
     }
   ],
   "seed": 4213255170

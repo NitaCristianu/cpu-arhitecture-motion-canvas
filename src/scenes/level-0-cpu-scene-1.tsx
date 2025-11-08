@@ -33,8 +33,8 @@ export default makeScene2D(function* (view) {
 
   const inner_cpu = buildCPULevel0(scene);
   const outer_cpu = (
-    <Box
-      material={new MeshPhongMaterial({ color: "#130235" })}
+    <Model
+      src="/models/cpu.glb"
       localScale={new Vector3(0, 0, 0)}
       localPosition={new Vector3(-0.02, -0.4, 0)}
     />
@@ -100,6 +100,7 @@ export default makeScene2D(function* (view) {
     />
   ) as Label3D;
 
+
   [ramData, cpuData, cpuData2, cpuData3].map((item) => view.add(item));
 
   // INIT SCENE -------------------------------
@@ -108,29 +109,53 @@ export default makeScene2D(function* (view) {
   yield* inner_cpu.ram.reposition(
     inner_cpu.ram.localPosition().clone().add(new Vector3(0.02, 0, 0)),
     0
-  );
+  ); 
 
   scene.add(outer_cpu);
   scene.init();
 
   view.add(scene);
 
+  yield* all(
+    inner_cpu.wire_mc_ram_address.updatePoints(
+      [
+        inner_cpu.wire_mc_ram_address.getPointAt(0).add(new Vector3(-.1, 0, 0)),
+        inner_cpu.wire_mc_ram_address.getPointAt(0.5),
+        inner_cpu.wire_mc_ram_address.getPointAt(1),
+      ],
+      0
+    ),
+      inner_cpu.wire_mc_ram_data.updatePoints(
+        [
+          inner_cpu.wire_mc_ram_data.getPointAt(0).add(new Vector3(-.1, 0, 0)),
+          inner_cpu.wire_mc_ram_data.getPointAt(0.5),
+          inner_cpu.wire_mc_ram_data.getPointAt(1),
+        ],
+        0
+      )
+  )
+
   // ANIMATE --------------------------
 
-  // rotate camera initially
   yield* all(
     inner_cpu.group.popIn(0, new Vector3(0.5)),
-    outer_cpu.popIn(1, new Vector3(0.66, 0.02 * 5 + 0.04, 0.61)),
+    outer_cpu.popIn(
+      1,
+      new Vector3(0.66, 0.02 * 5 + 0.04, 0.61).multiplyScalar(0.6)
+    ),
     inner_cpu.ram.popIn(0.5, RAM_SCALE)
   );
+  yield* waitUntil("start");
+  // rotate camera initially
   yield all(
     inner_cpu.wire_mc_ram_address.widthTo(11, 1),
     inner_cpu.wire_mc_ram_data.widthTo(10, 1)
   );
   yield* all(
-    camera.moveTo(new Vector3(0.5, 4, 2).divideScalar(2), 2),
-    camera.lookTo(new Vector3(0.5, -0.7, 0).divideScalar(2), 2)
+    camera.moveTo(new Vector3(0.5, 4, 2).divideScalar(2), 1),
+    camera.lookTo(new Vector3(0.5, -0.7, 0).divideScalar(2), 1)
   );
+  yield* waitUntil('compute');
   yield* all(
     ramData.popIn(),
     inner_cpu.wire_mc_ram_address.reverseFlow(0.3, easeInSine, 50)
@@ -151,6 +176,7 @@ export default makeScene2D(function* (view) {
     )
   );
   yield* cpuData3.popIn();
+  yield* waitUntil('back');
   yield* any(
     camera.lookTo(inner_cpu.ram.localPosition()),
     inner_cpu.wire_mc_ram_data.currentFlow(0.6, easeInSine, 50)
@@ -369,9 +395,9 @@ export default makeScene2D(function* (view) {
           (child as Label3D).translucency(1, 1)
         )
       ),
-    camera.moveTo(new Vector3(0.75, 3.5, 1.46).divideScalar(2), .5),
-    camera.lookTo(new Vector3(0.75, -0.7, 0.2).divideScalar(2), .5),
-    camera.zoomTo(1.5, .5)
+    camera.moveTo(new Vector3(0.75, 3.5, 1.46).divideScalar(2), 0.5),
+    camera.lookTo(new Vector3(0.75, -0.7, 0.2).divideScalar(2), 0.5),
+    camera.zoomTo(1.5, 0.5)
   );
   yield* inner_cpu.wire_mc_ram_address.widthTo(0, 0);
   yield* inner_cpu.wire_mc_ram_data.widthTo(0, 0);
