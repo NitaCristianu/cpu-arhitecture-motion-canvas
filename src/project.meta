@@ -3,7 +3,7 @@
   "shared": {
     "background": "rgb(255,16,16)",
     "range": [
-      77.73250132824698,
+      32.579834894904394,
       null
     ],
     "size": {
@@ -14,7 +14,7 @@
   },
   "preview": {
     "fps": 30,
-    "resolutionScale": 0.25
+    "resolutionScale": 1
   },
   "rendering": {
     "fps": 60,

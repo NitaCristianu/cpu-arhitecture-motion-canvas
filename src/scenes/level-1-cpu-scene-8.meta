@@ -1,0 +1,74 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 1.1175829517959548
+    },
+    {
+      "name": "div by 2",
+      "targetTime": 4.617582951795955
+    },
+    {
+      "name": "loop",
+      "targetTime": 6.301363926644507
+    },
+    {
+      "name": "execute",
+      "targetTime": 10.00643151945197
+    },
+    {
+      "name": "PC",
+      "targetTime": 12.997701337563345
+    },
+    {
+      "name": "IR",
+      "targetTime": 16.658415519064537
+    },
+    {
+      "name": "load memory",
+      "targetTime": 22.616026401621866
+    },
+    {
+      "name": "step 2",
+      "targetTime": 26.979387982092945
+    },
+    {
+      "name": "shift",
+      "targetTime": 31.54248194285002
+    },
+    {
+      "name": "reupdate",
+      "targetTime": 35.53070203075811
+    },
+    {
+      "name": "increment",
+      "targetTime": 38.91403536409139
+    },
+    {
+      "name": "enter l",
+      "targetTime": 42.44643884594937
+    },
+    {
+      "name": "pan out",
+      "targetTime": 42.44643884594937
+    },
+    {
+      "name": "exit the loop",
+      "targetTime": 66.07983888593884
+    },
+    {
+      "name": "add two number",
+      "targetTime": 71.82430475698541
+    },
+    {
+      "name": "next episode",
+      "targetTime": 76.01157851202358
+    },
+    {
+      "name": "next",
+      "targetTime": 100.29390618339427
+    }
+  ],
+  "seed": 1856318586
+}

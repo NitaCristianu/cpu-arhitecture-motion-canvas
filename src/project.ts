@@ -16,6 +16,7 @@ import level1CpuScene4 from "./scenes/level-1-cpu-scene-4?scene";
 import level1CpuScene5 from "./scenes/level-1-cpu-scene-5?scene";
 import level1CpuScene6 from "./scenes/level-1-cpu-scene-6?scene";
 import level1CpuScene7 from "./scenes/level-1-cpu-scene-7?scene";
+import level1CpuScene8 from "./scenes/level-1-cpu-scene-8?scene";
 import level2CpuScene1 from "./scenes/level-2-cpu-scene-1?scene";
 import level2CpuScene2 from "./scenes/level-2-cpu-scene-2?scene";
 import level2CpuScene3 from "./scenes/level-2-cpu-scene-3?scene";
@@ -29,7 +30,7 @@ import level3CpuScene6 from "./scenes/level-3-cpu-scene-6?scene";
 import level3CpuScene7 from "./scenes/level-3-cpu-scene-7?scene";
 import level3CpuScene8 from "./scenes/level-3-cpu-scene-8?scene";
 
-import level0CpuAudio from './assets/audio/level-0-take-3.wav';
+import level0CpuAudio from './assets/audio/level-1-take-0.wav';
 
 export default makeProject({
   audio : level0CpuAudio,
@@ -38,16 +39,17 @@ export default makeProject({
     // level0Postintro,
     // introScene,
     // ramConcept,
-    level0CpuScene1,
-    level0CpuScene2,
-    registerIntroduction,
-    // // level1CpuScene1,
+    // level0CpuScene1,
+      // level0CpuScene2,
+    // registerIntroduction,
+    // level1CpuScene1,
     // level1CpuScene2,
     // level1CpuScene3,
     // level1CpuScene4,
     // level1CpuScene5,
     // level1CpuScene6,
     // level1CpuScene7,
+    level1CpuScene8,
     // level2CpuScene1,
     // level2CpuScene2,
     // level2CpuScene3,

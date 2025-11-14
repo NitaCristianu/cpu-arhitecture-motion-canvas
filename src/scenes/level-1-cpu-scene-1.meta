@@ -11,27 +11,27 @@
     },
     {
       "name": "inspect data",
-      "targetTime": 4.1
+      "targetTime": 4.870131655166339
     },
     {
       "name": "level-1-cpu",
-      "targetTime": 9.879999999999997
+      "targetTime": 14.0156243500583
     },
     {
       "name": "steps",
-      "targetTime": 12.879999999999997
+      "targetTime": 20.954042910627688
     },
     {
       "name": "zoom",
-      "targetTime": 17.853834412930908
+      "targetTime": 25.927877323558597
     },
     {
       "name": "alu",
-      "targetTime": 18.853834412930908
+      "targetTime": 28.18561511613538
     },
     {
       "name": "next",
-      "targetTime": 20.853834412930908
+      "targetTime": 33.31896395058483
     }
   ],
   "seed": 1789488040

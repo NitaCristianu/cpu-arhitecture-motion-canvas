@@ -47,6 +47,7 @@ import { buildCPULevel1 } from "../utils/cpus/buildCPULevel1";
 import { Glass } from "../components/GlassRect";
 import Box from "../libs/Thrash/objects/Box";
 import { createInfoCard } from "../utils/infocard";
+import Model from "../libs/Thrash/objects/Model";
 
 export const ALU_OPERATIONS = [
   "ADD",
@@ -67,15 +68,17 @@ export default makeScene2D(function* (view: View2D) {
   view.fill("#000");
   // 3D SCENE
   const scene = createScene(new Vector3(-1.5, 1, 1.5));
-  const alu = new Box({
+  const alu = new Model({
+    src: "/models/Chips/ALU.glb",
     key: "level_1 ALU",
     material: new MeshPhysicalMaterial({
       color: 0x00a0ff,
       metalness: 0.5,
     }),
-    localScale: new Vector3(0.02, 0.18, 0.13),
+    localScale: new Vector3(0.05, 0.18, 0.13),
     localPosition: new Vector3(0.0, 0.3, 0),
-    localRotation: new Vector3(0, 0, Math.PI / 2),
+    localRotation: new Vector3(0, 0, -Math.PI / 2),
+    sceneRotation : new Vector3(0,0,-Math.PI/2)
   });
   scene.add(alu);
 
@@ -126,7 +129,7 @@ export default makeScene2D(function* (view: View2D) {
     delay(
       0.2,
       all(
-        alu.reposition(level0_cpu.iu.getGlobalPosition(), 1, easeInOutCubic),
+        alu.reposition(level0_cpu.iu.getGlobalPosition().add(new Vector3(0,.01,0)), 1, easeInOutCubic),
         alu.rotateTo(
           new Vector3(0, level0_cpu.container.localRotation().y, Math.PI / 2),
           1
@@ -147,7 +150,7 @@ export default makeScene2D(function* (view: View2D) {
   yield* waitUntil("purpose");
   yield* all(camera.lookTo(alu.getGlobalPosition()), camera.zoomIn(2.6, 1));
   const surface = (
-    <Ray from={[800, 100]} to={[-400, 100]} />
+    <Ray from={[500, -100]} to={[-400, -100]} />
   ) as Ray;
   view.add(surface);
   const rnd = useRandom(2);

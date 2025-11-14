@@ -3,51 +3,51 @@
   "timeEvents": [
     {
       "name": "begin",
-      "targetTime": 2.9742087723564623
+      "targetTime": 1.2557294946683235
     },
     {
       "name": "transition",
-      "targetTime": 4.774208772356462
+      "targetTime": 8.743140572134568
     },
     {
       "name": "look",
-      "targetTime": 8.074208772356462
+      "targetTime": 12.04314057213457
     },
     {
       "name": "list",
-      "targetTime": 10.574208772356462
+      "targetTime": 21.368122811955946
     },
     {
       "name": "addreses",
-      "targetTime": 13.074208772356462
+      "targetTime": 26.19162317925963
     },
     {
       "name": "code",
-      "targetTime": 19.634208772356637
+      "targetTime": 40.292627021422064
     },
     {
       "name": "address",
-      "targetTime": 25.034208772356635
+      "targetTime": 53.66241567770902
     },
     {
       "name": "byte",
-      "targetTime": 31.634208772356633
+      "targetTime": 65.24114020961859
     },
     {
       "name": "artihmetic",
-      "targetTime": 41.63420877235663
+      "targetTime": 79.6066219272336
     },
     {
       "name": "memory",
-      "targetTime": 42.63420877235663
+      "targetTime": 91.88317276769905
     },
     {
       "name": "retrive",
-      "targetTime": 43.63420877235663
+      "targetTime": 96.96073979757571
     },
     {
       "name": "next",
-      "targetTime": 44.63420877235663
+      "targetTime": 105.23258406311872
     }
   ],
   "seed": 1867632715

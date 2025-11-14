@@ -57,7 +57,7 @@ export default makeScene2D(function* (view: View2D) {
       worldPosition={level0_cpu.ram.getGlobalPosition()}
       fontSize={220}
       text={() => ram_number_label_count().toFixed(0)}
-      offset2D={[200, -1000]}
+      offset2D={[-250, -1000]}
       color="bus"
       size={500}
       radius={64}

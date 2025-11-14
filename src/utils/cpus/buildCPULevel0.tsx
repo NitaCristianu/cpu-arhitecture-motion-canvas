@@ -407,7 +407,7 @@ export function buildCPULevel0(scene: Scene3D, addToScene: boolean = true) {
       yield all(
         ...wires.map((wire) =>
           wire.updatePoints(
-            wire._points.map((item) => item.add(new Vector3(0, -0.8, 0)))
+            wire._points.map((item) => item.add(new Vector3(0, -1.8, 0)))
           )
         )
       );

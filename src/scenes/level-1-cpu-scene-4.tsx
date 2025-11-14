@@ -50,7 +50,7 @@ import { Line, MeshPhysicalMaterial, Spherical, Vector3 } from "three";
 import { Label3D } from "../components/Label3D";
 import { buildCPULevel1 } from "../utils/cpus/buildCPULevel1";
 import { Glass } from "../components/GlassRect";
-import Box from "../libs/Thrash/objects/Box";
+import Model from "../libs/Thrash/objects/Model";
 import { createInfoCard } from "../utils/infocard";
 import COLORS from "../utils/colors";
 import { ShaderBackground } from "../components/background";
@@ -62,16 +62,14 @@ export default makeScene2D(function* (view: View2D) {
   const scene = createScene(new Vector3(-1.5, 1, 1.5));
   const level0_cpu = buildCPULevel0(scene);
   const level1_cpu = buildCPULevel1(scene);
-  const alu = new Box({
-    material: new MeshPhysicalMaterial({
-      color: 0x00a0ff,
-      metalness: 0.5,
-    }),
-    localScale: new Vector3(0, 0, 0),
+  const alu = new Model({
+    src: "/models/Chips/ALU.glb",
+    localScale: new Vector3(0,0,0),
     localPosition: level0_cpu.iu
       .getGlobalPosition()
       .add(new Vector3(0, 0, 0.1)),
     localRotation: new Vector3(0, 0, Math.PI / 2),
+    sceneRotation : new Vector3(0,0,-Math.PI/2)
   });
   scene.add(alu);
 
@@ -201,14 +199,14 @@ export default makeScene2D(function* (view: View2D) {
   yield* waitUntil("list");
   yield* list.restore(1, easeOutCubic);
 
+  
+  yield* waitUntil("addreses");
   yield* waitFor(0.5);
   yield* all(
     list.childAs<Txt>(1).opacity(0.5, 0.3),
     list.childAs<Txt>(4).opacity(0.5, 0.3),
     list.childAs<Ray>(2).end(1,1),
   );
-
-  yield* waitUntil("addreses");
   yield* all(camera.lookTo(level1_cpu.ram.getGlobalPosition(), 1));
 
   const addresses_raw = ["0x05", "0xa1", "0x12", "0xf0"];

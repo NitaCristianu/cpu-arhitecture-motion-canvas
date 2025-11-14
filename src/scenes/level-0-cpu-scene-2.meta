@@ -7,59 +7,59 @@
     },
     {
       "name": "busses",
-      "targetTime": 7.8762203548905845
+      "targetTime": 9.309992064376075
     },
     {
       "name": "a",
-      "targetTime": 9.809201817701979
+      "targetTime": 11.24297352718747
     },
     {
       "name": "d",
-      "targetTime": 11.209201817701977
+      "targetTime": 12.642973527187468
     },
     {
       "name": "address",
-      "targetTime": 14.982493428920922
+      "targetTime": 16.416265138406413
     },
     {
       "name": "data",
-      "targetTime": 20.808018309566673
+      "targetTime": 22.241790019052182
     },
     {
       "name": "zoom back",
-      "targetTime": 27.799974344255208
+      "targetTime": 29.233746053740717
     },
     {
       "name": "theory",
-      "targetTime": 34.21621686958039
+      "targetTime": 35.07896261684658
     },
     {
       "name": "missing",
-      "targetTime": 36.07035093601422
+      "targetTime": 36.93309668328041
     },
     {
       "name": "memory",
-      "targetTime": 40.94343569691194
+      "targetTime": 41.80618144417813
     },
     {
       "name": "guess",
-      "targetTime": 49.39481794496711
+      "targetTime": 50.2575636922333
     },
     {
       "name": "reveal",
-      "targetTime": 50.60546850742921
+      "targetTime": 51.4682142546954
     },
     {
       "name": "store",
-      "targetTime": 54.34463652232289
+      "targetTime": 55.207382269589075
     },
     {
       "name": "area",
-      "targetTime": 57.316040182381
+      "targetTime": 58.17878592964719
     },
     {
       "name": "next",
-      "targetTime": 61.99456074645114
+      "targetTime": 62.85730649371733
     }
   ],
   "seed": 1066491154

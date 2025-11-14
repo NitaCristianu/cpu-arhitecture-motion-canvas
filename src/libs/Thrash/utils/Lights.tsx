@@ -43,7 +43,8 @@ export default class Lights extends Object {
     this.keyLight.shadow.mapSize.set(2048, 2048);
     this.keyLight.shadow.camera.near = 1;
     this.keyLight.shadow.camera.far = 50;
-    this.keyLight.shadow.bias = -0.0001;
+    this.keyLight.shadow.bias = 0.0002;
+    this.keyLight.shadow.normalBias = 0.02;
     this.core.add(this.keyLight);
 
     // Hemisphere fill for subtle ambient

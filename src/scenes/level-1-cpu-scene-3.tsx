@@ -25,6 +25,7 @@ import {
   easeOutCubic,
   range,
   sequence,
+  Vector2,
   waitFor,
   waitUntil,
 } from "@motion-canvas/core";
@@ -34,17 +35,41 @@ import SN74181Circuit from "../assets/SN74181-Circuit.png";
 import SN74181Table from "../assets/SN74181-Table.jpg";
 import { ShaderBackground } from "../components/background";
 import { Bitnumber } from "../utils/bitnumber";
+import { Glass } from "../components/GlassRect";
+import { GlassBodyText } from "../components/TextPresets";
+import Scene3D from "../libs/Thrash/Scene";
+import Floor from "../libs/Thrash/components/Floor";
+import Camera from "../libs/Thrash/Camera";
+import Lights from "../libs/Thrash/utils/Lights";
+import EnvMap from "../libs/Thrash/utils/EnvMap";
+import { MeshBasicMaterial, MeshPhysicalMaterial, Vector3 } from "three";
+import Box from "../libs/Thrash/objects/Box";
+import { createScene } from "../components/presets";
+import Model from "../libs/Thrash/objects/Model";
 
 export default makeScene2D(function* (view) {
   view.fill("rgba(11, 33, 51, 1)");
+  const ALU3D = createScene(new Vector3(.5, 1, .5));
+  const alu = new Model({
+    src: "/models/Chips/ALU.glb",
+    key: "level_1 ALU",
+    localScale: new Vector3(0.05, 0.18, 0.13),
+    localPosition: new Vector3(0.0, 0, 0),
+    localRotation: new Vector3(0, 0, -Math.PI / 2),
+    sceneRotation: new Vector3(0, 0, Math.PI / 2),
+  });
 
+  ALU3D.add(alu);
+  ALU3D.init();
+  yield* ALU3D.getCameraClass().zoomOut(0.6, 0);
+  
   const bgr = <ShaderBackground opacity={0.3} />;
   view.add(bgr);
   const container = (
     <Grid stroke={"#fff3"} lineWidth={3} spacing={300} size={"1000%"} />
   ) as Grid;
   yield container.spacing(300 + 60, 20);
-
+  
   view.add(container);
 
   const SN74181Image = createRef<Img>();
@@ -441,10 +466,14 @@ export default makeScene2D(function* (view) {
         func_column_rect2().position(functionality_rect2().position, 0.5)
       )
     );
+    yield* waitFor(5);
     yield* sequence(
       1.3,
       traits_table().childAs<Txt>(2).scale(1, 1, easeOutCubic),
       traits_table().childAs<Txt>(3).scale(1, 1, easeOutCubic),
+      waitFor(0),
+      waitFor(0),
+      waitFor(0),
       traits_table().childAs<Txt>(4).scale(1, 1, easeOutCubic),
       traits_table().childAs<Txt>(5).scale(1, 1, easeOutCubic)
     );
@@ -576,8 +605,37 @@ export default makeScene2D(function* (view) {
       </Rect>
     </Rect>
   );
+  const alu_scene = createRef<Rect>();
+  container.add(
+    <Rect
+      size={new Vector2(banalogic().height() * banalogic().scale().y).addY(430)}
+      radius={64}
+      left={() => banalogic().right().addX(100)}
+      fill={"#ffffff30"}
+      stroke={"#ffffff25"}
+      lineWidth={2}
+      shadowBlur={60}
+      shadowColor={"#000000aa"}
+      clip
+      ref={alu_scene}
+    ></Rect>
+  );
+
+  //  <Scene3D background={"#d32525ff"} size={new Vector2(banalogic().height() * banalogic().scale().y).addY(430)}>
+  //   <Floor />
+  //   <Lights />
+  //   {/* <Camera /> */}
+  //   <Box material={new MeshBasicMaterial({color : 'red'})} >
+
+  //   </Box>
+  //   <EnvMap url="/textures/rogland_clear_night_2k.hdr" />
+  // </Scene3D>
+
+  yield* container.y(container.y()+10, 10);
+  alu_scene().add(ALU3D);
+
   yield* waitUntil("bananalogic");
-  yield sequence(0.2, container.x(container.x() - 4000 - 50, 2));
+  yield sequence(0.2, container.x(container.x() - 4600 - 50, 2));
   yield* waitFor(1);
   yield* chain(
     all(banalogic().opacity(1, 0.5), banalogic().scale(1.5, 0.6, easeOutBack)),
@@ -595,6 +653,7 @@ export default makeScene2D(function* (view) {
     ),
     waitFor(0.1)
   );
+  // yield alu.rotateTo(new Vector3(0, Math.PI*10, 0), 20);
 
   yield* waitUntil("8bit");
   yield* all(
@@ -720,28 +779,53 @@ export default makeScene2D(function* (view) {
   );
   yield* waitUntil("scroll");
   yield* all(
-    numbers_binary.y(-numbers_binary.y() - 3500, 5),
-    numbers_decimal.y(-numbers_decimal.y() - 3500, 5)
+    numbers_binary.y(-numbers_binary.y() - 3500, 3),
+    numbers_decimal.y(-numbers_decimal.y() - 3500, 3)
   );
   yield* waitUntil("sub");
-  const subtitle = (
-    <Txt x={600} y={-100} fontFamily={"Poppins"} fontSize={120} fill={"white"}>
-      {`Subtraction circuit\nA - B = A + (~B + 1)`}
-    </Txt>
+  const panel = (
+    <Rect x={1200} y={-100}>
+      <Txt
+        fontFamily={"Poppins"}
+        textAlign={"center"}
+        fontSize={120}
+        fill={"white"}
+      >
+        {`Subtraction circuit`}
+      </Txt>
+    </Rect>
   ) as Txt;
-  subtitle.save();
-  subtitle.text("");
-  subtitle.x(2000);
+  const subsubtitle = (
+    <Glass y={200} width={1000} height={200}>
+      <GlassBodyText
+        zIndex={1}
+        fontFamily={"Fira Code"}
+        text={"A - B = A + (~B + 1)"}
+      />
+    </Glass>
+  );
+  panel.save();
+  panel.scale(0);
+  panel.x(2000);
 
-  view.add(subtitle);
-  yield* all(container.x(container.x() - 800, 1), subtitle.restore(2));
+  panel.add(subsubtitle);
+  view.add(panel);
+  yield* all(container.x(container.x() - 800, 1), panel.restore(2));
 
   // in davinci here will be a different scene put !!!
+  yield* waitUntil("complement");
+  yield* all(
+    line().opacity(0.1, 1),
+    numbers_binary.opacity(0.25, 1),
+    numbers_decimal.opacity(0.25, 1),
+    panel.position([0, -200], 1.5),
+    panel.scale(2, 1.5)
+  );
   yield* waitUntil("cut");
   line().remove();
   numbers_binary.remove();
   numbers_decimal.remove();
-  subtitle.remove();
+  panel.remove();
 
   const binary = (
     <Bitnumber number={6} bitgroups={2} showDecimal={1} scale={2} />
@@ -786,27 +870,23 @@ export default makeScene2D(function* (view) {
   yield* waitUntil("~bits");
   yield* binary.y(binary.y() - 200, 1);
   yield all(
-    steps.childAs<Txt>(0).scale(1,.4,easeOutCubic),
-    steps.childAs<Txt>(0).opacity(1,.4,easeOutCubic),
+    steps.childAs<Txt>(0).scale(1, 0.4, easeOutCubic),
+    steps.childAs<Txt>(0).opacity(1, 0.4, easeOutCubic)
   );
   binary.load(~6);
   yield* waitUntil("+1");
   yield all(
-    steps.childAs<Txt>(1).scale(1,.4,easeOutCubic),
-    steps.childAs<Txt>(1).opacity(1,.4,easeOutCubic),
+    steps.childAs<Txt>(1).scale(1, 0.4, easeOutCubic),
+    steps.childAs<Txt>(1).opacity(1, 0.4, easeOutCubic)
   );
   binary.load(~6 + 1);
   yield* waitUntil("examples");
-  binary.load(3)
-  yield* all(
-    steps.opacity(0,1),
-    binary.y(0,1),
-  );
-  yield* waitUntil('solve');
+  binary.load(3);
+  yield* all(steps.opacity(0, 1), binary.y(0, 1));
+  yield* waitUntil("solve");
   binary.load(~3);
-  yield* waitFor(.8);
-  binary.load(~3+1);
-
+  yield* waitFor(0.8);
+  binary.load(~3 + 1);
 
   yield* waitUntil("next");
 });

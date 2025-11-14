@@ -80,16 +80,16 @@ export default makeScene2D(function* (view: View2D) {
     level1_cpu.ram.popIn(1, RAM_SCALE)
   );
   yield* level1_cpu.initWires(level1_cpu.wires);
-  yield* all(camera.lookTo(level1_cpu.ir.getGlobalPosition(), 3));
+  yield* all(camera.lookTo(level1_cpu.ir.getGlobalPosition(), 3), camera.zoomIn(3,3));
 
   yield* waitUntil("back");
-
+  yield camera.zoomOut(0.5,3);
   const list = (
     <Glass size={[1200, 1000]} translucency={1} borderModifier={-1} x={1300}>
       <Txt
         zIndex={1}
         shadowBlur={50}
-        shadowColor={"#fff4"}
+        shadowColor={"#fff4" }
         fill={"white"}
         fontFamily={"Poppins"}
         fontSize={120}
@@ -407,14 +407,10 @@ STORE 0x11  ; Store accumulator result into memory address 0x11`,
       level1_cpu.pc.getGlobalPosition().add(new Vector3(-0.02, 0, 0.01)),
       2
     ),
-    camera.zoomIn(3, 2, easeInOutCubic)
+    camera.zoomIn(2, 2, easeInOutCubic)
   );
   yield* waitUntil("program");
-  yield* level1_cpu.pc.rotateTo(
-    new Vector3(0, 0, Math.PI * 2),
-    1.5,
-    easeInOutSine
-  );
+  yield* level1_cpu.pc.pulse();
   yield sequence(
     0.8,
     level1_cpu.wire_pc_mc.currentFlow(1, easeInOutCubic, 100),

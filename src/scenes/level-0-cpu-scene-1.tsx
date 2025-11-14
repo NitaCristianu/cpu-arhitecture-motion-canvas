@@ -27,9 +27,7 @@ import Model from "../libs/Thrash/objects/Model";
 
 export default makeScene2D(function* (view) {
   const scene = createScene(new Vector3(3, 4, 4).divideScalar(3));
-  const camera: Camera = scene.findFirst(
-    (child) => (child as any) instanceof Camera
-  ) as any;
+  const camera: Camera = scene.getCameraClass();
 
   const inner_cpu = buildCPULevel0(scene);
   const outer_cpu = (
@@ -121,7 +119,7 @@ export default makeScene2D(function* (view) {
       [
         inner_cpu.wire_mc_ram_address.getPointAt(0).add(new Vector3(-.1, 0, 0)),
         inner_cpu.wire_mc_ram_address.getPointAt(0.5),
-        inner_cpu.wire_mc_ram_address.getPointAt(1),
+        inner_cpu.wire_mc_ram_address.getPointAt(1).add(new Vector3(.02,0,0)),
       ],
       0
     ),
@@ -129,7 +127,7 @@ export default makeScene2D(function* (view) {
         [
           inner_cpu.wire_mc_ram_data.getPointAt(0).add(new Vector3(-.1, 0, 0)),
           inner_cpu.wire_mc_ram_data.getPointAt(0.5),
-          inner_cpu.wire_mc_ram_data.getPointAt(1),
+          inner_cpu.wire_mc_ram_data.getPointAt(1).add(new Vector3(.02,0,0)),
         ],
         0
       )
@@ -165,7 +163,7 @@ export default makeScene2D(function* (view) {
     cpuData.popIn(),
     inner_cpu.wire_mc_ram_address.reverseFlow(0.6, easeInSine, 50),
     camera.lookTo(inner_cpu.group.localPosition(), 0.9),
-    camera.zoomTo(1.5, 0.9)
+    camera.zoomTo(1.45, 0.9)
   );
 
   yield* all(cpuData2.popIn());
@@ -177,7 +175,7 @@ export default makeScene2D(function* (view) {
   );
   yield* cpuData3.popIn();
   yield* waitUntil('back');
-  yield* any(
+  yield* all(
     camera.lookTo(inner_cpu.ram.localPosition()),
     inner_cpu.wire_mc_ram_data.currentFlow(0.6, easeInSine, 50)
   );
@@ -188,7 +186,7 @@ export default makeScene2D(function* (view) {
     props: { top: [0, -view.size().y / 2 - 250] },
   });
   view.add(context_title.node);
-  yield* any(
+  yield* all(
     camera.moveTo(new Vector3(0.5, 5, 1).divideScalar(2), 2),
     camera.lookTo(new Vector3(0.5, -0.7, 0).divideScalar(2), 2),
     camera.zoomTo(1, 2),
@@ -367,7 +365,7 @@ export default makeScene2D(function* (view) {
     tags.mc.popIn(),
     camera.lookTo(inner_cpu.mc.getGlobalPosition()),
     camera.moveRight(0.8, 1),
-    camera.zoomOut(1.1),
+    camera.zoomOut(1 / 1.1),
     titleText("Memory Controller (MC)", 0.6),
     bulletText(
       "- Reads from RAM\n- Writes back results\n- Sends/receives bytes",
