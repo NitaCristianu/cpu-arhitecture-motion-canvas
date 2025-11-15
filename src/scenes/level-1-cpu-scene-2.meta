@@ -7,19 +7,19 @@
     },
     {
       "name": "alu",
-      "targetTime": 3.0024067173694458
+      "targetTime": 5.617519467538229
     },
     {
       "name": "fall",
-      "targetTime": 9.182034906605734
+      "targetTime": 10.015379053730818
     },
     {
       "name": "purpose",
-      "targetTime": 13.069127749582703
+      "targetTime": 12.866479393084065
     },
     {
       "name": "next",
-      "targetTime": 22.35637122343661
+      "targetTime": 20.204420333515525
     }
   ],
   "seed": 1915906503

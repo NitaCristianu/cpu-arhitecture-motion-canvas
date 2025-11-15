@@ -49,7 +49,6 @@ import Model from "../libs/Thrash/objects/Model";
 
 export default makeScene2D(function* (view) {
   view.fill("rgba(11, 33, 51, 1)");
-  const ALU3D = createScene(new Vector3(.5, 1, .5));
   const alu = new Model({
     src: "/models/Chips/ALU.glb",
     key: "level_1 ALU",
@@ -59,9 +58,6 @@ export default makeScene2D(function* (view) {
     sceneRotation: new Vector3(0, 0, Math.PI / 2),
   });
 
-  ALU3D.add(alu);
-  ALU3D.init();
-  yield* ALU3D.getCameraClass().zoomOut(0.6, 0);
   
   const bgr = <ShaderBackground opacity={0.3} />;
   view.add(bgr);
@@ -632,7 +628,6 @@ export default makeScene2D(function* (view) {
   // </Scene3D>
 
   yield* container.y(container.y()+10, 10);
-  alu_scene().add(ALU3D);
 
   yield* waitUntil("bananalogic");
   yield sequence(0.2, container.x(container.x() - 4600 - 50, 2));

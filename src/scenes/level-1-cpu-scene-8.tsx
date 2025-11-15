@@ -22,6 +22,7 @@ import {
   sequence,
   SignalValue,
   SimpleSignal,
+  spawn,
   waitFor,
   waitUntil,
 } from "@motion-canvas/core";
@@ -237,6 +238,8 @@ JMP [0x14]
     return (val: number) => {
       value(val);
       bits().load(val);
+
+      spawn(main().scale(1.1, .8).back(.8));
     };
   };
 

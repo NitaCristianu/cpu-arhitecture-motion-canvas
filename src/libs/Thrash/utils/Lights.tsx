@@ -27,6 +27,7 @@ export default class Lights extends Object {
   public hemiLight = new HemisphereLight(0x406080, 0x202020, 0.3);
   public ambientLight = new AmbientLight(0x404040, 0.2);  
   public rimLight = new DirectionalLight(0x233099, 2.5);
+  public topLight = new DirectionalLight(0xffffff, .5);
 
   // Volumetric/fog & god rays
   private sunMesh!: ThreeMesh;
@@ -55,6 +56,17 @@ export default class Lights extends Object {
     this.rimLight.position.set(-8, 6, -4);
     this.rimLight.castShadow = false;
     this.core.add(this.rimLight);
+
+    // Top light aimed straight down at CPU center for even coverage
+    this.topLight.position.set(0, 15, 0);
+    this.topLight.target.position.set(0, 0, 0);
+    this.topLight.castShadow = true;
+    this.topLight.shadow.mapSize.set(1024, 1024);
+    this.topLight.shadow.camera.near = 2;
+    this.topLight.shadow.camera.far = 30;
+    this.topLight.shadow.bias = 0.0005;
+    this.core.add(this.topLight);
+    this.core.add(this.topLight.target);
   }
 
   private initFogAndEffects(

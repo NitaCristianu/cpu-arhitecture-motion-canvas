@@ -75,7 +75,7 @@ export default makeScene2D(function* (view: View2D) {
       color: 0x00a0ff,
       metalness: 0.5,
     }),
-    localScale: new Vector3(0.05, 0.18, 0.13),
+    localScale: new Vector3( 0.02 * 4,0.18, 0.13),
     localPosition: new Vector3(0.0, 0.3, 0),
     localRotation: new Vector3(0, 0, -Math.PI / 2),
     sceneRotation : new Vector3(0,0,-Math.PI/2)

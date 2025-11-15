@@ -15,23 +15,23 @@
     },
     {
       "name": "level-1-cpu",
-      "targetTime": 14.0156243500583
+      "targetTime": 10.865496971658077
     },
     {
       "name": "steps",
-      "targetTime": 20.954042910627688
+      "targetTime": 22.58179720550881
     },
     {
       "name": "zoom",
-      "targetTime": 25.927877323558597
+      "targetTime": 24.191324404709068
     },
     {
       "name": "alu",
-      "targetTime": 28.18561511613538
+      "targetTime": 26.44906219728585
     },
     {
       "name": "next",
-      "targetTime": 33.31896395058483
+      "targetTime": 30.197108061375623
     }
   ],
   "seed": 1789488040

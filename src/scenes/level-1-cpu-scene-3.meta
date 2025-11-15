@@ -3,79 +3,79 @@
   "timeEvents": [
     {
       "name": "begin",
-      "targetTime": 1.400024035469309
+      "targetTime": 2.7052092100217306
     },
     {
       "name": "gAtes",
-      "targetTime": 10.596654408234564
+      "targetTime": 7.613697062321846
     },
     {
       "name": "table",
-      "targetTime": 14.596654408234564
+      "targetTime": 11.613697062321846
     },
     {
       "name": "traits",
-      "targetTime": 22.301742784904114
+      "targetTime": 19.318785438991398
     },
     {
       "name": "logic functions",
-      "targetTime": 25.864982665365503
+      "targetTime": 22.882025319452787
     },
     {
       "name": "bananalogic",
-      "targetTime": 51.564982665365484
+      "targetTime": 48.582025319452775
     },
     {
       "name": "8bit",
-      "targetTime": 59.30963434163532
+      "targetTime": 56.326676995722615
     },
     {
       "name": "mul",
-      "targetTime": 62.426572176152426
+      "targetTime": 59.44361483023972
     },
     {
       "name": "numbers",
-      "targetTime": 68.81601829357152
+      "targetTime": 65.83306094765881
     },
     {
       "name": "representation",
-      "targetTime": 71.90090123092918
+      "targetTime": 68.91794388501647
     },
     {
       "name": "scroll",
-      "targetTime": 81.58492995863949
+      "targetTime": 78.60197261272678
     },
     {
       "name": "sub",
-      "targetTime": 95.49702883825469
+      "targetTime": 92.51407149234198
     },
     {
       "name": "complement",
-      "targetTime": 97.49702883825469
+      "targetTime": 94.51407149234198
     },
     {
       "name": "cut",
-      "targetTime": 119.63320472469974
+      "targetTime": 116.65024737878703
     },
     {
       "name": "~bits",
-      "targetTime": 123.58702651154033
+      "targetTime": 120.60406916562762
     },
     {
       "name": "+1",
-      "targetTime": 125.5521199968482
+      "targetTime": 122.5691626509355
     },
     {
       "name": "examples",
-      "targetTime": 134.71488222539446
+      "targetTime": 131.73192487948177
     },
     {
       "name": "solve",
-      "targetTime": 139.19975958822036
+      "targetTime": 136.21680224230766
     },
     {
       "name": "next",
-      "targetTime": 143.45549966399366
+      "targetTime": 140.47254231808097
     }
   ],
   "seed": 953439808
