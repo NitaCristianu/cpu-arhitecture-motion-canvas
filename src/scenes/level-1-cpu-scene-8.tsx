@@ -86,8 +86,8 @@ export default makeScene2D(function* (view: View2D) {
       ref={code_frame}
       color="control"
       translucency={1}
-      lightness={-.1}
-      zIndex={90999 }
+      lightness={-0.1}
+      zIndex={90999}
     >
       <Code
         fontSize={80}
@@ -239,7 +239,7 @@ JMP [0x14]
       value(val);
       bits().load(val);
 
-      spawn(main().scale(1.1, .8).back(.8));
+      spawn(main().scale(main().scale().mul(1.1), 0.8).back(0.8));
     };
   };
 
@@ -271,11 +271,15 @@ JMP [0x14]
       0.7,
       all(
         cpu.wire_mc_ram_data.reverseFlow(1, easeInOutSine, 60),
-        cpu.wire_mc_ram_address.reverseFlow(1, easeInOutSine, 60)
+        cpu.wire_mc_ram_address.reverseFlow(1, easeInOutSine, 60),
+        cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60),
+        cpu.clock.pulse(1.05, 1)
       ),
       all(
         cpu.wire_mc_ir_margin.currentFlow(1, easeInOutSine, 60),
         cpu.wire_pc_mc.reverseFlow(1, easeInOutSine, 60),
+        cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60),
+
         run(function* () {
           yield* waitFor(0.5);
           updatePC(index + 12);
@@ -302,8 +306,14 @@ JMP [0x14]
     instruction_register().popIn(1),
     sequence(
       0.6,
-      cpu.wire_mc_ram_data.reverseFlow(1),
-      cpu.wire_mc_ir_margin.currentFlow(1, easeInOutSine, 100),
+      all(
+        cpu.wire_mc_ram_data.reverseFlow(1),
+        cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60)
+      ),
+      all(
+        cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60),
+        cpu.wire_mc_ir_margin.currentFlow(1, easeInOutSine, 100)
+      ),
       run(function* () {
         updateIR(convertInstruction("LOAD", 1));
       })
@@ -315,8 +325,15 @@ JMP [0x14]
   yield all(accumulator().offset2D([0, -700], 1), accumulator().popIn(1));
   yield* sequence(
     0.7,
-    cpu.wire_mc_ram_data.reverseFlow(1, easeInOutSine, 60),
-    cpu.wire_gpr_mc.reverseFlow(1, easeInOutSine, 60),
+    all(
+      cpu.wire_mc_ram_data.reverseFlow(1, easeInOutSine, 60),
+      cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60),
+      cpu.clock.pulse(1.05, 1)
+    ),
+    all(
+      cpu.wire_gpr_mc.reverseFlow(1, easeInOutSine, 60),
+      cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60)
+    ),
     run(function* () {
       updateACC(3);
     })
@@ -328,8 +345,14 @@ JMP [0x14]
   yield* waitUntil("shift");
   yield* sequence(
     0.7,
-    cpu.wire_cu_iu.currentFlow(1, easeInOutSine, 60),
-    cpu.wire_gpr_iu.reverseFlow(1, easeInOutSine, 60),
+    all(
+      cpu.wire_cu_iu.currentFlow(1, easeInOutSine, 60),
+      cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60)
+    ),
+    all(
+      cpu.wire_gpr_iu.reverseFlow(1, easeInOutSine, 60),
+      cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60)
+    ),
     run(function* () {
       updateACC(1);
     })
@@ -341,8 +364,14 @@ JMP [0x14]
   yield* waitUntil("increment");
   yield* sequence(
     0.7,
-    cpu.wire_cu_iu.currentFlow(1, easeInOutSine, 60),
-    cpu.wire_gpr_iu.reverseFlow(1, easeInOutSine, 60),
+    all(
+      cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60),
+      cpu.wire_cu_iu.currentFlow(1, easeInOutSine, 60)
+    ),
+    all(
+      cpu.wire_cu_iu.currentFlow(1, easeInOutSine, 60),
+      cpu.wire_gpr_iu.reverseFlow(1, easeInOutSine, 60)
+    ),
     run(function* () {
       updateACC(ACC() + 1);
     })
@@ -355,8 +384,14 @@ JMP [0x14]
       loadRegisters(2),
       sequence(
         0.7,
-        cpu.wire_cu_iu.currentFlow(1, easeInOutSine, 60),
-        cpu.wire_gpr_iu.reverseFlow(1, easeInOutSine, 60),
+        all(
+          cpu.wire_cu_iu.currentFlow(1, easeInOutSine, 60),
+          cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60)
+        ),
+        all(
+          cpu.wire_clock_cu.currentFlow(0.5, easeInOutSine, 60),
+          cpu.wire_gpr_iu.reverseFlow(1, easeInOutSine, 60)
+        ),
         run(function* () {
           updateACC(ACC() + 1);
         })
@@ -365,23 +400,23 @@ JMP [0x14]
   );
   yield* waitUntil("pan out");
 
-  yield camera.moveForward(4,80);
-  yield camera.moveRight(4,80);
+  yield camera.moveForward(3, 60);
+  yield camera.moveRight(3, 60);
 
   yield* waitUntil("exit the loop");
-  yield* all(
-    code_frame().position(0,1),
-    code_frame().scale(2,1),
-  );
+  yield* all(code_frame().position(0, 1), code_frame().scale(2, 1));
 
   yield* waitUntil("add two number");
   yield code_sample().selection(DEFAULT, 1);
-  yield* code_sample().code(`
+  yield* code_sample().code(
+    `
     LOAD [0x01]           
     LOAD [0x02]
     ADD ?
     
-    `, 1);
+    `,
+    1
+  );
 
   yield* waitUntil("next episode");
   yield* all(
@@ -389,14 +424,17 @@ JMP [0x14]
     accumulator().popOut(),
     instruction_register().popOut(),
     program_counter().popOut()
-  )
+  );
 
   const context_title = createInfoCard("LEVEL 1 CPU", {
     width: 1600,
     props: { top: [0, -view.size().y / 2 - 250] },
   });
   view.add(context_title.node);
-  yield context_title.node.position(context_title.node.position().add([0, 500]), 1)
+  yield context_title.node.position(
+    context_title.node.position().add([0, 500]),
+    1
+  );
 
   yield* waitUntil("next");
 });

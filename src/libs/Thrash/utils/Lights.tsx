@@ -27,7 +27,7 @@ export default class Lights extends Object {
   public hemiLight = new HemisphereLight(0x406080, 0x202020, 0.3);
   public ambientLight = new AmbientLight(0x404040, 0.2);  
   public rimLight = new DirectionalLight(0x233099, 2.5);
-  public topLight = new DirectionalLight(0xffffff, .5);
+  public topLight = new DirectionalLight(0xddeeff, 1);
 
   // Volumetric/fog & god rays
   private sunMesh!: ThreeMesh;

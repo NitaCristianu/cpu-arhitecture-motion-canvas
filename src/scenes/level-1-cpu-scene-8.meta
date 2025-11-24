@@ -3,71 +3,71 @@
   "timeEvents": [
     {
       "name": "begin",
-      "targetTime": 1.1175829517959548
+      "targetTime": 0.4867971072676035
     },
     {
       "name": "div by 2",
-      "targetTime": 4.617582951795955
+      "targetTime": 3.9867971072676034
     },
     {
       "name": "loop",
-      "targetTime": 6.301363926644507
+      "targetTime": 5.670578082116156
     },
     {
       "name": "execute",
-      "targetTime": 10.00643151945197
+      "targetTime": 8.678866030914149
     },
     {
       "name": "PC",
-      "targetTime": 12.997701337563345
+      "targetTime": 11.670135849025524
     },
     {
       "name": "IR",
-      "targetTime": 16.658415519064537
+      "targetTime": 14.902062557290119
     },
     {
       "name": "load memory",
-      "targetTime": 22.616026401621866
+      "targetTime": 20.35404434832647
     },
     {
       "name": "step 2",
-      "targetTime": 26.979387982092945
+      "targetTime": 24.767713902293945
     },
     {
       "name": "shift",
-      "targetTime": 31.54248194285002
+      "targetTime": 29.33080786305102
     },
     {
       "name": "reupdate",
-      "targetTime": 35.53070203075811
+      "targetTime": 32.45121540814629
     },
     {
       "name": "increment",
-      "targetTime": 38.91403536409139
+      "targetTime": 35.83454874147957
     },
     {
       "name": "enter l",
-      "targetTime": 42.44643884594937
+      "targetTime": 39.366952223337556
     },
     {
       "name": "pan out",
-      "targetTime": 42.44643884594937
+      "targetTime": 39.366952223337556
     },
     {
       "name": "exit the loop",
-      "targetTime": 66.07983888593884
+      "targetTime": 58.32170895329476
     },
     {
       "name": "add two number",
-      "targetTime": 71.82430475698541
+      "targetTime": 64.67153875008918
     },
     {
       "name": "next episode",
-      "targetTime": 76.01157851202358
+      "targetTime": 70.70347714702223
     },
     {
       "name": "next",
-      "targetTime": 100.29390618339427
+      "targetTime": 90.77414264017865
     }
   ],
   "seed": 1856318586

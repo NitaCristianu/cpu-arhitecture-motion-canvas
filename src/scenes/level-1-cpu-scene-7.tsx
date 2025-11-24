@@ -48,11 +48,12 @@ import {
   waitUntil,
 } from "@motion-canvas/core";
 import Camera from "../libs/Thrash/Camera";
-import { Line, MeshPhysicalMaterial, Spherical, Vector3 } from "three";
+import { Line, Spherical, Vector3 } from "three";
 import { Label3D } from "../components/Label3D";
 import { buildCPULevel1 } from "../utils/cpus/buildCPULevel1";
 import { Glass } from "../components/GlassRect";
 import Box from "../libs/Thrash/objects/Box";
+import Model from "../libs/Thrash/objects/Model";
 import { createInfoCard } from "../utils/infocard";
 import COLORS from "../utils/colors";
 import { ShaderBackground } from "../components/background";
@@ -64,6 +65,25 @@ export default makeScene2D(function* (view: View2D) {
   // 3D SCENE
   const scene = createScene(new Vector3(-1.5, 1, -0.5));
   const level1_cpu = buildCPULevel1(scene);
+  const level1ClockNewModel = level1_cpu.clock.childAs<Model>(0);
+  const level1ClockRestScale = level1ClockNewModel.localScale().clone();
+  const level1ClockRestPosition = level1ClockNewModel.getGlobalPosition().clone();
+  level1ClockNewModel.localScale(
+    level1ClockRestScale.clone().multiplyScalar(0.001)
+  );
+  level1ClockNewModel.localPosition(
+    level1ClockRestPosition.clone().add(new Vector3(0, 0.35, 0))
+  );
+  const legacyClock = new Model({
+    key: "level_1 legacy clock",
+    src: "/models/Chips/ButtonClock.glb",
+    localScale: level1ClockRestScale.clone().multiplyScalar(0.07).multiply(new Vector3(1,.7,1)),
+    localPosition: level1_cpu.alu.getGlobalPosition().add(new Vector3(-0.26,0.02,0.2)),
+    localRotation: new Vector3(0, 0, 0),
+  });
+  const legacyClockRestPosition = legacyClock.localPosition().clone();
+  const legacyClockRestScale = legacyClock.localScale().clone();
+  scene.add(legacyClock);
 
   view.add(scene);
   scene.init();
@@ -194,6 +214,37 @@ export default makeScene2D(function* (view: View2D) {
     camera.lookTo(level1_cpu.clock.getGlobalPosition(), 1),
     camera.zoomIn(3, 2, easeInOutCubic)
   );
+  yield* all(
+    legacyClock.scaleTo(
+      legacyClockRestScale.clone().multiplyScalar(1.1),
+      0.6,
+      easeOutBack
+    ),
+    legacyClock.glowTo(0xffd7a8, 0.6, easeOutBack)
+  );
+  yield* all(
+    legacyClock.scaleTo(legacyClockRestScale, 0.4, easeInBack),
+    legacyClock.glowTo(0xffffff, 0.4, easeInBack)
+  );
+  yield* waitFor(0.2);
+  yield* all(
+    legacyClock.reposition(
+      legacyClockRestPosition.clone().add(new Vector3(-0.4, 0.25, -0.2).multiplyScalar(2)),
+      1.1,
+      easeInOutBack
+    ),
+    legacyClock.rotateTo(
+      new Vector3(Math.PI / 2, -0.2, -Math.PI / 3),
+      1.1,
+      easeOutBack
+    ),
+    legacyClock.scaleTo(legacyClockRestScale.clone().multiplyScalar(0.5), 1.1, easeInBack),
+    level1ClockNewModel.reposition(level1ClockRestPosition, 1.1, easeInCubic),
+    level1ClockNewModel.scaleTo(level1ClockRestScale, 1.1, easeOutBack)
+  );
+  run(function* () {
+    yield* level1ClockNewModel.startIdleRotation(["y"], 12);
+  });
   yield* waitUntil("tick");
   yield loop((i) =>
     chain(
@@ -252,10 +303,11 @@ export default makeScene2D(function* (view: View2D) {
       waitFor(0.5)
     )
   );
-  yield* waitFor(2);
+  yield* waitFor(1);
   yield* all(
- camera.moveTo(new Vector3(-1.2, 0.5, -1.3),3),
+ camera.moveTo(new Vector3(-1.1, 0.95, 1.1),3),
  camera.lookTo(new Vector3(0,-.35,0),3),
+ camera.zoomTo(1,3),
   )
 
 

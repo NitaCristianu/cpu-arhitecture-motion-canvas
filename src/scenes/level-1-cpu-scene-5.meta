@@ -3,51 +3,51 @@
   "timeEvents": [
     {
       "name": "begin",
-      "targetTime": 1.675843501895721
+      "targetTime": 0.7554215409734845
     },
     {
       "name": "back",
-      "targetTime": 6.6535883533484
+      "targetTime": 7.108353360007509
     },
     {
       "name": "list",
-      "targetTime": 8.558462140385856
+      "targetTime": 9.013227147044965
     },
     {
       "name": "show register",
-      "targetTime": 17.290727468620137
+      "targetTime": 17.745492475279246
     },
     {
       "name": "acc",
-      "targetTime": 20.625829088684657
+      "targetTime": 20.259964894884327
     },
     {
       "name": "code",
-      "targetTime": 29.441428829424794
+      "targetTime": 29.075564635624463
     },
     {
       "name": "increment",
-      "targetTime": 38.88494476596584
+      "targetTime": 37.73328933484174
     },
     {
       "name": "shift",
-      "targetTime": 42.82180898744605
+      "targetTime": 41.67015355632195
     },
     {
       "name": "store",
-      "targetTime": 47.91460396358415
+      "targetTime": 45.4289308504918
     },
     {
       "name": "pc",
-      "targetTime": 60.48414231797972
+      "targetTime": 57.01557602554372
     },
     {
       "name": "program",
-      "targetTime": 66.57317476420522
+      "targetTime": 61.394814671302946
     },
     {
       "name": "next",
-      "targetTime": 70.92166392106958
+      "targetTime": 65.74330382816731
     }
   ],
   "seed": 2212114856

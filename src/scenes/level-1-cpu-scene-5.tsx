@@ -173,13 +173,13 @@ export default makeScene2D(function* (view: View2D) {
         zIndex={1}
         fontSize={100}
         code={`\
-LOAD 0x10
-ADD 0x11
-SUB 0x12
+LOAD [0x10]
+ADD 5 
+SUB 3
 INC
-DEC
+MUL 2
 SHR
-STORE 0x20`}
+STORE [0x20]`}
       ></Code>
     </Glass>
   ) as Glass;

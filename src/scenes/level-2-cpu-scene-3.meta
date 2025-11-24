@@ -7,51 +7,51 @@
     },
     {
       "name": "expand",
-      "targetTime": 4.714802917555787
+      "targetTime": 9.161896529497977
     },
     {
       "name": "opcode",
-      "targetTime": 7.074802917555786
+      "targetTime": 22.312294937739217
     },
     {
       "name": "modifier-intro",
-      "targetTime": 7.591084005382255
+      "targetTime": 24.538706891076238
     },
     {
       "name": "operand",
-      "targetTime": 7.935848009448235
+      "targetTime": 25.516294651542598
     },
     {
       "name": "operand-b",
-      "targetTime": 8.378045319011122
+      "targetTime": 25.958491961105484
     },
     {
       "name": "larger",
-      "targetTime": 8.91248709228297
+      "targetTime": 29.08449768915984
     },
     {
       "name": "modifier-focus",
-      "targetTime": 12.91248709228297
+      "targetTime": 38.11284403060095
     },
     {
       "name": "modifier-m",
-      "targetTime": 15.281803060240179
+      "targetTime": 45.33106930084678
     },
     {
       "name": "modifier-destination",
-      "targetTime": 19.192262411224124
+      "targetTime": 52.23442888502299
     },
     {
       "name": "modifier-jump",
-      "targetTime": 22.792262411224122
+      "targetTime": 59.18408631264404
     },
     {
       "name": "modifier-condition",
-      "targetTime": 26.39226241122412
+      "targetTime": 64.84602491426041
     },
     {
       "name": "next",
-      "targetTime": 32.67420463969958
+      "targetTime": 89.28962732955189
     }
   ],
   "seed": 1481779856

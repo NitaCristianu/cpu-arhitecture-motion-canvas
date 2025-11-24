@@ -42,7 +42,7 @@ import Floor from "../libs/Thrash/components/Floor";
 import Camera from "../libs/Thrash/Camera";
 import Lights from "../libs/Thrash/utils/Lights";
 import EnvMap from "../libs/Thrash/utils/EnvMap";
-import { MeshBasicMaterial, MeshPhysicalMaterial, Vector3 } from "three";
+import { MeshPhysicalMaterial, Vector3 } from "three";
 import Box from "../libs/Thrash/objects/Box";
 import { createScene } from "../components/presets";
 import Model from "../libs/Thrash/objects/Model";
@@ -52,20 +52,29 @@ export default makeScene2D(function* (view) {
   const alu = new Model({
     src: "/models/Chips/ALU.glb",
     key: "level_1 ALU",
+    material: new MeshPhysicalMaterial({
+      color: 0x0d8dff,
+      metalness: 0.85,
+      roughness: 0.25,
+    }),
     localScale: new Vector3(0.05, 0.18, 0.13),
-    localPosition: new Vector3(0.0, 0, 0),
+    localPosition: new Vector3(0.0, 0.08, 0),
     localRotation: new Vector3(0, 0, -Math.PI / 2),
     sceneRotation: new Vector3(0, 0, Math.PI / 2),
   });
+  const aluPreviewScene: Scene3D = createScene(new Vector3(-1.35, 0.9, 1.45));
+  const camera = aluPreviewScene.getCameraClass();
+  aluPreviewScene.add(alu);
+  aluPreviewScene.scene.background = null;
+  yield* camera.lookTo(alu.getGlobalPosition().add(new Vector3(0,.01,.01)), 0);
 
-  
   const bgr = <ShaderBackground opacity={0.3} />;
   view.add(bgr);
   const container = (
     <Grid stroke={"#fff3"} lineWidth={3} spacing={300} size={"1000%"} />
   ) as Grid;
   yield container.spacing(300 + 60, 20);
-  
+
   view.add(container);
 
   const SN74181Image = createRef<Img>();
@@ -604,7 +613,7 @@ export default makeScene2D(function* (view) {
   const alu_scene = createRef<Rect>();
   container.add(
     <Rect
-      size={new Vector2(banalogic().height() * banalogic().scale().y).addY(430)}
+      size={() => new Vector2(400, banalogic().height())}
       radius={64}
       left={() => banalogic().right().addX(100)}
       fill={"#ffffff30"}
@@ -612,10 +621,17 @@ export default makeScene2D(function* (view) {
       lineWidth={2}
       shadowBlur={60}
       shadowColor={"#000000aa"}
+      opacity={0}
+      scale={0.9}
       clip
       ref={alu_scene}
-    ></Rect>
+    >
+      {aluPreviewScene}
+    </Rect>
   );
+  
+  aluPreviewScene.init();
+  yield* alu.startIdleRotation();
 
   //  <Scene3D background={"#d32525ff"} size={new Vector2(banalogic().height() * banalogic().scale().y).addY(430)}>
   //   <Floor />
@@ -627,13 +643,19 @@ export default makeScene2D(function* (view) {
   //   <EnvMap url="/textures/rogland_clear_night_2k.hdr" />
   // </Scene3D>
 
-  yield* container.y(container.y()+10, 10);
+  yield* container.y(container.y() + 10, 10);
 
   yield* waitUntil("bananalogic");
+  yield alu.startIdleRotation(["y"], 16);
   yield sequence(0.2, container.x(container.x() - 4600 - 50, 2));
   yield* waitFor(1);
   yield* chain(
-    all(banalogic().opacity(1, 0.5), banalogic().scale(1.5, 0.6, easeOutBack)),
+    all(
+      banalogic().opacity(1, 0.5),
+      banalogic().scale(1.5, 0.6, easeOutBack),
+      alu_scene().opacity(1, 0.5),
+      alu_scene().scale(1.5, 0.6, easeOutBack)
+    ),
     all(icon().opacity(1, 0.3), icon().scale(1, 0.3, easeOutBack)),
     all(opsBadge().opacity(1, 0.25), opsBadge().scale(1, 0.25, easeOutBack)),
     sequence(

@@ -3,39 +3,67 @@
   "timeEvents": [
     {
       "name": "begin",
-      "targetTime": 0.5
+      "targetTime": 26.72698201156202
     },
     {
       "name": "activate",
-      "targetTime": 3.55
+      "targetTime": 29.77698201156202
     },
     {
       "name": "level 1 cpu",
-      "targetTime": 10.050000000000004
+      "targetTime": 43.206498947984755
     },
     {
       "name": "alu",
-      "targetTime": 13.850000000000005
+      "targetTime": 47.00649894798475
+    },
+    {
+      "name": "what happen",
+      "targetTime": 52.60975753332526
+    },
+    {
+      "name": "zero",
+      "targetTime": 55.58312316251786
+    },
+    {
+      "name": "negative",
+      "targetTime": 56.821399102145705
+    },
+    {
+      "name": "overflow",
+      "targetTime": 57.821399102145705
+    },
+    {
+      "name": "d z",
+      "targetTime": 59.54991632025735
+    },
+    {
+      "name": "loops",
+      "targetTime": 63.44207998603497
     },
     {
       "name": "light bulbs",
-      "targetTime": 29.278435900838012
+      "targetTime": 72.32559966132706
+    },
+    {
+      "name": "Z",
+      "targetTime": 77.40544384054951
     },
     {
       "name": "N",
-      "targetTime": 35.48033309132478
+      "targetTime": 81.90544384054951
     },
     {
       "name": "V",
-      "targetTime": 39.92262447163151
+      "targetTime": 85.90544384054951
     },
     {
       "name": "DZ",
-      "targetTime": 45.42262447163151
+      "targetTime": 95.78066368654743
     },
     {
       "name": "next",
-      "targetTime": 50.602407258596514
+      "targetTime": 105.20552960634095
     }
   ],
   "seed": 1546857294

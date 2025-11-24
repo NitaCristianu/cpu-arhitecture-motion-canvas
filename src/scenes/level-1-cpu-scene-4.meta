@@ -7,47 +7,47 @@
     },
     {
       "name": "transition",
-      "targetTime": 8.743140572134568
+      "targetTime": 6.5033915009518655
     },
     {
       "name": "look",
-      "targetTime": 12.04314057213457
+      "targetTime": 9.803391500951866
     },
     {
       "name": "list",
-      "targetTime": 21.368122811955946
+      "targetTime": 15.42233081191225
     },
     {
       "name": "addreses",
-      "targetTime": 26.19162317925963
+      "targetTime": 19.835620320677883
     },
     {
       "name": "code",
-      "targetTime": 40.292627021422064
+      "targetTime": 28.047076413297454
     },
     {
       "name": "address",
-      "targetTime": 53.66241567770902
+      "targetTime": 34.977330086213684
     },
     {
       "name": "byte",
-      "targetTime": 65.24114020961859
+      "targetTime": 48.25114081042924
     },
     {
       "name": "artihmetic",
-      "targetTime": 79.6066219272336
+      "targetTime": 65.04748052740298
     },
     {
       "name": "memory",
-      "targetTime": 91.88317276769905
+      "targetTime": 70.50346863180366
     },
     {
       "name": "retrive",
-      "targetTime": 96.96073979757571
+      "targetTime": 74.0942001863444
     },
     {
       "name": "next",
-      "targetTime": 105.23258406311872
+      "targetTime": 77.3863256376671
     }
   ],
   "seed": 1867632715

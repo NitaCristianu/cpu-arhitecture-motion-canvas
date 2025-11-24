@@ -43,7 +43,7 @@ export default class Scene3D extends Layout {
   public declare readonly camera: SimpleSignal<Camera | null, this>;
 
   public scene = new Scene();
-  public composer: EffectComposer;
+  public composer: EffectComposer | null = null;
 
   @initial(0x000)
   @signal()
@@ -53,6 +53,9 @@ export default class Scene3D extends Layout {
   private readonly context: WebGLRenderingContext;
   public onRender: RenderCallback;
   private composerInitialized = false;
+  private static sharedRenderer: WebGLRenderer | null = null;
+  private static sharedContext: WebGLRenderingContext | null = null;
+  private static rendererUsers = 0;
 
 
   public projectToScreen(point3D: Vector3): Vector2 {
@@ -77,14 +80,22 @@ export default class Scene3D extends Layout {
 
   public constructor({ onRender, ...props }: SceneProps) {
     super({ size: "100%", ...props });
-    this.renderer = new WebGLRenderer({
-      canvas: document.createElement("canvas"),
-      antialias: true,
-      alpha: true,
-      stencil: true,
-    });
+    if (Scene3D.sharedRenderer) {
+      this.renderer = Scene3D.sharedRenderer;
+      this.context = Scene3D.sharedContext!;
+    } else {
+      this.renderer = new WebGLRenderer({
+        canvas: document.createElement("canvas"),
+        antialias: true,
+        alpha: true,
+        stencil: true,
+      });
+      this.context = this.renderer.getContext() as WebGLRenderingContext;
+      Scene3D.sharedRenderer = this.renderer;
+      Scene3D.sharedContext = this.context;
+    }
+    Scene3D.rendererUsers += 1;
 
-    this.context = this.renderer.getContext();
     const fogColor = new Color(0x05060a);
     this.scene.fog = new FogExp2(fogColor, 0.02);
     this.scene.background = fogColor.clone();
@@ -95,7 +106,7 @@ export default class Scene3D extends Layout {
           this.initComposer(scene, camera, renderer);
           this.composerInitialized = true;
         }
-        this.composer.render();
+        this.composer?.render();
       });
       // this.scene.background = new Color(this.background());
   }
@@ -181,11 +192,24 @@ export default class Scene3D extends Layout {
     renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = SRGBColorSpace;
 
-    const targetWidth = Math.max(1, Math.round(size.width || 4096));
-    const targetHeight = Math.max(1, Math.round(size.height || 2048));
+    const fallbackWidth =
+      typeof window !== "undefined" && window.innerWidth
+        ? Math.min(window.innerWidth, 1920)
+        : 1920;
+    const fallbackHeight =
+      typeof window !== "undefined" && window.innerHeight
+        ? Math.min(window.innerHeight, 1080)
+        : 1080;
+
+    const targetWidth = Math.max(1, Math.round(size.width || fallbackWidth));
+    const targetHeight = Math.max(1, Math.round(size.height || fallbackHeight));
 
     renderer.setSize(targetWidth, targetHeight);
-    const pixelRatio = typeof window !== "undefined" && window.devicePixelRatio ? window.devicePixelRatio : 1;
+    const deviceRatio =
+      typeof window !== "undefined" && window.devicePixelRatio
+        ? window.devicePixelRatio
+        : 1;
+    const pixelRatio = Math.min(deviceRatio, 2);
     renderer.setPixelRatio(pixelRatio);
 
     return renderer;
@@ -193,5 +217,33 @@ export default class Scene3D extends Layout {
 
   public getCameraClass(): ThrashCamera {
     return this.findFirst((child) => child instanceof ThrashCamera) as any;
+  }
+
+  public override dispose(): void {
+    if (this.composer) {
+      this.composer.passes?.forEach((pass: any) => pass?.dispose?.());
+      this.composer.dispose?.();
+      this.composer = null;
+      this.composerInitialized = false;
+    }
+
+    if (Scene3D.rendererUsers > 0) {
+      Scene3D.rendererUsers -= 1;
+    }
+
+    if (Scene3D.rendererUsers === 0 && Scene3D.sharedRenderer) {
+      Scene3D.sharedRenderer.dispose();
+      const gl = Scene3D.sharedContext;
+      const loseContext = gl
+        ? (gl.getExtension("WEBGL_lose_context") as
+            | { loseContext?: () => void }
+            | null)
+        : null;
+      loseContext?.loseContext?.();
+      Scene3D.sharedRenderer = null;
+      Scene3D.sharedContext = null;
+    }
+
+    super.dispose();
   }
 }

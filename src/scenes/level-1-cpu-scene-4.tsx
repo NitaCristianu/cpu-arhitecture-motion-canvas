@@ -64,12 +64,12 @@ export default makeScene2D(function* (view: View2D) {
   const level1_cpu = buildCPULevel1(scene);
   const alu = new Model({
     src: "/models/Chips/ALU.glb",
-    localScale: new Vector3(0,0,0),
+    localScale: new Vector3(0, 0, 0),
     localPosition: level0_cpu.iu
       .getGlobalPosition()
       .add(new Vector3(0, 0, 0.1)),
     localRotation: new Vector3(0, 0, Math.PI / 2),
-    sceneRotation : new Vector3(0,0,-Math.PI/2)
+    sceneRotation: new Vector3(0, 0, -Math.PI / 2),
   });
   scene.add(alu);
 
@@ -150,15 +150,15 @@ export default makeScene2D(function* (view: View2D) {
       >
         1. Arithmetic ops support{" "}
       </Txt>
-        <Ray
-          fromX={-500}
-          toX={500}
-          stroke={'white'}
-          y={-150}
-          end={0}
-          lineWidth={3}
-          zIndex={2}
-        />
+      <Ray
+        fromX={-500}
+        toX={500}
+        stroke={"white"}
+        y={-150}
+        end={0}
+        lineWidth={3}
+        zIndex={2}
+      />
       <Txt
         zIndex={1}
         fill={"#ededed"}
@@ -199,13 +199,12 @@ export default makeScene2D(function* (view: View2D) {
   yield* waitUntil("list");
   yield* list.restore(1, easeOutCubic);
 
-  
   yield* waitUntil("addreses");
   yield* waitFor(0.5);
   yield* all(
     list.childAs<Txt>(1).opacity(0.5, 0.3),
     list.childAs<Txt>(4).opacity(0.5, 0.3),
-    list.childAs<Ray>(2).end(1,1),
+    list.childAs<Ray>(2).end(1, 1)
   );
   yield* all(camera.lookTo(level1_cpu.ram.getGlobalPosition(), 1));
 
@@ -216,11 +215,11 @@ export default makeScene2D(function* (view: View2D) {
         <Label3D
           scene={scene}
           worldPosition={level1_cpu.ram.getGlobalPosition()}
-          position={new Vector2(225, -59)}
-          text={address}
-          width={200*1.8}
+          position={new Vector2(-145, -44)}
+          text={"["+address+"]"}
+          width={200 * 1.8}
           fontSize={100}
-          height={75*1.8}
+          height={75 * 1.8}
           ignorePosition
         />
       ) as Label3D
@@ -237,7 +236,7 @@ export default makeScene2D(function* (view: View2D) {
         level1_cpu.wire_ir_cu.currentFlow(0.4, easeInSine, 100)
       ),
       chain(
-        addreses_lbls[i].position(new Vector2(-808, 738), 1),
+        addreses_lbls[i].position(new Vector2(-1121, 576), 1),
         addreses_lbls[i].popOut()
       )
     )
@@ -421,7 +420,7 @@ export default makeScene2D(function* (view: View2D) {
 
   yield* waitUntil("address");
   yield* all(ar_ref().fill("#0ff2", 1));
-  yield* waitFor(1);
+  yield* waitFor(2);
   yield* all(
     ar_ref()
       .findFirst((instance) => instance instanceof Txt)
@@ -452,6 +451,7 @@ export default makeScene2D(function* (view: View2D) {
     child.text("");
   });
   view.add(questions);
+  yield* waitFor(1.5);
   yield* all(
     black.opacity(1, 1),
     shader_background.opacity(0.2, 1),
@@ -593,7 +593,7 @@ export default makeScene2D(function* (view: View2D) {
     run(function* () {
       opcode.load(3), operand.load(3);
     }),
-    title.text("Here the operand (0101) represents the memory addres 0x03", 1)
+    title.text("Here the operand (0101) represents the memory address 0x03", 1)
   );
 
   yield* waitUntil("retrive");
@@ -602,6 +602,5 @@ export default makeScene2D(function* (view: View2D) {
     title.text("", 1)
   );
 
-  
   yield* waitUntil("next");
 });

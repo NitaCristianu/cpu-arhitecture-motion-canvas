@@ -19,91 +19,95 @@
     },
     {
       "name": "translator",
-      "targetTime": 20.630038061770534
+      "targetTime": 25.896962274370317
     },
     {
       "name": "CPU",
-      "targetTime": 23.030038061770533
+      "targetTime": 28.296962274370316
     },
     {
       "name": "registers",
-      "targetTime": 27.363018464781376
+      "targetTime": 37.45318815915205
     },
     {
       "name": "restore",
-      "targetTime": 31.40618735207922
+      "targetTime": 50.69034736777862
     },
     {
       "name": "code",
-      "targetTime": 34.00759350830991
+      "targetTime": 62.534919422165395
     },
     {
       "name": "operands-intro",
-      "targetTime": 35.00759350830991
+      "targetTime": 63.534919422165395
     },
     {
       "name": "load-r0",
-      "targetTime": 35.60759350830991
+      "targetTime": 76.57934699670537
     },
     {
       "name": "imm-flag",
-      "targetTime": 37.20759350830991
+      "targetTime": 80.80983878828688
     },
     {
       "name": "imm-off",
-      "targetTime": 40.50759350830991
+      "targetTime": 86.96077900951312
     },
     {
       "name": "load-r1",
-      "targetTime": 41.91628942257414
+      "targetTime": 88.36947492377735
     },
     {
       "name": "memory",
-      "targetTime": 45.16554354379307
+      "targetTime": 91.97646042353021
     },
     {
       "name": "add-r0-r1",
-      "targetTime": 48.18614982251743
+      "targetTime": 105.51844642620424
     },
     {
       "name": "store-r0",
-      "targetTime": 50.757208813649605
+      "targetTime": 118.23209615459395
     },
     {
       "name": "where-modifiers",
-      "targetTime": 51.98591024044622
+      "targetTime": 126.64158135965904
     },
     {
       "name": "first-op",
-      "targetTime": 53.81228860452036
+      "targetTime": 129.63097743739948
     },
     {
       "name": "cmp-zero",
-      "targetTime": 62.52308815256458
+      "targetTime": 153.84269889294202
     },
     {
       "name": "alu",
-      "targetTime": 65.52308815256457
+      "targetTime": 167.91200491797474
+    },
+    {
+      "name": "back",
+      "targetTime": 177.94659381469793
     },
     {
       "name": "while-intro",
-      "targetTime": 69.89792043458412
+      "targetTime": 190.63444582754687
     },
     {
       "name": "loop-load",
-      "targetTime": 71.0715786753836
+      "targetTime": 195.12087776850402
     },
     {
       "name": "loop-end",
-      "targetTime": 74.37449411368483
+      "targetTime": 207.33726686571785
     },
     {
       "name": "restore0",
-      "targetTime": 75.97449411368483
+      "targetTime": 215.9830240227543
     },
     {
       "name": "next",
-      "targetTime": 82.95839977967373
+      "targetTime": 253.91515683984952
     }
   ],
   "seed": 3291741135

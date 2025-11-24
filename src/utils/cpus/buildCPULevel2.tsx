@@ -129,7 +129,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
     localPosition: alu
       .localPosition()
       .clone()
-      .add(new Vector3(0, -0.03, 0.017)),
+      .add(new Vector3(0.04, .005, 0.005)),
   });
 
   // Individual flag lights (Z, N, V, DZ) — smaller & brighter
@@ -142,7 +142,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
       emissive: FLAG_DEFS.Z.off,
     }),
     localScale: new Vector3(S * 0.12, S * 0.12, T * 0.6).multiplyScalar(0.5),
-    localPosition: new Vector3(-0.03, 0, 0),
+    localPosition: new Vector3(0,-0.021, 0),
   });
 
   const flag_N = new Sphere({
@@ -154,7 +154,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
       emissive: FLAG_DEFS.N.off,
     }),
     localScale: new Vector3(S * 0.12, S * 0.12, T * 0.6).multiplyScalar(0.5),
-    localPosition: new Vector3(-0.01, 0, 0),
+    localPosition: new Vector3(0,-0.007, 0),
   });
 
   const flag_V = new Sphere({
@@ -166,7 +166,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
       emissive: FLAG_DEFS.V.off,
     }),
     localScale: new Vector3(S * 0.12, S * 0.12, T * 0.6).multiplyScalar(0.5),
-    localPosition: new Vector3(0.01, 0, 0),
+    localPosition: new Vector3(0,0.007, 0),
   });
 
   const flag_DZ = new Sphere({
@@ -178,7 +178,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
       emissive: FLAG_DEFS.DZ.off,
     }),
     localScale: new Vector3(S * 0.12, S * 0.12, T * 0.6).multiplyScalar(0.5),
-    localPosition: new Vector3(0.03, 0, 0),
+    localPosition: new Vector3(0,0.021,  0),
   });
 
   const wire_cu_iu = (

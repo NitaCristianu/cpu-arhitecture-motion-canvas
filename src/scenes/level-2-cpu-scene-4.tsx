@@ -1049,9 +1049,9 @@ export default makeScene2D(function* (view) {
   yield* program.code.append(explination_string_raw, 1);
   yield* program.selection(lines(12, 15), 1);
   yield* program.selection(word(14, 15, 12), 0.5);
-  yield* waitFor(0.5);
-
+  
   yield* program.selection(DEFAULT, 0.5);
+  yield* waitFor(2.5);
   yield* program.code.remove(lines(11, 15), 1);
 
   yield* waitUntil("cmp-zero");
@@ -1071,8 +1071,9 @@ export default makeScene2D(function* (view) {
   yield* sequence(0.1, flags[0](1, 0.5), flags[1](1, 0.5));
   yield* waitFor(1);
   
-  yield* waitUntil("while-intro");
+  yield* waitUntil("back");
   yield* toggleWindowMode(programwindow);
+  yield* waitUntil("while-intro");
   yield* appendLine("\n; While loop:");
 
   yield program.y(-500, 1);

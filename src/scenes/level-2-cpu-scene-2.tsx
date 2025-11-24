@@ -46,7 +46,7 @@ import {
   waitUntil,
 } from "@motion-canvas/core";
 import { RAM_SCALE } from "../utils/cpus/buildCPULevel0";
-import { Layers, Vector3 } from "three";
+import { Layers, MeshBasicMaterial, Vector3 } from "three";
 import { Label3D } from "../components/Label3D";
 import { buildCPULevel1 } from "../utils/cpus/buildCPULevel1";
 import { Glass } from "../components/GlassRect";
@@ -56,6 +56,8 @@ import { Switch } from "../components/switch";
 import { Bitnumber } from "../utils/bitnumber";
 import { AsmHighlighter } from "../utils/AsmHighlighter";
 import COLORS from "../utils/colors";
+import * as THREE from "three";
+import { GlowPanelTitle } from "../components/TextPresets";
 
 const PROGRAM = CODE`\
 ; Program: Calculate (3 + 5) * 2, then decrement to 10
@@ -105,7 +107,7 @@ export default makeScene2D(function* (view) {
     level2_cpu.flags.DZ,
   ];
   yield* all(...flags.map((flag) => flag.moveDOWN(5, 0)));
-  yield* all(...flags.map((flag) => flag.moveForward(0.1, 0)));
+  yield* all(...flags.map((flag) => flag.moveBack(-0.075, 0)));
   yield* all(level1_cpu.group.popIn(0), level1_cpu.ram.popIn(0, RAM_SCALE));
   yield* level1_cpu.initWires(level1_cpu.wires, 0);
 
@@ -170,7 +172,76 @@ export default makeScene2D(function* (view) {
     )
   );
 
+  yield* waitUntil("CU need");
+  const bits = range(4).map(
+    (i) =>
+      (
+        <Bitnumber
+          number={0}
+          bits={1}
+          position={new Vector2(-370, 304)
+            .add(new Vector2(289, -418))
+            .mul(i)
+            .add([508, -91])}
+        />
+      ) as Bitnumber
+  );
+  const title = (
+    <GlowPanelTitle
+      scale={0}
+      bottom={() => bits[0].top().add(-20).addX(300)}
+      fontSize={120}
+    >
+      ALU FLAGS
+    </GlowPanelTitle>
+  ) as GlowPanelTitle;
+  view.add(title);
+
+  bits.forEach((b, i) => {
+    b.childAs<Rect>(2).fill(
+      new Color(FLAG_DEFS[["Z", "N", "V", "DZ"][i] as "Z"].on).alpha(0.1)
+    );
+    b.childAs<Rect>(2).shadowColor(
+      new Color(FLAG_DEFS[["Z", "N", "V", "DZ"][i] as "Z"].on).alpha(0.1)
+    );
+    b.childAs<Rect>(2).shadowBlur(20);
+  });
+  view.add(bits);
+  yield* camera.lookTo(level1_cpu.alu.getGlobalPosition(), 1);
+  generator.nextInt(0, 2);
+  generator.nextInt(0, 2);
+  generator.nextInt(0, 2);
+  yield sequence(
+    0.05,
+    ...bits.map((b, i) =>
+      chain(b.pop(), all(b.scale(2, 1), b.position([-1600 + i * 350, 500], 1)))
+    ),
+    title.popIn(),
+    loop(4, (i) =>
+      run(function* () {
+        const modifer = range(4).map((i) => generator.nextInt(0, 2));
+        yield* level2_cpu.flags.clearAll();
+        modifer.forEach((v, i) => (v == 1 ? bits[i].load(1) : bits[i].load(2)));
+        yield* all(
+          ...modifer.map((v, i) =>
+            v == 0
+              ? level2_cpu.flags.clear(["Z", "N", "V", "DZ"][i] as "Z")
+              : level2_cpu.flags.set(["Z", "N", "V", "DZ"][i] as "Z")
+          )
+        );
+        yield* waitFor(1);
+      })
+    )
+  );
+  yield* level1_cpu.wire_cu_iu.currentFlow();
+
   yield* waitUntil("GPR");
+  yield all(
+    title.x(title.x()-2000, 1),
+     ...bits.map((b, i) =>
+     b.position([-1600 + i * 350 - 2000, 500], 1)
+    ),
+  )
   const vr_ref = createRef<Glass>();
   const ar_ref = createRef<Glass>();
   const registers = createRefArray<Glass>();
@@ -369,7 +440,7 @@ export default makeScene2D(function* (view) {
           var newI = i;
           if (i == 0) newI = 1;
           if (i == 1) newI = 0;
-          var x = newI < 3 ? -800 : +800; 
+          var x = newI < 3 ? -800 : +800;
           var y = (newI % 3) * 300 - 600 / 2;
 
           return center.add([x, y]);

@@ -7,23 +7,23 @@
     },
     {
       "name": "list",
-      "targetTime": 4.449862165849896
+      "targetTime": 1.6494691184603252
     },
     {
       "name": "clock",
-      "targetTime": 27.5634897041038
+      "targetTime": 20.59675092970552
     },
     {
       "name": "tick",
-      "targetTime": 29.5634897041038
+      "targetTime": 24.896750929705522
     },
     {
       "name": "lookat",
-      "targetTime": 29.5634897041038
+      "targetTime": 24.896750929705522
     },
     {
       "name": "next",
-      "targetTime": 39.32311481767899
+      "targetTime": 30.896750929705522
     }
   ],
   "seed": 1986641649

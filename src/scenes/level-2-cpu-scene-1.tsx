@@ -47,7 +47,7 @@ import { Switch } from "../components/switch";
 import { Bitnumber } from "../utils/bitnumber";
 import { AsmHighlighter } from "../utils/AsmHighlighter";
 
-export default   makeScene2D(function* (view) {
+export default makeScene2D(function* (view) {
   const generator = useRandom(3);
 
   const scene = createScene(new Vector3(-1.5, 0.6, 1.2));
@@ -85,6 +85,10 @@ export default   makeScene2D(function* (view) {
   ]);
 
   yield* waitUntil("activate");
+  yield camera.moveTo(
+    camera.localPosition().clone().add(new Vector3(0.2, -0.3, -1)),
+    5
+  );
   yield loop(4, () =>
     sequence(
       0.15,
@@ -128,7 +132,9 @@ export default   makeScene2D(function* (view) {
         <Label3D
           scene={scene}
           worldPosition={level2_cpu.ram.getGlobalPosition()}
-          position={new Vector2(1054, -418)}
+          position={scene
+            .projectToScreen(level2_cpu.ram.getGlobalPosition())
+            .add(new Vector2(-10200, -6000))}
           text={instr}
           width={instr.length * 30 * 1.8 + 100}
           fontSize={100}
@@ -144,7 +150,12 @@ export default   makeScene2D(function* (view) {
       all(
         instructions_lbls[i].popIn(),
         chain(
-          instructions_lbls[i].position(new Vector2(-40, 328), 1),
+          instructions_lbls[i].position(
+            scene
+              .projectToScreen(level2_cpu.cu.getGlobalPosition())
+              .add(new Vector2(-6400, -5000)),
+            1
+          ),
           instructions_lbls[i].popOut()
         )
       )
@@ -270,7 +281,7 @@ export default   makeScene2D(function* (view) {
     1
   );
   yield* sequence(0.3, ...labels.map((label) => label.popIn()));
-  yield* waitFor(0.8);
+  yield* waitUntil("what happen");
   yield* sequence(
     0.25,
     ...labels.map((label, i) =>
@@ -286,7 +297,7 @@ export default   makeScene2D(function* (view) {
   );
   // Emphasize results and slide them into their slots smoothly
   yield* sequence(
-    0.25,
+    .25,
     ...labels.map((label, i) =>
       all(
         // Smooth slide to target with gentle overshoot feel
@@ -316,8 +327,33 @@ export default   makeScene2D(function* (view) {
     )
   );
   // Gentle bounce to add life, then settle
+  yield* waitUntil("zero");
+  yield* all(
+    chain(
+      labels_results[0].y(40, 0.45, easeOutCubic),
+      labels_results[0].y(0, 0.55, easeInOutCirc)
+    ),
+    chain(
+      labels_results_glow[0].y(40, 0.45, easeOutCubic),
+      labels_results_glow[0].y(0, 0.55, easeInOutCirc)
+    )
+  );
+
+  yield* waitUntil("negative");
+  yield* all(
+    chain(
+      labels_results[1].y(40, 0.45, easeOutCubic),
+      labels_results[1].y(0, 0.55, easeInOutCirc)
+    ),
+    chain(
+      labels_results_glow[1].y(40, 0.45, easeOutCubic),
+      labels_results_glow[1].y(0, 0.55, easeInOutCirc)
+    )
+  );
+
+  yield* waitUntil("overflow");
   yield* sequence(
-    0.2,
+    0.1,
     ...labels_results.map((label, i) =>
       all(
         chain(
@@ -331,6 +367,20 @@ export default   makeScene2D(function* (view) {
       )
     )
   );
+
+  yield* waitUntil("d z");
+  yield* all(
+    chain(
+      labels_results[2].y(40, 0.45, easeOutCubic),
+      labels_results[2].y(0, 0.55, easeInOutCirc)
+    ),
+    chain(
+      labels_results_glow[2].y(40, 0.45, easeOutCubic),
+      labels_results_glow[2].y(0, 0.55, easeInOutCirc)
+    )
+  );
+
+  yield* waitUntil("loops");
   const shaderBackground = <ShaderBackground preset="ocean" opacity={0.3} />;
   overlay.add(shaderBackground);
   // Converge to center and fade down scale smoothly
@@ -485,6 +535,7 @@ export default   makeScene2D(function* (view) {
     lightbulbs.scale(1, 1, easeOutCubic),
     lightbulbs.x(0, 1, easeOutBack)
   );
+  yield* waitUntil("Z");
   yield* all(
     ...lightbulbs.children().map((bulb, i) => {
       if (i > 0) {
@@ -610,7 +661,7 @@ DIV 0 ; raises flag`,
     ),
     code.height(320, 1),
     code.childAs<Code>(0).x(-260, 1),
-    code.y(code.y()+100, 1),
+    code.y(code.y() + 100, 1),
     subtitle.y(subtitle.y() - 100, 1),
     subtitle.x(subtitle.x() - 400, 1),
     subtitle.text(flagData[3].scope, 1),
@@ -619,18 +670,19 @@ DIV 0 ; raises flag`,
       bitnumber.load(32);
     })
   );
-  yield code.childAs<Code>(0).selection(lines(0,1), 1);
-  yield* all(
-    sw.toggle(1),
-  );
-  yield* waitFor(.7);
-  yield code.childAs<Code>(0).code(`\
+  yield code.childAs<Code>(0).selection(lines(0, 1), 1);
+  yield* all(sw.toggle(1));
+  yield* waitFor(0.7);
+  yield code.childAs<Code>(0).code(
+    `\
 LOAD 1011 ; load something
-DIV 2`, .6);
+DIV 2`,
+    0.6
+  );
   yield* all(
     sw.toggle(1),
     run(function* () {
-      bitnumber.load(32/2);
+      bitnumber.load(32 / 2);
     })
   );
 

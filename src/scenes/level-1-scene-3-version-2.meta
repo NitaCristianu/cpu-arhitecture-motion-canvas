@@ -1,0 +1,118 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "start",
+      "targetTime": 0
+    },
+    {
+      "name": "the first",
+      "targetTime": 2.9038104464407724
+    },
+    {
+      "name": "single chip",
+      "targetTime": 4.119837000731216
+    },
+    {
+      "name": "internaly",
+      "targetTime": 6.1829060115717525
+    },
+    {
+      "name": "table",
+      "targetTime": 10.412128015075714
+    },
+    {
+      "name": "4bit",
+      "targetTime": 14.83454820650124
+    },
+    {
+      "name": "functions",
+      "targetTime": 17.284548206501245
+    },
+    {
+      "name": "operations",
+      "targetTime": 20.545781475887367
+    },
+    {
+      "name": "addition",
+      "targetTime": 23.10293416680166
+    },
+    {
+      "name": "subtraction",
+      "targetTime": 24.10293416680166
+    },
+    {
+      "name": "exit",
+      "targetTime": 26.650343628780348
+    },
+    {
+      "name": "restore",
+      "targetTime": 28.901809139332485
+    },
+    {
+      "name": "bananalogic",
+      "targetTime": 37.21787750251754
+    },
+    {
+      "name": "data",
+      "targetTime": 43.03816118903632
+    },
+    {
+      "name": "8bit",
+      "targetTime": 47.859414486152254
+    },
+    {
+      "name": "mul",
+      "targetTime": 49.01817608002127
+    },
+    {
+      "name": "show title",
+      "targetTime": 53.08098493700388
+    },
+    {
+      "name": "transition",
+      "targetTime": 55.08098493700388
+    },
+    {
+      "name": "sub",
+      "targetTime": 64.8953590730883
+    },
+    {
+      "name": "signed bit",
+      "targetTime": 74.0728533486607
+    },
+    {
+      "name": "indicates",
+      "targetTime": 77.75676899279672
+    },
+    {
+      "name": "examples",
+      "targetTime": 78.75676899279672
+    },
+    {
+      "name": "other numbers",
+      "targetTime": 85.89317903244934
+    },
+    {
+      "name": "~bits",
+      "targetTime": 88.73805367440278
+    },
+    {
+      "name": "+1",
+      "targetTime": 90.53468114681564
+    },
+    {
+      "name": "with 3",
+      "targetTime": 95.773110283591
+    },
+    {
+      "name": "solve",
+      "targetTime": 97.93184115255514
+    },
+    {
+      "name": "next",
+      "targetTime": 101.6244287265947
+    }
+  ],
+  "seed": 2706752400
+}

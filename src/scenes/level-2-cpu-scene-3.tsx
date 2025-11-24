@@ -408,7 +408,7 @@ export default makeScene2D(function* (view) {
   ] as PossibleVector2[];
 
   const opcodeHigh = bitgroups[0]!;
-  
+
   const opcodeLow = bitgroups[1]!;
 
   const modifiers = bitgroups[2]!;
@@ -588,18 +588,19 @@ export default makeScene2D(function* (view) {
       ...panes.map((pane) => pane.scale(1, 0.8, easeOutBack))
     );
 
-    yield* waitFor(2);
 
-    yield* all(...panes.map((pane) => pane.scale(0, 0.4, easeInCubic)));
-
-    panes.forEach((pane) => pane.remove());
-
-    yield* cleanup();
+    return function* () {
+      yield* all(
+        ...panes.map((pane) =>
+          pane.scale(0, 0.4, easeInCubic).do(() => pane.remove())
+        )
+      );
+    };
   };
 
   yield* waitUntil("modifier-m");
 
-  yield* presentModifier({
+  const cleanM = yield* presentModifier({
     index: 0,
 
     color: "#fb923c",
@@ -627,8 +628,8 @@ ADD R0, #1`,
   });
 
   yield* waitUntil("modifier-destination");
-
-  yield* presentModifier({
+  yield cleanM();
+  const cleanD = yield* presentModifier({
     index: 1,
 
     color: "#38bdf8",
@@ -657,7 +658,8 @@ STORE R0, [0x00f]`,
 
   yield* waitUntil("modifier-jump");
 
-  yield* presentModifier({
+  yield cleanD();
+  const cleanJ = yield* presentModifier({
     index: 2,
 
     color: "#a855f7",
@@ -684,8 +686,9 @@ JMP #0x40\n; branch to address 0x40`,
   });
 
   yield* waitUntil("modifier-condition");
+  yield cleanJ();
 
-  yield* presentModifier({
+  const cleanC = yield* presentModifier({
     index: 3,
 
     color: "#f472b6",
@@ -713,6 +716,7 @@ GRT0 R4, [0xf0]`,
   });
 
   yield* waitUntil("next");
+  yield cleanC();
 
   yield* all(
     glass_info.x(-3000, 0.8, easeInCubic),

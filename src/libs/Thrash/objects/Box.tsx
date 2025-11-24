@@ -16,11 +16,13 @@ export default class Box extends Mesh {
     this.InitMesh();
 
     // Apply transform after mesh creation
-    this.core.position.copy(this.localPosition());
-    this.core.scale.copy(this.localScale());
+    if (props.localPosition) this.core.position.copy(props.localPosition);
+    if (props.localScale) this.core.scale.copy(props.localScale);
 
-    const rot = this.localRotation();
-    this.core.rotation.set(rot.x, rot.y, rot.z);
+    if (props.localRotation){
+      const rot = props.localRotation;
+      this.core.rotation.set(rot.x, rot.y, rot.z);
+    }
   }
 
   public override InitMesh(): void {
