@@ -2,6 +2,7 @@
 node_modules
 output
 dist
+src/assets/audio/
 
 # Editor directories and files
 .vscode/*
