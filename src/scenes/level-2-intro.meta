@@ -1,0 +1,14 @@
+{
+  "version": 0,
+  "timeEvents": [
+    {
+      "name": "begin",
+      "targetTime": 0.19068493150684931
+    },
+    {
+      "name": "next",
+      "targetTime": 5.355689497716895
+    }
+  ],
+  "seed": 140656046
+}

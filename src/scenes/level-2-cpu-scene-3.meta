@@ -50,8 +50,12 @@
       "targetTime": 64.84602491426041
     },
     {
+      "name": "cleanup",
+      "targetTime": 72.39437184848326
+    },
+    {
       "name": "next",
-      "targetTime": 89.28962732955189
+      "targetTime": 91.86178967642465
     }
   ],
   "seed": 1481779856

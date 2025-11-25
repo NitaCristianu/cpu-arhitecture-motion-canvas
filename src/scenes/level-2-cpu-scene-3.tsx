@@ -34,6 +34,29 @@ import { ShaderBackground } from "../components/background";
 import { Bitnumber } from "../utils/bitnumber";
 import { Glass } from "../components/GlassRect";
 import { AsmHighlighter } from "../utils/AsmHighlighter";
+import { GlowPanelTitle } from "../components/TextPresets";
+
+const code_samples: [string, [0 | 1, 0 | 1, 0 | 1, 0 | 1]][] = [
+  // 0. No modifiers
+  ["ADD R0, R1", [0, 0, 0, 0]],
+
+  // 1. Immediate mode (M)
+  ["ADD R0, #1", [1, 0, 0, 0]],
+  ["LOAD R0, [0x0a]", [1, 0, 0, 0]],
+
+  // 2. Destination to memory (D)
+  ["STORE R3, [0x02]", [0, 1, 0, 0]],
+  ["ADD [0x10], R1", [0, 1, 0, 0]], // ALU result written to memory
+
+  // 3. Jump (J)
+  ["JMP [0x20]", [1, 0, 1, 0]], // jump to address in memory
+
+  // 5. Conditional jump (J + C)
+  ["GRT0 R4, [0xf0]", [1, 0, 1, 1]], // jump if last result > 0
+  ["JEQ  [0x30]", [1, 0, 1, 1]], // classic “jump if equal”
+
+];
+
 export default makeScene2D(function* (view) {
   view.fill("#010a1b");
 
@@ -588,7 +611,6 @@ export default makeScene2D(function* (view) {
       ...panes.map((pane) => pane.scale(1, 0.8, easeOutBack))
     );
 
-
     return function* () {
       yield* all(
         ...panes.map((pane) =>
@@ -715,18 +737,129 @@ GRT0 R4, [0xf0]`,
     ],
   });
 
-  yield* waitUntil("next");
+  yield* waitUntil("cleanup");
   yield cleanC();
 
-  yield* all(
-    glass_info.x(-3000, 0.8, easeInCubic),
-
-    info_icon.scale(0, 0.5, easeInCubic),
-
-    modifiers.position(positions[2], 0.6, easeInOutBack),
-
-    modifiers.scale(1.6, 0.6, easeInOutBack),
-
-    ...otherGroups.map((group) => group.opacity(1, 0.6))
+  const code_panel = (
+    <Glass
+      zIndex={5}
+      size={[1550, 220]}
+      position={[-900, 0]}
+      scale={0}
+      translucency={1}
+      borderModifier={-1}
+    >
+      <Code
+        zIndex={1}
+        fontSize={80}
+        width={1550}
+        textAlign={"left"}
+        height={600}
+        highlighter={new AsmHighlighter()}
+        code={`hello world`}
+      ></Code>
+    </Glass>
+  ) as Glass;
+  const ray = (
+    <Ray
+      from={() => code_panel.right()}
+      to={() => modifiers.left().addX(200)}
+      lineDash={[20, 20]}
+      startOffset={50}
+      stroke={"white"}
+      shadowBlur={20}
+      shadowColor={"#fff5"}
+      end={0}
+      zIndex={10}
+      lineWidth={5}
+      endArrow
+    ></Ray>
+  ) as Ray;
+  const compiler = (
+    <GlowPanelTitle
+      text={"COMPILER"}
+      fontWeight={400}
+      fontSize={90}
+      scale={ray.end}
+      opacity={0.7}
+      position={() => {
+        const p = ray.getPointAtPercentage(0.5);
+        return p.position.add(p.normal.mul(-80));
+      }}
+    />
   );
+  const refresh = (
+    <Icon
+      icon={"mdi:refresh"}
+      opacity={0.7}
+      size={150}
+      color={"white"}
+      position={() => {
+        const p = ray.getPointAtPercentage(0.5);
+        return p.position.add(p.normal.mul(100));
+      }}
+    />
+  ) as Icon;
+
+  view.add(refresh);
+  view.add(compiler);
+  view.add(ray);
+  view.add(code_panel);
+
+  yield* all(
+    glass_info.x(-3000, 0.8),
+    info_icon.scale(0, 1),
+    modifiers.position([900, 0], 2),
+    title.y(title.y() - 500, 1),
+    modifiers.scale(2.4, 0.6),
+    code_panel.scale(1, 2),
+    ...otherGroups.map((group) => group.opacity(0, 0.6))
+  );
+  yield ray.end(1, 2);
+  yield* all(code_panel.width(1000, 1), code_panel.x(code_panel.x() - 300, 1));
+  yield loop((i) =>
+    run(function* () {
+      const code = code_panel.childAs<Code>(0);
+      const [sample, modifiers_bits] = code_samples[i % code_samples.length];
+      const colors = ["#fb923c", "38bdf8", "#a855f7", "#f472b6"];
+
+      const bitRects = modifiers.boxes;
+      const selected = bitRects.filter((b, i) => modifiers_bits[i] == 1);
+      const otherBoxes = bitRects.filter((b, i) => modifiers_bits[i] == 0);
+      const selectedColors = colors.filter((c, i) => modifiers_bits[i] == 1);
+
+      modifiers.load(
+        Math.pow(2, 3) * modifiers_bits[0] +
+          Math.pow(2, 2) * modifiers_bits[1] +
+          Math.pow(2, 1) * modifiers_bits[2] +
+          modifiers_bits[3],
+        0.1
+      );
+      yield* all(
+        code.code(sample, 0.2),
+        code_panel.scale(1.1, 0.25).back(0.25),
+        refresh.rotation(refresh.rotation() + 360,1,easeInOutBack),
+        ...selected.map((s, i) =>
+          all(
+            s.fill(new Color(selectedColors[i]).alpha(0.3), 0.4, easeOutCubic),
+
+            s.shadowBlur(90, 0.4, easeOutCubic),
+
+            s.shadowColor(
+              new Color(selectedColors[i]).alpha(0.9),
+              0.4,
+              easeOutCubic
+            ),
+
+            s.opacity(1, 0.4, easeOutCubic)
+          )
+        ),
+        
+        ...otherBoxes.map((box, idx) => box.opacity(0.4, 0.5, easeOutCubic))
+      );
+      yield* waitFor(0.5);
+    })
+  );
+
+  yield* waitUntil("next");
 });
