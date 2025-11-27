@@ -60,9 +60,9 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
   const alu = new Model({
     key: "level_2 ALU",
     src: "/models/Chips/ALU.glb",
-    localScale: new Vector3(L, T * 2, H),
+    localScale: new Vector3(L, T * 4, H),
     localRotation: new Vector3(Math.PI / 2, 0, 0),
-    localPosition: new Vector3(0.0, -0.05, 0),
+    localPosition: new Vector3(0.0, -0.05, 0.02),
   });
 
   const ir = new Box({
@@ -197,7 +197,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
         alu
           .localPosition()
           .clone()
-          .add(new Vector3(-alu.localScale().x / 2, 0, 0)),
+          .add(new Vector3(-alu.localScale().x / 4, 0, 0)),
       ]}
       lineWidth={0}
       color="decoder"
@@ -212,7 +212,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
         alu
           .localPosition()
           .clone()
-          .add(new Vector3(alu.localScale().x / 2, 0, 0)),
+          .add(new Vector3(alu.localScale().x / 8, 0, 0)),
         alu
           .localPosition()
           .clone()
@@ -278,16 +278,13 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
   const wire_clock_cu = (
     <Line
       points={[
-        clock.localPosition().clone().add(new Vector3(0, 0, 0)),
+        clock.localPosition().clone().add(new Vector3(0, 0, -0.05)),
         clock
           .localPosition()
           .clone()
           .lerp(cu.localPosition(), 0.5)
           .add(new Vector3(-0.06, 0.01, 0.005)),
-        cu
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, 0, -cu.localScale().z / 2)),
+        cu.localPosition().clone(),
       ]}
       lineWidth={0}
       color="control"
@@ -299,10 +296,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
   const wire_gpr_mc = (
     <Line
       points={[
-        gpr
-          .localPosition()
-          .clone()
-          .add(new Vector3(0.01 , -0.04,0)),
+        gpr.localPosition().clone().add(new Vector3(0, 0, -0.05)),
         gpr
           .localPosition()
           .clone()
@@ -337,7 +331,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
         alu
           .localPosition()
           .clone()
-          .add(new Vector3(0, alu.localScale().y / 2, 0.01)),
+          .add(new Vector3(0, alu.localScale().y / 2 + 0.025, 0)),
       ]}
       lineWidth={0}
       color="register"
@@ -350,10 +344,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
     <Line
       points={[
         // exit CU on the right
-        cu
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, cu.localScale().y / 2 - 0.13, 0)),
+        cu.localPosition().clone(),
         // go above ALU
         cu.localPosition().clone().add(new Vector3(0, -0.15, 0)),
 
@@ -399,10 +390,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
     <Line
       points={[
         // exit MC at the top
-        mc
-          .localPosition()
-          .clone()
-          .add(new Vector3(0, mc.localScale().y / 2, 0)),
+        mc.localPosition().clone().add(new Vector3(0, 0)),
         // hug top-right corner of CPU base, then traverse the top edge
         cpu_base
           .localPosition()
@@ -410,7 +398,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
           .add(
             new Vector3(
               cpu_base.localScale().x / 2 - 0.25,
-              cpu_base.localScale().y / 2 - 0.02,
+              cpu_base.localScale().y / 2 - 0.06,
               0.06
             )
           ),
@@ -419,8 +407,8 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
           .clone()
           .add(
             new Vector3(
-              -cpu_base.localScale().x / 2 + 0.2,
-              cpu_base.localScale().y / 2 - 0.09,
+              -cpu_base.localScale().x / 2 + 0.3,
+              cpu_base.localScale().y / 2 - 0.03,
               0.07
             )
           ),
@@ -428,7 +416,7 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
         ir
           .localPosition()
           .clone()
-        .add(new Vector3(.03,0, 0)),
+          .add(new Vector3(0, ir.localScale().x / 2 - 0.02, 0)),
       ]}
       lineWidth={0}
       color="busData"
@@ -452,7 +440,6 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
         decode
           .localPosition()
           .clone()
-          .add(new Vector3(-decode.localScale().x / 2, 0, 0)),
       ]}
       lineWidth={0}
       color="busData"
@@ -464,16 +451,15 @@ export function buildCPULevel2(scene: Scene3D, addToScene: boolean = true) {
   const wire_decode_cu = (
     <Line
       points={[
-        decode.localPosition().clone().add(new Vector3(0, 0, 0)),
+        decode.localPosition().clone().add(new Vector3(0, -0.02, 0)),
         decode
           .localPosition()
           .clone()
           .lerp(cu.localPosition(), 0.5)
-          .add(new Vector3(0.02, 0.01, 0.01)),
+          .add(new Vector3(0.02, 0.00, 0.02)),
         cu
           .localPosition()
           .clone()
-          .add(new Vector3(0, cu.localScale().y / 2, 0.01)),
       ]}
       lineWidth={0}
       color="control"

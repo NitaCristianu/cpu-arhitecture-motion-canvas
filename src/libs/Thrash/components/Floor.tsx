@@ -99,7 +99,7 @@ vec3 blur(sampler2D sp, vec2 uv, vec2 scale) {
 
 float blendOverlay(float base, float blend) {
     return (base < 0.5)
-        ? (10.0 * base * blend)
+        ? (20.0 * base * blend)
         : (1.0 - 2.0 * (1.0 - base) * (1.0 - blend));
 }
 
@@ -120,7 +120,7 @@ void main() {
     vec3 blurred = blur(tDiffuse, uv, ps);
     vec3 blended = blendOverlay(blurred, color);
 
-    gl_FragColor = vec4(blended, .4); // transparent reflection
+    gl_FragColor = vec4(blended, .1); // transparent reflection
 
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -128,7 +128,7 @@ void main() {
 
   `;
       shader.uniforms.blurAmount = { value: 1 / 700 };
-      shader.uniforms.color = { value: new Color(0.3, 0.3, 0.3) }; // white = no tint
+      shader.uniforms.color = { value: new Color(0.1, 0.1, 0.1) }; // white = no tint
     };
 
     parent.add(this.tint);

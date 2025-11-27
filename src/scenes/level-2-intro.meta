@@ -6,8 +6,28 @@
       "targetTime": 0.19068493150684931
     },
     {
+      "name": "level 1 CPU",
+      "targetTime": 6.760684931506826
+    },
+    {
+      "name": "dissapear labels",
+      "targetTime": 13.921806426546983
+    },
+    {
+      "name": "level 2 CPU",
+      "targetTime": 19.527554891936923
+    },
+    {
+      "name": "support list",
+      "targetTime": 21.941422133926263
+    },
+    {
+      "name": "code panel",
+      "targetTime": 25.13771353946799
+    },
+    {
       "name": "next",
-      "targetTime": 5.355689497716895
+      "targetTime": 34.220861979752996
     }
   ],
   "seed": 140656046
